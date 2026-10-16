@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum StatusVerifikasi {
+  PENDING
+  VALID
+  INVALID
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  nama      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  pendaftaran Pendaftaran?
+}
+
+model Pendaftaran {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+  nisn         String   @unique
+  nik          String
+  jurusan      String
+  status       StatusVerifikasi @default(PENDING)
+  createdAt    DateTime @default(now())
+
+  dokumen      Dokumen[]
+}
+
+model Dokumen {
+  id            String           @id @default(uuid())
+  pendaftaranId String
+  pendaftaran   Pendaftaran      @relation(fields: [pendaftaranId], references: [id])
+  jenisDokumen  String           // contoh: KTP, KK, Ijazah
+  fileUrl       String
+  hasiltEkstraksi String?        // Teks hasil OCR dari Python AI
+  status        StatusVerifikasi @default(PENDING)
+  createdAt     DateTime         @default(now())
+}
