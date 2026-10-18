@@ -26,3 +26,71 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Smooth Blit & Floating Glowing Graphics */
+@keyframes blit-float-1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate(30px, -40px) scale(1.12);
+    opacity: 0.75;
+  }
+}
+
+@keyframes blit-float-2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translate(-35px, 35px) scale(0.92);
+    opacity: 0.7;
+  }
+}
+
+@keyframes blit-float-3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translate(25px, 25px) scale(1.08);
+    opacity: 0.75;
+  }
+  66% {
+    transform: translate(-25px, 15px) scale(0.95);
+    opacity: 0.4;
+  }
+}
+
+@keyframes blit-pulse-smooth {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.08);
+  }
+}
+
+.animate-blit-float-1 {
+  animation: blit-float-1 9s ease-in-out infinite;
+}
+.animate-blit-float-2 {
+  animation: blit-float-2 12s ease-in-out infinite;
+}
+.animate-blit-float-3 {
+  animation: blit-float-3 15s ease-in-out infinite;
+}
+.animate-blit-pulse {
+  animation: blit-pulse-smooth 4.5s ease-in-out infinite;
+}
+.animate-blit-pulse-delay-1 {
+  animation: blit-pulse-smooth 5s ease-in-out infinite 1.5s;
+}
+.animate-blit-pulse-delay-2 {
+  animation: blit-pulse-smooth 6s ease-in-out infinite 3s;
+}
+

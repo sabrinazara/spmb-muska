@@ -149,8 +149,15 @@ export default function DashboardBeranda() {
                     </div>
                 </div>
 
-                <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-8 translate-y-8 text-9xl font-black">
-                    MUSKA
+                {/* Responsive Official School Emblem Watermark */}
+                <div className="absolute -right-4 -bottom-4 sm:right-6 sm:top-1/2 sm:-translate-y-1/2 opacity-20 sm:opacity-25 pointer-events-none select-none">
+                    <div className="w-28 h-28 sm:w-44 sm:h-44 md:w-52 md:h-52 lg:w-60 lg:h-60 filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.35)]">
+                        <img
+                            src="/logo.png"
+                            alt="Logo SMK Muhammadiyah Sekampung"
+                            className="w-full h-full object-contain"
+                        />
+                    </div>
                 </div>
             </div>
 

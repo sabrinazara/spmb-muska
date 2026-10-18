@@ -1,8 +1,70 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Sun, Moon, AlertCircle, ArrowRight, Loader2, ShieldCheck } from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
+
+function AnimatedBlitBackground({ isDark }: { isDark: boolean }) {
+    return (
+        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+            {/* Latar Belakang Gradien Induk */}
+            <div
+                className={`absolute inset-0 transition-colors duration-500 ${
+                    isDark
+                        ? 'bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950/40'
+                        : 'bg-gradient-to-br from-emerald-50/80 via-slate-50 to-amber-50/70'
+                }`}
+            />
+
+            {/* Pola Titik Grid Halus */}
+            <div
+                className={`absolute inset-0 opacity-[0.025] ${
+                    isDark ? 'invert' : ''
+                }`}
+                style={{
+                    backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
+                    backgroundSize: '24px 24px',
+                }}
+            />
+
+            {/* Bulat Blit 1: Ambient Glowing Blob Hijau Zamrud (Kiri Atas) */}
+            <div className="absolute -top-24 -left-24 w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-emerald-500/20 dark:bg-emerald-500/15 blur-3xl animate-blit-float-1" />
+
+            {/* Bulat Blit 2: Ambient Glowing Blob Emas / Amber (Kanan Bawah) */}
+            <div className="absolute -bottom-28 -right-20 w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-amber-400/20 dark:bg-amber-500/15 blur-3xl animate-blit-float-2" />
+
+            {/* Bulat Blit 3: Ambient Blob Teal / Cyan (Tengah Kiri) */}
+            <div className="absolute top-1/2 -left-20 w-64 h-64 rounded-full bg-teal-400/15 dark:bg-teal-500/10 blur-2xl animate-blit-float-3" />
+
+            {/* === KELOMPOK BULAT BLIT BERGERAK & KEDIP HALUS === */}
+            
+            {/* Bulat Blit A: Cincin Glowing Emerald (Melayang di kanan atas) */}
+            <div className="absolute top-20 right-10 sm:right-28 w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-emerald-500/40 dark:border-emerald-400/50 bg-emerald-500/10 dark:bg-emerald-400/20 backdrop-blur-xs shadow-lg shadow-emerald-500/20 animate-blit-float-1 flex items-center justify-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 dark:bg-emerald-300 animate-blit-pulse" />
+            </div>
+
+            {/* Bulat Blit B: Cincin Glowing Amber / Gold (Melayang di kiri bawah) */}
+            <div className="absolute bottom-24 left-8 sm:left-24 w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-amber-400/40 dark:border-amber-400/50 bg-amber-400/10 dark:bg-amber-400/20 backdrop-blur-xs shadow-lg shadow-amber-500/20 animate-blit-float-2 flex items-center justify-center">
+                <div className="w-3 h-3 rounded-full bg-amber-400 dark:bg-amber-300 animate-blit-pulse-delay-1" />
+            </div>
+
+            {/* Bulat Blit C: Cincin Halus Teal (Mengapung di kanan tengah) */}
+            <div className="absolute top-2/3 right-8 sm:right-20 w-12 h-12 rounded-full border border-teal-400/30 dark:border-teal-400/40 bg-teal-400/10 dark:bg-teal-400/15 animate-blit-float-3 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-teal-300 animate-blit-pulse-delay-2" />
+            </div>
+
+            {/* Bulat Blit D: Sparkle Kedip Smooth (Dekat Card Kiri) */}
+            <div className="absolute top-36 left-1/4 w-3.5 h-3.5 rounded-full bg-emerald-400/80 dark:bg-emerald-300/90 shadow-md shadow-emerald-400/50 animate-blit-pulse" />
+
+            {/* Bulat Blit E: Sparkle Kedip Smooth (Kanan Bawah Card) */}
+            <div className="absolute bottom-36 right-1/4 w-3 h-3 rounded-full bg-amber-400/80 dark:bg-amber-300/90 shadow-md shadow-amber-400/50 animate-blit-pulse-delay-2" />
+
+            {/* Bulat Blit F: Orbiting Mini Dot (Kiri Tengah) */}
+            <div className="absolute top-1/3 left-10 w-2 h-2 rounded-full bg-teal-400/80 dark:bg-teal-300 shadow-xs shadow-teal-400/40 animate-blit-pulse-delay-1" />
+        </div>
+    );
+}
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -10,6 +72,30 @@ export default function AdminLoginPage() {
     const [password, setPassword] = useState('password123');
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [isDark, setIsDark] = useState(true);
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('cms_theme');
+        if (savedTheme === 'light') {
+            setIsDark(false);
+            document.documentElement.classList.remove('dark');
+        } else {
+            setIsDark(true);
+            document.documentElement.classList.add('dark');
+        }
+    }, []);
+
+    const toggleTheme = () => {
+        const next = !isDark;
+        setIsDark(next);
+        if (next) {
+            localStorage.setItem('cms_theme', 'dark');
+            document.documentElement.classList.add('dark');
+        } else {
+            localStorage.setItem('cms_theme', 'light');
+            document.documentElement.classList.remove('dark');
+        }
+    };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -51,49 +137,71 @@ export default function AdminLoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 antialiased font-sans">
-            <div className="w-full max-w-md">
-                {/* Brand Header */}
+        <div className="relative min-h-screen flex items-center justify-center p-4 antialiased font-sans overflow-x-hidden">
+            {/* Background Grafis Bulat Blit Bergerak & Kedip Halus */}
+            <AnimatedBlitBackground isDark={isDark} />
+
+            {/* Tombol Minimalist Darkmode & Lightmode */}
+            <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-40">
+                <button
+                    onClick={toggleTheme}
+                    type="button"
+                    aria-label={isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode'}
+                    className="p-2.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-amber-300 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center group"
+                >
+                    {isDark ? (
+                        <Sun className="w-5 h-5 transition-transform duration-300 rotate-0 group-hover:rotate-45 text-amber-300" />
+                    ) : (
+                        <Moon className="w-5 h-5 transition-transform duration-300 rotate-0 group-hover:-rotate-12 text-slate-700" />
+                    )}
+                </button>
+            </div>
+
+            <div className="relative z-10 w-full max-w-md">
+                {/* Brand Header with Official School Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-800/90 border border-emerald-600/40 text-amber-300 shadow-xl mb-4">
-                        <svg className="w-8 h-8 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 p-2 mb-3">
+                        <img
+                            src="/logo.png"
+                            alt="Logo SMK Muhammadiyah Sekampung"
+                            className="w-full h-full object-contain"
+                        />
                     </div>
-                    <h1 className="text-xl font-bold text-white tracking-tight">
+                    <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                         CMS Panel SPMB MUSKA
                     </h1>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                         Portal Verifikasi & Pengelolaan SMK Muhammadiyah Sekampung
                     </p>
                 </div>
 
                 {/* Login Card */}
-                <div className="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
-                    <div className="flex items-center justify-between pb-4 border-b border-slate-700 mb-6">
+                <div className="bg-white/95 dark:bg-slate-900/95 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl transition-colors duration-200">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
                         <div>
-                            <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-                                Autentikasi Panitia
+                            <h2 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                <span>Autentikasi Panitia</span>
                             </h2>
-                            <p className="text-[11px] text-slate-400">Masuk menggunakan akun staf panitia SPMB</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                Masuk menggunakan akun staf panitia SPMB
+                            </p>
                         </div>
-                        <span className="text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-mono font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                             SECURE ACCESS
                         </span>
                     </div>
 
                     {errorMsg && (
-                        <div className="p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5 mb-5">
-                            <svg className="w-4 h-4 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
+                        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2.5 mb-5">
+                            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                             <span>{errorMsg}</span>
                         </div>
                     )}
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
                                 Email Panitia
                             </label>
                             <input
@@ -102,12 +210,12 @@ export default function AdminLoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="admin@muska.sch.id"
-                                className="w-full px-3.5 py-2.5 bg-slate-900/80 rounded-xl border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
+                                className="w-full px-4 py-3 bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
+                            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider">
                                 Kata Sandi
                             </label>
                             <input
@@ -116,33 +224,31 @@ export default function AdminLoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
-                                className="w-full px-3.5 py-2.5 bg-slate-900/80 rounded-xl border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
+                                className="w-full px-4 py-3 bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full mt-2 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                            className="w-full mt-3 py-3.5 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-700/20 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                         >
                             {loading ? (
                                 <>
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    <span>Memverifikasi...</span>
+                                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                                    <span>Memverifikasi Akses...</span>
                                 </>
                             ) : (
                                 <>
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                                    </svg>
                                     <span>Masuk ke Panel CMS</span>
+                                    <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-4 border-t border-slate-700/60 text-center">
-                        <p className="text-[11px] text-slate-400">
+                    <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
                             Sistem Informasi SPMB &copy; 2026 SMK Muhammadiyah Sekampung
                         </p>
                     </div>
