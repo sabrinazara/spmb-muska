@@ -23,6 +23,8 @@ import {
     Clock,
     PanelLeftClose,
     PanelLeftOpen,
+    Zap,
+    HardDrive,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
 
@@ -215,6 +217,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     icon: Users,
                 },
                 {
+                    name: 'Kuota Jurusan & Seleksi',
+                    href: '/pengaturan-kuota',
+                    exact: false,
+                    icon: Zap,
+                },
+                {
                     name: 'Pengaturan & Jadwal CBT',
                     href: '/settings',
                     exact: false,
@@ -244,6 +252,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     exact: false,
                     icon: ShieldCheck,
                 },
+                {
+                    name: 'Backup & Restore Database',
+                    href: '/database-manager',
+                    exact: false,
+                    icon: HardDrive,
+                },
             ],
         },
     ];
@@ -252,10 +266,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         if (pathname === '/') return 'Dashboard Analytics';
         if (pathname.startsWith('/pendaftar/')) return 'Detail & Validasi Berkas Pendaftar';
         if (pathname === '/pendaftar') return 'Manajemen Data Pendaftar';
+        if (pathname === '/pengaturan-kuota') return 'Manajemen Kuota Jurusan & Seleksi Ranking';
         if (pathname === '/admin-users') return 'Manajemen Administrator & Akun Panitia';
         if (pathname === '/settings') return 'Pengaturan SPMB & Jadwal Kelulusan';
         if (pathname === '/knowledge-base') return 'AI Knowledge Base Management';
         if (pathname === '/audit-log') return 'Audit Trail & Riwayat Aktivitas';
+        if (pathname === '/database-manager') return 'Disaster Recovery & Database Manager';
         return 'CMS MUSKA';
     };
 

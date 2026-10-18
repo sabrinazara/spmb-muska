@@ -202,5 +202,43 @@ export class AdminController {
     async getNotifications() {
         return this.adminService.getNotifications();
     }
+
+    // === FASE 4: KUOTA JURUSAN & SELEKSI OTOMATIS ===
+
+    @Get('kuota')
+    async getKuotaJurusan() {
+        return this.adminService.getKuotaJurusan();
+    }
+
+    @Put('kuota/:id')
+    async updateKuotaJurusan(
+        @Param('id') id: string,
+        @Body('kuotaMaksimal') kuotaMaksimal: number,
+        @Request() req: any,
+    ) {
+        return this.adminService.updateKuotaJurusan(id, kuotaMaksimal, req.user);
+    }
+
+    @Post('seleksi-otomatis')
+    async jalankanSeleksiOtomatis(@Request() req: any) {
+        return this.adminService.jalankanSeleksiOtomatis(req.user);
+    }
+
+    // === FASE 4: BACKUP & RESTORE DATABASE ===
+
+    @Get('db/backup')
+    async backupDatabase(@Request() req: any, @Res() res: Response) {
+        const backupData = await this.adminService.backupDatabase(req.user);
+        const filename = `backup-spmb-muska-${new Date().toISOString().split('T')[0]}.json`;
+
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        return res.send(JSON.stringify(backupData, null, 2));
+    }
+
+    @Post('db/restore')
+    async restoreDatabase(@Body() body: any, @Request() req: any) {
+        return this.adminService.restoreDatabase(body, req.user);
+    }
 }
 

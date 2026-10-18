@@ -829,4 +829,420 @@ export class AdminService {
             })),
         };
     }
+
+    /**
+     * ========================================================
+     * FASE 4: MANAJEMEN KUOTA JURUSAN & SELEKSI OTOMATIS
+     * ========================================================
+     */
+
+    /**
+     * Mengambil daftar seluruh jurusan beserta kuota dan statistik keterisian
+     */
+    async getKuotaJurusan() {
+        // Cek jika tabel Jurusan masih kosong, lakukan inisialisasi 8 jurusan resmi
+        const count = await this.prisma.jurusan.count();
+        if (count === 0) {
+            const defaultMajors = [
+                { namaJurusan: 'Teknik Jaringan Komputer dan Telekomunikasi', singkatan: 'TKJ', kuotaMaksimal: 72, deskripsi: 'Konsentrasi Jaringan Komputer, Cloud, Server, & Telekomunikasi' },
+                { namaJurusan: 'Teknik Otomotif (Teknik Sepeda Motor)', singkatan: 'TSM', kuotaMaksimal: 72, deskripsi: 'Perbengkelan, Injeksi, & Rancang Bangun Kendaraan Sepeda Motor' },
+                { namaJurusan: 'Desain Komunikasi Visual', singkatan: 'DKV', kuotaMaksimal: 72, deskripsi: 'Desain Grafis, UI/UX, Animasi, Fotografi, & Periklanan Kreatif' },
+                { namaJurusan: 'Bisnis Digital dan Kreatif', singkatan: 'BDK', kuotaMaksimal: 72, deskripsi: 'E-Commerce, Pemasaran Digital, FinTech, & Kewirausahaan' },
+                { namaJurusan: 'Kulineri (Tata Boga)', singkatan: 'BOGA', kuotaMaksimal: 72, deskripsi: 'Pengolahan Makanan Tradisional & Kontinental, Pastry, & Restoran' },
+                { namaJurusan: 'Kecantikan dan Tata Rias', singkatan: 'TATA RIAS', kuotaMaksimal: 72, deskripsi: 'Perawatan Kulit, Tata Rias Pengantin, & Manajemen Beauty Spa' },
+                { namaJurusan: 'Teknik Pemesinan (CNC)', singkatan: 'CNC', kuotaMaksimal: 72, deskripsi: 'Operator Mesin Bubut, Frais, Presisi Tinggi, & Desain CAD/CAM' },
+                { namaJurusan: 'Teknik Pengelasan (Welding)', singkatan: 'LAS', kuotaMaksimal: 72, deskripsi: 'Pengelasan SMAW, GMAW, Argon, Konstruksi Baja, & Sertifikasi Industri' },
+            ];
+
+            for (const item of defaultMajors) {
+                await this.prisma.jurusan.create({ data: item });
+            }
+        }
+
+        const jurusanList = await this.prisma.jurusan.findMany({
+            orderBy: { namaJurusan: 'asc' },
+        });
+
+        // Hitung statistik pendaftar untuk setiap jurusan
+        const results = await Promise.all(
+            jurusanList.map(async (j) => {
+                const keyword = j.singkatan || j.namaJurusan.split(' ')[0];
+
+                const [totalPendaftar, pendaftarValid, pendaftarLulus, pendaftarCadangan, pendaftarTidakLulus, siapSeleksi] = await Promise.all([
+                    this.prisma.pendaftaran.count({
+                        where: { jurusan: { contains: keyword, mode: 'insensitive' } },
+                    }),
+                    this.prisma.pendaftaran.count({
+                        where: {
+                            jurusan: { contains: keyword, mode: 'insensitive' },
+                            status: 'VALID',
+                        },
+                    }),
+                    this.prisma.pendaftaran.count({
+                        where: {
+                            jurusan: { contains: keyword, mode: 'insensitive' },
+                            statusKelulusan: 'LULUS',
+                        },
+                    }),
+                    this.prisma.pendaftaran.count({
+                        where: {
+                            jurusan: { contains: keyword, mode: 'insensitive' },
+                            statusKelulusan: 'CADANGAN',
+                        },
+                    }),
+                    this.prisma.pendaftaran.count({
+                        where: {
+                            jurusan: { contains: keyword, mode: 'insensitive' },
+                            statusKelulusan: 'TIDAK_LULUS',
+                        },
+                    }),
+                    this.prisma.pendaftaran.count({
+                        where: {
+                            jurusan: { contains: keyword, mode: 'insensitive' },
+                            status: 'VALID',
+                            nilaiUjian: { not: null },
+                        },
+                    }),
+                ]);
+
+                return {
+                    id: j.id,
+                    namaJurusan: j.namaJurusan,
+                    singkatan: j.singkatan,
+                    kuotaMaksimal: j.kuotaMaksimal,
+                    deskripsi: j.deskripsi,
+                    totalPendaftar,
+                    pendaftarValid,
+                    pendaftarLulus,
+                    pendaftarCadangan,
+                    pendaftarTidakLulus,
+                    siapSeleksi,
+                    sisaKuota: Math.max(0, j.kuotaMaksimal - pendaftarLulus),
+                    persentaseKeterisian: Math.min(100, Math.round((pendaftarLulus / (j.kuotaMaksimal || 1)) * 100)),
+                };
+            })
+        );
+
+        return results;
+    }
+
+    /**
+     * Memperbarui kuota maksimal suatu jurusan
+     */
+    async updateKuotaJurusan(id: string, kuotaMaksimal: number, adminUser?: any) {
+        const parsedKuota = Math.max(1, Number(kuotaMaksimal) || 1);
+        const jurusan = await this.prisma.jurusan.update({
+            where: { id },
+            data: { kuotaMaksimal: parsedKuota },
+        });
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'UPDATE_KUOTA_JURUSAN',
+                    detail: `Memperbarui kuota jurusan ${jurusan.namaJurusan} menjadi ${parsedKuota} kursi`,
+                    targetUser: jurusan.namaJurusan,
+                },
+            });
+        }
+
+        return jurusan;
+    }
+
+    /**
+     * Jalankan Seleksi Otomatis Berbasis Sistem Ranking & Kuota Jurusan
+     * Logika:
+     * 1. Ambil pendaftar status 'VALID' dan punya 'nilaiUjian'
+     * 2. Urutkan ranking descending berdasarkan 'nilaiUjian'
+     * 3. Pendaftar ranking 1 s/d kuotaMaksimal -> LULUS
+     * 4. Sisanya melebihi kuota -> CADANGAN
+     */
+    async jalankanSeleksiOtomatis(adminUser?: any) {
+        // Ambil seluruh jurusan
+        const jurusanList = await this.prisma.jurusan.findMany();
+        if (jurusanList.length === 0) {
+            await this.getKuotaJurusan(); // Auto-seed jika belum ada
+        }
+        const activeJurusan = await this.prisma.jurusan.findMany();
+
+        let totalLulus = 0;
+        let totalCadangan = 0;
+        let totalDiproses = 0;
+        const rekapPerJurusan: any[] = [];
+
+        for (const jur of activeJurusan) {
+            const keyword = jur.singkatan || jur.namaJurusan.split(' ')[0];
+
+            // Ambil pendaftar yang valid dan sudah memiliki nilai ujian
+            const peserta = await this.prisma.pendaftaran.findMany({
+                where: {
+                    jurusan: { contains: keyword, mode: 'insensitive' },
+                    status: 'VALID',
+                    nilaiUjian: { not: null },
+                },
+                orderBy: [
+                    { nilaiUjian: 'desc' },
+                    { createdAt: 'asc' }, // Nilai sama: yang daftar duluan mendapat prioritas
+                ],
+            });
+
+            totalDiproses += peserta.length;
+            let lulusCount = 0;
+            let cadanganCount = 0;
+
+            for (let i = 0; i < peserta.length; i++) {
+                const item = peserta[i];
+                const ranking = i + 1;
+                const statusKelulusan = ranking <= jur.kuotaMaksimal ? 'LULUS' : 'CADANGAN';
+
+                if (statusKelulusan === 'LULUS') lulusCount++;
+                else cadanganCount++;
+
+                await this.prisma.pendaftaran.update({
+                    where: { id: item.id },
+                    data: {
+                        statusKelulusan,
+                        catatanVerifikasi: item.catatanVerifikasi
+                            ? `${item.catatanVerifikasi} | Seleksi Otomatis Kuota Rank #${ranking} (${statusKelulusan})`
+                            : `Seleksi Otomatis Kuota Rank #${ranking} (${statusKelulusan})`,
+                    },
+                });
+            }
+
+            totalLulus += lulusCount;
+            totalCadangan += cadanganCount;
+
+            rekapPerJurusan.push({
+                jurusan: jur.namaJurusan,
+                singkatan: jur.singkatan,
+                kuotaMaksimal: jur.kuotaMaksimal,
+                totalPeserta: peserta.length,
+                lulus: lulusCount,
+                cadangan: cadanganCount,
+            });
+        }
+
+        // Catat Audit Log
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'JALANKAN_SELEKSI_OTOMATIS',
+                    detail: `Menjalankan seleksi otomatis kuota: Total diproses ${totalDiproses} siswa (${totalLulus} Lulus, ${totalCadangan} Cadangan)`,
+                    targetUser: 'ALL_APPLICANTS',
+                },
+            });
+        }
+
+        return {
+            message: 'Seleksi otomatis kuota jurusan berhasil dijalankan',
+            waktuEksekusi: new Date().toISOString(),
+            ringkasan: {
+                totalDiproses,
+                totalLulus,
+                totalCadangan,
+            },
+            detailPerJurusan: rekapPerJurusan,
+        };
+    }
+
+    /**
+     * ========================================================
+     * FASE 4: BACKUP & RESTORE DATABASE
+     * ========================================================
+     */
+
+    /**
+     * Membuat file backup JSON seluruh data sistem
+     */
+    async backupDatabase(adminUser?: any) {
+        const [users, pendaftaran, dokumen, jurusan, auditLogs, knowledgeBase, systemSettings] = await Promise.all([
+            this.prisma.user.findMany({
+                select: {
+                    id: true,
+                    email: true,
+                    nama: true,
+                    role: true,
+                    createdAt: true,
+                },
+            }),
+            this.prisma.pendaftaran.findMany(),
+            this.prisma.dokumen.findMany(),
+            this.prisma.jurusan.findMany(),
+            this.prisma.auditLog.findMany({ take: 200, orderBy: { createdAt: 'desc' } }),
+            this.prisma.knowledgeBase.findMany(),
+            this.prisma.systemSetting.findMany(),
+        ]);
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'BACKUP_DATABASE',
+                    detail: `Membuat file cadangan database (Total ${pendaftaran.length} data pendaftar)`,
+                    targetUser: 'DATABASE',
+                },
+            });
+        }
+
+        return {
+            meta: {
+                aplikasi: 'SPMB SMK Muhammadiyah Sekampung',
+                versi: '1.0.0',
+                tanggalBackup: new Date().toISOString(),
+                jumlahData: {
+                    users: users.length,
+                    pendaftaran: pendaftaran.length,
+                    dokumen: dokumen.length,
+                    jurusan: jurusan.length,
+                    knowledgeBase: knowledgeBase.length,
+                },
+            },
+            data: {
+                users,
+                pendaftaran,
+                dokumen,
+                jurusan,
+                auditLogs,
+                knowledgeBase,
+                systemSettings,
+            },
+        };
+    }
+
+    /**
+     * Memulihkan (restore) data dari file backup JSON
+     */
+    async restoreDatabase(backupPayload: any, adminUser?: any) {
+        if (!backupPayload || !backupPayload.data) {
+            throw new BadRequestException('Format file backup tidak valid. Objek data tidak ditemukan.');
+        }
+
+        const { jurusan, pendaftaran, systemSettings } = backupPayload.data;
+
+        let restoredJurusanCount = 0;
+        let restoredPendaftaranCount = 0;
+        let restoredSettingsCount = 0;
+
+        // Gunakan transaksi Prisma agar pemulihan data konsisten dan aman
+        await this.prisma.$transaction(async (tx) => {
+            // 1. Restore Jurusan
+            if (Array.isArray(jurusan)) {
+                for (const item of jurusan) {
+                    if (item.namaJurusan) {
+                        await tx.jurusan.upsert({
+                            where: { namaJurusan: item.namaJurusan },
+                            create: {
+                                namaJurusan: item.namaJurusan,
+                                singkatan: item.singkatan || null,
+                                kuotaMaksimal: Number(item.kuotaMaksimal) || 72,
+                                deskripsi: item.deskripsi || null,
+                            },
+                            update: {
+                                kuotaMaksimal: Number(item.kuotaMaksimal) || 72,
+                                deskripsi: item.deskripsi || null,
+                            },
+                        });
+                        restoredJurusanCount++;
+                    }
+                }
+            }
+
+            // 2. Restore System Settings
+            if (Array.isArray(systemSettings)) {
+                for (const s of systemSettings) {
+                    if (s.key && s.value) {
+                        await tx.systemSetting.upsert({
+                            where: { key: s.key },
+                            create: { key: s.key, value: String(s.value) },
+                            update: { value: String(s.value) },
+                        });
+                        restoredSettingsCount++;
+                    }
+                }
+            }
+
+            // 3. Restore Pendaftaran Data
+            if (Array.isArray(pendaftaran)) {
+                for (const p of pendaftaran) {
+                    if (p.nisn && p.id) {
+                        await tx.pendaftaran.upsert({
+                            where: { nisn: p.nisn },
+                            create: {
+                                userId: p.userId,
+                                nomorPendaftaran: p.nomorPendaftaran || null,
+                                namaLengkap: p.namaLengkap || null,
+                                jenisKelamin: p.jenisKelamin || null,
+                                agama: p.agama || null,
+                                tempatLahir: p.tempatLahir || null,
+                                tanggalLahir: p.tanggalLahir || null,
+                                alamat: p.alamat || null,
+                                noHpWa: p.noHpWa || null,
+                                sekolahAsal: p.sekolahAsal || null,
+                                nisn: p.nisn,
+                                nik: p.nik || '',
+                                beratBadan: p.beratBadan ? Number(p.beratBadan) : null,
+                                tinggiBadan: p.tinggiBadan ? Number(p.tinggiBadan) : null,
+                                namaAyah: p.namaAyah || null,
+                                pekerjaanAyah: p.pekerjaanAyah || null,
+                                namaIbu: p.namaIbu || null,
+                                pekerjaanIbu: p.pekerjaanIbu || null,
+                                alamatOrtu: p.alamatOrtu || null,
+                                noHpOrtu: p.noHpOrtu || null,
+                                jurusan: p.jurusan || 'Teknik Jaringan Komputer dan Telekomunikasi',
+                                ukuranBaju: p.ukuranBaju || null,
+                                intrakurikuler: p.intrakurikuler || null,
+                                ekstrakurikuler: p.ekstrakurikuler || [],
+                                status: p.status || 'PENDING',
+                                statusPembayaran: p.statusPembayaran || 'BELUM_BAYAR',
+                                nilaiUjian: p.nilaiUjian ? Number(p.nilaiUjian) : null,
+                                statusKelulusan: p.statusKelulusan || 'MENUNGGU',
+                                jadwalUjian: p.jadwalUjian || null,
+                                ruangUjian: p.ruangUjian || null,
+                                latitude: p.latitude ? Number(p.latitude) : null,
+                                longitude: p.longitude ? Number(p.longitude) : null,
+                            },
+                            update: {
+                                namaLengkap: p.namaLengkap || undefined,
+                                status: p.status || undefined,
+                                nilaiUjian: p.nilaiUjian ? Number(p.nilaiUjian) : undefined,
+                                statusKelulusan: p.statusKelulusan || undefined,
+                                latitude: p.latitude ? Number(p.latitude) : undefined,
+                                longitude: p.longitude ? Number(p.longitude) : undefined,
+                            },
+                        });
+                        restoredPendaftaranCount++;
+                    }
+                }
+            }
+        });
+
+        // Audit Log
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'RESTORE_DATABASE',
+                    detail: `Memulihkan database: ${restoredPendaftaranCount} pendaftar, ${restoredJurusanCount} jurusan, ${restoredSettingsCount} pengaturan`,
+                    targetUser: 'DATABASE',
+                },
+            });
+        }
+
+        return {
+            message: 'Pemulihan (restore) database berhasil dilakukan',
+            waktuEksekusi: new Date().toISOString(),
+            hasilRestore: {
+                restoredPendaftaranCount,
+                restoredJurusanCount,
+                restoredSettingsCount,
+            },
+        };
+    }
 }
+

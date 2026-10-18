@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
     CheckCircle2,
     AlertCircle,
@@ -19,6 +20,16 @@ import {
     X,
 } from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
+
+const GisMapPicker = dynamic(() => import('@/components/GisMapPicker'), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-64 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse flex flex-col items-center justify-center text-xs text-slate-400 gap-2">
+            <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <span>Memuat Modul Peta GIS...</span>
+        </div>
+    ),
+});
 
 export default function LengkapiDataPage() {
     const router = useRouter();
@@ -39,6 +50,8 @@ export default function LengkapiDataPage() {
         sekolahAsal: '',
         nisn: '',
         nik: '',
+        latitude: null as number | null,
+        longitude: null as number | null,
 
         // 2. Data Fisik
         beratBadan: '',
@@ -157,6 +170,8 @@ export default function LengkapiDataPage() {
                         sekolahAsal: data.sekolahAsal || '',
                         nisn: data.nisn || '',
                         nik: data.nik || '',
+                        latitude: data.latitude !== undefined && data.latitude !== null ? Number(data.latitude) : null,
+                        longitude: data.longitude !== undefined && data.longitude !== null ? Number(data.longitude) : null,
                         beratBadan: data.beratBadan ? String(data.beratBadan) : '',
                         tinggiBadan: data.tinggiBadan ? String(data.tinggiBadan) : '',
                         namaAyah: data.namaAyah || '',
@@ -249,6 +264,8 @@ export default function LengkapiDataPage() {
                 },
                 body: JSON.stringify({
                     ...formData,
+                    latitude: formData.latitude !== null ? Number(formData.latitude) : null,
+                    longitude: formData.longitude !== null ? Number(formData.longitude) : null,
                     namaIbu: formData.namaIbuKandung || formData.namaIbu,
                     namaIbuKandung: formData.namaIbuKandung || formData.namaIbu,
                     beratBadan: formData.beratBadan ? parseFloat(formData.beratBadan) : undefined,
@@ -569,6 +586,21 @@ export default function LengkapiDataPage() {
                                     onChange={handleInputChange}
                                     placeholder="Dusun/Jalan, RT/RW, Desa/Kelurahan, Kecamatan, Kabupaten"
                                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
+                                />
+                            </div>
+
+                            {/* PETA ZONASI / GIS SEDERHANA */}
+                            <div className="sm:col-span-2 pt-2">
+                                <GisMapPicker
+                                    latitude={formData.latitude}
+                                    longitude={formData.longitude}
+                                    onChange={({ latitude, longitude }) => {
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            latitude,
+                                            longitude,
+                                        }));
+                                    }}
                                 />
                             </div>
                         </div>

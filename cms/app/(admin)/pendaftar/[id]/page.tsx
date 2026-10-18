@@ -3,6 +3,7 @@
 import { useState, useEffect, use, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
     ArrowLeft,
     CheckCircle2,
@@ -23,6 +24,16 @@ import {
     Sparkles,
 } from 'lucide-react';
 import { API_ENDPOINTS, API_BASE_URL, getAuthHeaders } from '@/lib/api';
+
+const GisMapViewer = dynamic(() => import('@/components/GisMapViewer'), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-80 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 animate-pulse flex flex-col items-center justify-center text-xs text-slate-400 gap-2">
+            <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <span>Memuat Peta Zonasi GIS...</span>
+        </div>
+    ),
+});
 
 interface ParsedIdCard {
     nik?: string;
@@ -105,6 +116,8 @@ interface DetailPendaftar {
     statusPembayaran: string | null;
     nilaiUjian: number | null;
     statusKelulusan: 'LULUS' | 'TIDAK_LULUS' | 'MENUNGGU' | null;
+    latitude?: number | null;
+    longitude?: number | null;
     createdAt: string;
     user?: { id: string; email: string; nama: string | null };
     dokumen: DokumenItem[];
@@ -788,6 +801,16 @@ function DetailPendaftarContent({ id }: { id: string }) {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* SECTION 4: PETA ZONASI & VISUALISASI TITIK KOORDINAT GIS */}
+            <div className="bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xs">
+                <GisMapViewer
+                    latitude={data.latitude}
+                    longitude={data.longitude}
+                    namaLengkap={data.namaLengkap || data.user?.nama}
+                    alamat={data.alamat || data.alamatOrtu}
+                />
             </div>
 
             {/* LIGHTBOX MODAL IMAGE VIEWER */}

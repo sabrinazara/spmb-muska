@@ -39,4 +39,8 @@ export class LengkapiDataDto {
   // Intra & Ekstrakurikuler
   intrakurikuler?: string;
   ekstrakurikuler?: string[];
+
+  // GIS Visualisasi Titik Koordinat Rumah
+  latitude?: number;
+  longitude?: number;
 }

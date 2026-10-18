@@ -91,10 +91,24 @@ model Pendaftaran {
   nilaiUjian        Float?
   statusKelulusan   String?          @default("MENUNGGU")
 
+  // Lokasi Rumah (GIS Visualisasi Koordinat)
+  latitude          Float?
+  longitude         Float?
+
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @default(now()) @updatedAt
 
   dokumen      Dokumen[]
+}
+
+model Jurusan {
+  id            String   @id @default(uuid())
+  namaJurusan   String   @unique
+  singkatan     String?
+  kuotaMaksimal Int      @default(72)
+  deskripsi     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
 }
 
 model Dokumen {

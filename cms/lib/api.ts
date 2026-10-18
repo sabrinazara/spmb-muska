@@ -29,6 +29,11 @@ export const API_ENDPOINTS = {
         USERS: `${API_BASE_URL}/admin/users`,
         SETTINGS: `${API_BASE_URL}/admin/settings`,
         NOTIFICATIONS: `${API_BASE_URL}/admin/notifications`,
+        KUOTA: `${API_BASE_URL}/admin/kuota`,
+        UPDATE_KUOTA: (id: string) => `${API_BASE_URL}/admin/kuota/${id}`,
+        SELEKSI_OTOMATIS: `${API_BASE_URL}/admin/seleksi-otomatis`,
+        DB_BACKUP: `${API_BASE_URL}/admin/db/backup`,
+        DB_RESTORE: `${API_BASE_URL}/admin/db/restore`,
     },
     AI: {
         CHAT: `${API_BASE_URL}/ai/chat`,
