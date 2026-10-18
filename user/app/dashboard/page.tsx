@@ -77,15 +77,16 @@ export default function DashboardBeranda() {
 
     const getJurusanName = (code?: string) => {
         const map: Record<string, string> = {
-            'TKJ': '1. Teknik Jaringan Komputer dan Telekomunikasi',
-            'TKR': '2. Teknik Otomotif (Teknik Kendaraan Ringan)',
-            'TBSM': '2. Teknik Otomotif (Teknik Sepeda Motor)',
-            'DKV': '3. Desain Komunikasi Visual',
-            'BDK': '4. Bisnis Digital dan Kreatif',
-            'BOGA': '5. Kuliner (Tata Boga)',
-            'TATA_RIAS': '6. Kecantikan dan Tata Rias',
-            'CNC': '7. Teknik Pemesinan (CNC)',
-            'LAS': '8. Teknik Pengelasan (Welding)',
+            'TKJ': 'Teknik Jaringan Komputer dan Telekomunikasi',
+            'TSM': 'Teknik Otomotif (Teknik Sepeda Motor)',
+            'TBSM': 'Teknik Otomotif (Teknik Sepeda Motor)',
+            'TKR': 'Teknik Otomotif (Teknik Sepeda Motor)',
+            'DKV': 'Desain Komunikasi Visual',
+            'BDK': 'Bisnis Digital dan Kreatif',
+            'BOGA': 'Kulineri (Tata Boga)',
+            'TATA_RIAS': 'Kecantikan dan Tata Rias',
+            'CNC': 'Teknik Pemesinan (CNC)',
+            'LAS': 'Teknik Pengelasan (Welding)',
         };
         return (code && map[code]) || code || '-';
     };

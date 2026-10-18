@@ -93,15 +93,14 @@ export default function PendaftarManagementPage() {
 
     const JURUSAN_OPTIONS = [
         { value: 'ALL', label: 'Semua Jurusan (8 Keahlian)' },
-        { value: 'TKJ', label: 'Teknik Jaringan Komputer (TKJ)' },
-        { value: 'TKR', label: 'Teknik Kendaraan Ringan (TKR)' },
-        { value: 'TBSM', label: 'Teknik Sepeda Motor (TBSM)' },
-        { value: 'DKV', label: 'Desain Komunikasi Visual (DKV)' },
-        { value: 'BDK', label: 'Bisnis Digital dan Kreatif (BDK)' },
-        { value: 'BOGA', label: 'Kuliner / Tata Boga' },
-        { value: 'TATA_RIAS', label: 'Kecantikan dan Tata Rias' },
-        { value: 'CNC', label: 'Teknik Pemesinan (CNC)' },
-        { value: 'LAS', label: 'Teknik Pengelasan (Welding)' },
+        { value: 'Teknik Jaringan Komputer dan Telekomunikasi', label: 'Teknik Jaringan Komputer dan Telekomunikasi' },
+        { value: 'Teknik Otomotif', label: 'Teknik Otomotif (Teknik Sepeda Motor)' },
+        { value: 'Desain Komunikasi Visual', label: 'Desain Komunikasi Visual' },
+        { value: 'Bisnis Digital dan Kreatif', label: 'Bisnis Digital dan Kreatif' },
+        { value: 'Kulineri', label: 'Kulineri (Tata Boga)' },
+        { value: 'Kecantikan dan Tata Rias', label: 'Kecantikan dan Tata Rias' },
+        { value: 'Teknik Pemesinan', label: 'Teknik Pemesinan (CNC)' },
+        { value: 'Teknik Pengelasan', label: 'Teknik Pengelasan (Welding)' },
     ];
 
     return (

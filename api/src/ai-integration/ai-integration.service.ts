@@ -57,15 +57,15 @@ export class AiIntegrationService {
         question: cleanQuestion,
         answer:
           'SMK Muhammadiyah Sekampung membuka 8 Program Keahlian unggulan berstandar industri:\n' +
-          '1. Teknik Jaringan Komputer & Telekomunikasi (TKJ)\n' +
-          '2. Teknik Otomotif / Sepeda Motor (TSM)\n' +
-          '3. Desain Komunikasi Visual (DKV)\n' +
-          '4. Bisnis Digital & Kreatif\n' +
-          '5. Kuliner / Tata Boga\n' +
-          '6. Kecantikan & Tata Rias\n' +
+          '1. Teknik Jaringan Komputer dan Telekomunikasi\n' +
+          '2. Teknik Otomotif (Teknik Sepeda Motor)\n' +
+          '3. Desain Komunikasi Visual\n' +
+          '4. Bisnis Digital dan Kreatif\n' +
+          '5. Kulineri (Tata Boga)\n' +
+          '6. Kecantikan dan Tata Rias\n' +
           '7. Teknik Pemesinan (CNC)\n' +
           '8. Teknik Pengelasan (Welding).\n' +
-          'Semua jurusan dilengkapi bengkel & laboratorium standar DUDI.',
+          'Semua jurusan dilengkapi bengkel & laboratorium standar industri (DUDI).',
         source: 'Basis Pengetahuan Internal SPMB MUSKA',
       };
     }

@@ -271,54 +271,52 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 
             {/* Sidebar Desktop & Mobile */}
             <aside
-                className={`fixed lg:sticky top-0 left-0 bottom-0 z-50 border-r flex flex-col justify-between shrink-0 h-screen transition-all duration-300 ease-in-out ${
-                    isCollapsed ? 'lg:w-20 w-64' : 'w-64'
-                } ${
-                    isDark
+                className={`fixed lg:sticky top-0 left-0 bottom-0 z-50 border-r flex flex-col justify-between shrink-0 h-screen transition-all duration-300 ease-in-out ${isCollapsed ? 'lg:w-20 w-64' : 'w-64'
+                    } ${isDark
                         ? 'bg-slate-950 border-slate-800/80 text-slate-200'
                         : 'bg-white border-slate-200 text-slate-700 shadow-md'
-                } ${
-                    sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-                }`}
+                    } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                    }`}
             >
                 <div className="flex flex-col flex-1 min-h-0">
                     {/* Brand Header */}
-                    <div className={`h-16 flex items-center border-b transition-colors ${
-                        isCollapsed ? 'lg:justify-center justify-between px-3' : 'justify-between px-4'
-                    } ${isDark ? 'border-slate-800/80 bg-slate-950/50' : 'border-slate-200 bg-slate-50/80'}`}>
+                    <div className={`h-16 flex items-center border-b transition-colors ${isCollapsed ? 'lg:justify-center justify-between px-3' : 'justify-between px-4'
+                        } ${isDark ? 'border-slate-800/80 bg-slate-950/50' : 'border-slate-200 bg-slate-50/80'}`}>
                         <Link
                             href="/"
                             className={`flex items-center gap-3 group min-w-0 ${isCollapsed ? 'lg:justify-center' : ''}`}
                             title="CMS MUSKA"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-emerald-700 p-1 flex items-center justify-center shrink-0 shadow-sm border border-emerald-600/30">
+                            <div className="w-9 h-9 rounded-xl bg-emerald-700/80 p-1 flex items-center justify-center shrink-0 shadow-sm border border-emerald-600/30 overflow-hidden">
                                 <img
-                                    src="/logo.svg"
-                                    alt="Logo SMK MUSKA"
+                                    src="/logo.png"
+                                    onError={(e) => {
+                                        e.currentTarget.src = '/logo.svg';
+                                    }}
+                                    alt="Logo SMK Muhammadiyah Sekampung"
                                     className="w-full h-full object-contain"
                                 />
                             </div>
                             <div className={`min-w-0 transition-all duration-200 ${isCollapsed ? 'lg:hidden block' : 'block'}`}>
                                 <div className={`text-sm font-extrabold tracking-wider uppercase leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                                    CMS MUSKA
+                                    CMS
                                 </div>
                                 <div className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 truncate">
-                                    SMK Muhammadiyah
+                                    SMK MUSKA
                                 </div>
                             </div>
                         </Link>
 
                         {/* Minimize Sidebar Button (Desktop Only, hidden when collapsed to prevent overflow) */}
-                        <button
+                        {/* <button
                             onClick={toggleCollapse}
-                            className={`hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer ${
-                                isCollapsed ? 'hidden' : 'block'
-                            }`}
+                            className={`hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer ${isCollapsed ? 'hidden' : 'block'
+                                }`}
                             title="Kecilkan Sidebar"
                             aria-label="Toggle Minimize Sidebar"
                         >
                             <PanelLeftClose className="w-4 h-4" />
-                        </button>
+                        </button> */}
 
                         {/* Close Drawer Button (Mobile Only) */}
                         <button
@@ -334,26 +332,23 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     <nav className="p-3 space-y-2 flex-1 overflow-y-auto">
                         {/* Standalone: Dashboard Analytics */}
                         <div>
-                            <div className={`text-[10px] font-bold uppercase tracking-widest px-3 mb-1.5 ${
-                                isCollapsed ? 'lg:hidden block' : 'block'
-                            } ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                            <div className={`text-[10px] font-bold uppercase tracking-widest px-3 mb-1.5 ${isCollapsed ? 'lg:hidden block' : 'block'
+                                } ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                                 Utama
                             </div>
                             <Link
                                 href="/"
                                 onClick={() => setSidebarOpen(false)}
                                 title={isCollapsed ? 'Dashboard Analytics' : undefined}
-                                className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${
-                                    isCollapsed
-                                        ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2.5'
-                                        : 'px-3 py-2.5'
-                                } ${
-                                    pathname === '/'
+                                className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${isCollapsed
+                                    ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2.5'
+                                    : 'px-3 py-2.5'
+                                    } ${pathname === '/'
                                         ? 'bg-emerald-600 text-white shadow-sm font-bold'
                                         : isDark
-                                        ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                                        : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50'
-                                }`}
+                                            ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                                            : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50'
+                                    }`}
                             >
                                 <LayoutDashboard className="w-4 h-4 shrink-0" />
                                 <span className={`truncate ${isCollapsed ? 'lg:hidden block' : 'block'}`}>Dashboard Analytics</span>
@@ -370,28 +365,24 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                                     {/* Category header for Expanded & Mobile */}
                                     <button
                                         onClick={() => toggleGroup(group.key)}
-                                        className={`w-full items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition cursor-pointer ${
-                                            isCollapsed ? 'lg:hidden flex' : 'flex'
-                                        } ${
-                                            hasActiveChild
+                                        className={`w-full items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition cursor-pointer ${isCollapsed ? 'lg:hidden flex' : 'flex'
+                                            } ${hasActiveChild
                                                 ? 'text-emerald-400 font-extrabold'
                                                 : isDark
-                                                ? 'text-slate-400 hover:text-slate-200'
-                                                : 'text-slate-500 hover:text-slate-800'
-                                        }`}
+                                                    ? 'text-slate-400 hover:text-slate-200'
+                                                    : 'text-slate-500 hover:text-slate-800'
+                                            }`}
                                     >
                                         <span>{group.title}</span>
                                         <ChevronDown
-                                            className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                                                isGroupOpen ? 'rotate-0' : '-rotate-90'
-                                            }`}
+                                            className={`w-3.5 h-3.5 transition-transform duration-200 ${isGroupOpen ? 'rotate-0' : '-rotate-90'
+                                                }`}
                                         />
                                     </button>
 
                                     {/* Desktop Collapsed Divider */}
-                                    <div className={`h-px my-2 ${isCollapsed ? 'lg:block hidden' : 'hidden'} ${
-                                        isDark ? 'bg-slate-800' : 'bg-slate-200'
-                                    }`} />
+                                    <div className={`h-px my-2 ${isCollapsed ? 'lg:block hidden' : 'hidden'} ${isDark ? 'bg-slate-800' : 'bg-slate-200'
+                                        }`} />
 
                                     {/* Sub-items (Always visible on collapsed desktop as icon buttons, toggleable on mobile/expanded) */}
                                     {(isGroupOpen || isCollapsed) && (
@@ -408,17 +399,15 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                                                         href={item.href}
                                                         onClick={() => setSidebarOpen(false)}
                                                         title={isCollapsed ? item.name : undefined}
-                                                        className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${
-                                                            isCollapsed
-                                                                ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2'
-                                                                : 'px-3 py-2'
-                                                        } ${
-                                                            active
+                                                        className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${isCollapsed
+                                                            ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2'
+                                                            : 'px-3 py-2'
+                                                            } ${active
                                                                 ? 'bg-emerald-600 text-white shadow-sm font-bold'
                                                                 : isDark
-                                                                ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                                                                : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50'
-                                                        }`}
+                                                                    ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                                                                    : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50'
+                                                            }`}
                                                     >
                                                         <IconComponent className="w-4 h-4 shrink-0" />
                                                         <span className={`truncate ${isCollapsed ? 'lg:hidden block' : 'block'}`}>{item.name}</span>
@@ -461,9 +450,8 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         {/* Collapsed desktop view */}
                         <div className={`space-y-2 ${isCollapsed ? 'lg:flex lg:flex-col lg:items-center hidden' : 'hidden'}`}>
                             <div
-                                className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold border cursor-default ${
-                                    isDark ? 'bg-slate-800 border-slate-700 text-amber-300' : 'bg-emerald-100 border-emerald-200 text-emerald-800'
-                                }`}
+                                className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold border cursor-default ${isDark ? 'bg-slate-800 border-slate-700 text-amber-300' : 'bg-emerald-100 border-emerald-200 text-emerald-800'
+                                    }`}
                                 title={`${adminUser?.nama || 'Administrator'} (${adminUser?.email || ''})`}
                             >
                                 AD
@@ -497,11 +485,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         {/* Desktop Sidebar Minimize / Expand Toggle */}
                         <button
                             onClick={toggleCollapse}
-                            className={`hidden lg:flex p-2 rounded-xl transition cursor-pointer ${
-                                isDark
-                                    ? 'text-slate-400 hover:text-white hover:bg-slate-800'
-                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                            }`}
+                            className={`hidden lg:flex p-2 rounded-xl transition cursor-pointer ${isDark
+                                ? 'text-slate-400 hover:text-white hover:bg-slate-800'
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                }`}
                             title={isCollapsed ? 'Perluas Sidebar' : 'Kecilkan Sidebar'}
                             aria-label="Toggle Minimize Sidebar"
                         >
@@ -522,11 +509,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-3">
                         {/* LIVE INDONESIAN CLOCK */}
                         {currentTime && (
-                            <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-medium shadow-2xs ${
-                                isDark
-                                    ? 'bg-slate-950/80 text-emerald-400 border-slate-800'
-                                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            }`}>
+                            <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-medium shadow-2xs ${isDark
+                                ? 'bg-slate-950/80 text-emerald-400 border-slate-800'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                }`}>
                                 <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                 <span>{currentTime}</span>
                             </div>
@@ -535,11 +521,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         {/* THEME SWITCHER BUTTON */}
                         <button
                             onClick={toggleTheme}
-                            className={`p-2 rounded-xl transition cursor-pointer ${
-                                isDark
-                                    ? 'bg-slate-800 text-amber-300 hover:bg-slate-700 border border-slate-700'
-                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
-                            }`}
+                            className={`p-2 rounded-xl transition cursor-pointer ${isDark
+                                ? 'bg-slate-800 text-amber-300 hover:bg-slate-700 border border-slate-700'
+                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
+                                }`}
                             title={isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode'}
                             aria-label="Toggle Theme"
                         >
@@ -550,11 +535,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                         <div className="relative" ref={notifRef}>
                             <button
                                 onClick={() => setNotifOpen(!notifOpen)}
-                                className={`relative p-2 rounded-xl transition cursor-pointer ${
-                                    isDark
-                                        ? 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700'
-                                        : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border border-slate-300'
-                                }`}
+                                className={`relative p-2 rounded-xl transition cursor-pointer ${isDark
+                                    ? 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700'
+                                    : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border border-slate-300'
+                                    }`}
                                 title="Notifikasi Verifikasi"
                                 aria-label="Notifikasi Realtime"
                             >

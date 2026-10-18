@@ -57,7 +57,7 @@ export default function LengkapiDataPage() {
         noHpWali: '',
 
         // 4. Pilihan Jurusan
-        jurusan: '1. TKJ (Teknik Komputer & Jaringan)',
+        jurusan: 'Teknik Jaringan Komputer dan Telekomunikasi',
 
         // 4. Ukuran Baju
         ukuranBaju: 'M (40-45 kg)',
@@ -69,14 +69,14 @@ export default function LengkapiDataPage() {
     });
 
     const JURUSAN_OPTIONS = [
-        '1. TKJ (Teknik Komputer & Jaringan)',
-        '2. TSM (Teknik Sepeda Motor)',
-        '3. DKV (Desain Komunikasi Visual)',
-        '4. Bisnis Digital',
-        '5. Tata Boga',
-        '6. Kecantikan',
-        '7. Pemesinan (CNC)',
-        '8. Pengelasan (Welding)',
+        'Teknik Jaringan Komputer dan Telekomunikasi',
+        'Teknik Otomotif (Teknik Sepeda Motor)',
+        'Desain Komunikasi Visual',
+        'Bisnis Digital dan Kreatif',
+        'Kulineri (Tata Boga)',
+        'Kecantikan dan Tata Rias',
+        'Teknik Pemesinan (CNC)',
+        'Teknik Pengelasan (Welding)',
     ];
 
     const UKURAN_BAJU_OPTIONS = [

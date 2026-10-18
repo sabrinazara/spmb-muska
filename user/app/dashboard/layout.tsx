@@ -124,7 +124,7 @@ export default function DashboardLayout({
                     }
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     }, [router]);
 
     const toggleTheme = () => {
@@ -209,9 +209,8 @@ export default function DashboardLayout({
     };
 
     return (
-        <div className={`min-h-screen flex font-sans antialiased transition-colors duration-200 ${
-            isDark ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-800'
-        }`}>
+        <div className={`min-h-screen flex font-sans antialiased transition-colors duration-200 ${isDark ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-800'
+            }`}>
             {/* Mobile Backdrop */}
             {sidebarOpen && (
                 <div
@@ -222,23 +221,18 @@ export default function DashboardLayout({
 
             {/* Sidebar Navigation - Adaptive Dark & Light Modes */}
             <aside
-                className={`fixed lg:sticky top-0 left-0 bottom-0 z-50 border-r flex flex-col justify-between shrink-0 h-screen transition-all duration-300 ease-in-out ${
-                    isCollapsed ? 'lg:w-20 w-64' : 'w-64'
-                } ${
-                    isDark
+                className={`fixed lg:sticky top-0 left-0 bottom-0 z-50 border-r flex flex-col justify-between shrink-0 h-screen transition-all duration-300 ease-in-out ${isCollapsed ? 'lg:w-20 w-64' : 'w-64'
+                    } ${isDark
                         ? 'bg-slate-950 border-slate-800/80 text-slate-200'
                         : 'bg-white border-slate-200 text-slate-700 shadow-sm'
-                } ${
-                    sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-                }`}
+                    } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                    }`}
             >
                 <div className="flex flex-col flex-1 min-h-0">
                     {/* Sidebar Brand Header */}
-                    <div className={`h-16 flex items-center border-b transition-colors ${
-                        isCollapsed ? 'lg:justify-center justify-between px-3' : 'justify-between px-4'
-                    } ${
-                        isDark ? 'border-slate-800/80 bg-slate-950/60' : 'border-slate-200 bg-slate-50/80'
-                    }`}>
+                    <div className={`h-16 flex items-center border-b transition-colors ${isCollapsed ? 'lg:justify-center justify-between px-3' : 'justify-between px-4'
+                        } ${isDark ? 'border-slate-800/80 bg-slate-950/60' : 'border-slate-200 bg-slate-50/80'
+                        }`}>
                         <Link
                             href="/dashboard"
                             className={`flex items-center gap-3 group min-w-0 ${isCollapsed ? 'lg:justify-center' : ''}`}
@@ -255,30 +249,27 @@ export default function DashboardLayout({
                                 />
                             </div>
                             <div className={`min-w-0 transition-all duration-200 ${isCollapsed ? 'lg:hidden block' : 'block'}`}>
-                                <div className={`text-[13px] font-bold tracking-tight leading-tight truncate ${
-                                    isDark ? 'text-white' : 'text-slate-900'
-                                }`}>
+                                <div className={`text-[13px] font-bold tracking-tight leading-tight truncate ${isDark ? 'text-white' : 'text-slate-900'
+                                    }`}>
                                     SMK Muhammadiyah
                                 </div>
-                                <div className={`text-[10px] font-extrabold tracking-wider uppercase ${
-                                    isDark ? 'text-emerald-400' : 'text-emerald-600'
-                                }`}>
-                                    Sekampung (SPMB)
+                                <div className={`text-[10px] font-extrabold tracking-wider uppercase ${isDark ? 'text-emerald-400' : 'text-emerald-600'
+                                    }`}>
+                                    Sekampung
                                 </div>
                             </div>
                         </Link>
 
                         {/* Minimize Sidebar Button (Desktop Only, hidden when collapsed to prevent overflow) */}
-                        <button
+                        {/* <button
                             onClick={toggleCollapse}
-                            className={`hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer ${
-                                isCollapsed ? 'hidden' : 'block'
-                            }`}
+                            className={`hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition cursor-pointer ${isCollapsed ? 'hidden' : 'block'
+                                }`}
                             title="Kecilkan Sidebar"
                             aria-label="Toggle Minimize Sidebar"
                         >
                             <PanelLeftClose className="w-4 h-4" />
-                        </button>
+                        </button> */}
 
                         {/* Close Drawer Button (Mobile Only) */}
                         <button
@@ -294,9 +285,8 @@ export default function DashboardLayout({
                     <nav className="flex-1 overflow-y-auto p-3 space-y-2">
                         {/* Standalone: Beranda */}
                         <div>
-                            <div className={`text-[10px] font-bold uppercase tracking-widest px-3 mb-1.5 ${
-                                isCollapsed ? 'lg:hidden block' : 'block'
-                            } ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
+                            <div className={`text-[10px] font-bold uppercase tracking-widest px-3 mb-1.5 ${isCollapsed ? 'lg:hidden block' : 'block'
+                                } ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                                 Utama
                             </div>
 
@@ -304,17 +294,15 @@ export default function DashboardLayout({
                                 href="/dashboard"
                                 onClick={() => setSidebarOpen(false)}
                                 title={isCollapsed ? 'Beranda' : undefined}
-                                className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${
-                                    isCollapsed
+                                className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${isCollapsed
                                         ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2.5'
                                         : 'px-3 py-2.5'
-                                } ${
-                                    pathname === '/dashboard'
+                                    } ${pathname === '/dashboard'
                                         ? 'bg-emerald-600 text-white shadow-xs font-bold'
                                         : isDark
-                                        ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                                        : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/80'
-                                }`}
+                                            ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                                            : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/80'
+                                    }`}
                             >
                                 <Home className={`w-4 h-4 shrink-0 ${pathname === '/dashboard' ? 'text-white' : 'text-emerald-500'}`} />
                                 <span className={`truncate ${isCollapsed ? 'lg:hidden block' : 'block'}`}>
@@ -333,26 +321,22 @@ export default function DashboardLayout({
                                     {/* Group Title for Expanded & Mobile */}
                                     <button
                                         onClick={() => toggleGroup(group.key)}
-                                        className={`w-full items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition cursor-pointer ${
-                                            isCollapsed ? 'lg:hidden flex' : 'flex'
-                                        } ${
-                                            hasActiveChild
+                                        className={`w-full items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg transition cursor-pointer ${isCollapsed ? 'lg:hidden flex' : 'flex'
+                                            } ${hasActiveChild
                                                 ? isDark ? 'text-emerald-400 font-extrabold' : 'text-emerald-700 font-extrabold'
                                                 : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-800'
-                                        }`}
+                                            }`}
                                     >
                                         <span>{group.title}</span>
                                         <ChevronDown
-                                            className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                                                isGroupOpen ? 'rotate-0' : '-rotate-90'
-                                            }`}
+                                            className={`w-3.5 h-3.5 transition-transform duration-200 ${isGroupOpen ? 'rotate-0' : '-rotate-90'
+                                                }`}
                                         />
                                     </button>
 
                                     {/* Desktop Collapsed Divider */}
-                                    <div className={`h-px my-2 ${isCollapsed ? 'lg:block hidden' : 'hidden'} ${
-                                        isDark ? 'bg-slate-800/80' : 'bg-slate-200'
-                                    }`} />
+                                    <div className={`h-px my-2 ${isCollapsed ? 'lg:block hidden' : 'hidden'} ${isDark ? 'bg-slate-800/80' : 'bg-slate-200'
+                                        }`} />
 
                                     {/* Sub-items (Always visible on collapsed desktop as icon buttons, toggleable on mobile/expanded) */}
                                     {(isGroupOpen || isCollapsed) && (
@@ -367,17 +351,15 @@ export default function DashboardLayout({
                                                         href={item.href}
                                                         onClick={() => setSidebarOpen(false)}
                                                         title={isCollapsed ? item.label : undefined}
-                                                        className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${
-                                                            isCollapsed
+                                                        className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${isCollapsed
                                                                 ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2'
                                                                 : 'px-3 py-2'
-                                                        } ${
-                                                            isActive
+                                                            } ${isActive
                                                                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
                                                                 : isDark
-                                                                ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                                                                : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/80'
-                                                        }`}
+                                                                    ? 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                                                                    : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50/80'
+                                                            }`}
                                                     >
                                                         <IconComponent className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                                                         <span className={`truncate ${isCollapsed ? 'lg:hidden block' : 'block'}`}>
@@ -395,17 +377,15 @@ export default function DashboardLayout({
                 </div>
 
                 {/* Sidebar Footer: User Card & Status with Logout */}
-                <div className={`p-3 border-t transition-colors ${
-                    isDark ? 'border-slate-800/80 bg-slate-950/80' : 'border-slate-200 bg-slate-50/80'
-                }`}>
+                <div className={`p-3 border-t transition-colors ${isDark ? 'border-slate-800/80 bg-slate-950/80' : 'border-slate-200 bg-slate-50/80'
+                    }`}>
                     {/* User info: Full view on mobile & expanded desktop, compact icon view on collapsed desktop */}
                     <div className={isCollapsed ? 'lg:hidden block' : 'block'}>
                         <div className="flex items-center gap-2.5 mb-2.5">
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
-                                isDark
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${isDark
                                     ? 'bg-emerald-900/60 border-emerald-700/40 text-emerald-400'
                                     : 'bg-emerald-100 border-emerald-200 text-emerald-800'
-                            }`}>
+                                }`}>
                                 <User className="w-4 h-4" />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -419,11 +399,10 @@ export default function DashboardLayout({
                         </div>
                         <button
                             onClick={handleLogout}
-                            className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition cursor-pointer border ${
-                                isDark
+                            className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition cursor-pointer border ${isDark
                                     ? 'text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border-rose-500/20'
                                     : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border-rose-200'
-                            }`}
+                                }`}
                         >
                             <LogOut className="w-3.5 h-3.5" />
                             <span>Keluar Akun</span>
@@ -433,11 +412,10 @@ export default function DashboardLayout({
                     {/* Collapsed Desktop View */}
                     <div className={`space-y-2 ${isCollapsed ? 'lg:flex lg:flex-col lg:items-center hidden' : 'hidden'}`}>
                         <div
-                            className={`w-10 h-10 rounded-xl flex items-center justify-center border cursor-default ${
-                                isDark
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center border cursor-default ${isDark
                                     ? 'bg-emerald-900/60 border-emerald-700/40 text-emerald-400'
                                     : 'bg-emerald-100 border-emerald-200 text-emerald-800'
-                            }`}
+                                }`}
                             title={`${user?.nama || 'Calon Siswa'} (${user?.email || ''})`}
                         >
                             <User className="w-4 h-4" />
@@ -456,17 +434,15 @@ export default function DashboardLayout({
             {/* Main Wrapper */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Top Navbar */}
-                <header className={`h-16 border-b sticky top-0 z-30 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between transition-colors ${
-                    isDark ? 'bg-slate-950/80 border-slate-800/80' : 'bg-white/80 border-slate-200'
-                }`}>
+                <header className={`h-16 border-b sticky top-0 z-30 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between transition-colors ${isDark ? 'bg-slate-950/80 border-slate-800/80' : 'bg-white/80 border-slate-200'
+                    }`}>
                     {/* Left: Mobile hamburger & Desktop Minimize & Breadcrumb */}
                     <div className="flex items-center gap-2 sm:gap-3">
                         {/* Mobile Hamburger Button */}
                         <button
                             onClick={() => setSidebarOpen(true)}
-                            className={`lg:hidden p-2 rounded-xl cursor-pointer ${
-                                isDark ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
-                            }`}
+                            className={`lg:hidden p-2 rounded-xl cursor-pointer ${isDark ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+                                }`}
                             aria-label="Buka Menu Navigasi"
                         >
                             <Menu className="w-5 h-5" />
@@ -475,11 +451,10 @@ export default function DashboardLayout({
                         {/* Desktop Sidebar Minimize / Expand Toggle */}
                         <button
                             onClick={toggleCollapse}
-                            className={`hidden lg:flex p-2 rounded-xl transition cursor-pointer ${
-                                isDark
+                            className={`hidden lg:flex p-2 rounded-xl transition cursor-pointer ${isDark
                                     ? 'text-slate-400 hover:text-white hover:bg-slate-800'
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                            }`}
+                                }`}
                             title={isCollapsed ? 'Perluas Sidebar' : 'Kecilkan Sidebar'}
                             aria-label="Toggle Minimize Sidebar"
                         >
@@ -498,11 +473,10 @@ export default function DashboardLayout({
                     <div className="flex items-center gap-2.5 sm:gap-3">
                         {/* Live Clock Widget */}
                         {currentTime && (
-                            <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-medium shadow-2xs ${
-                                isDark
+                            <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-medium shadow-2xs ${isDark
                                     ? 'bg-slate-950 text-emerald-400 border-slate-800'
                                     : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            }`}>
+                                }`}>
                                 <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                 <span>{currentTime}</span>
                             </div>
@@ -511,11 +485,10 @@ export default function DashboardLayout({
                         {/* Theme Toggle Button */}
                         <button
                             onClick={toggleTheme}
-                            className={`p-2 rounded-xl transition cursor-pointer ${
-                                isDark
+                            className={`p-2 rounded-xl transition cursor-pointer ${isDark
                                     ? 'bg-slate-800 text-amber-300 hover:bg-slate-700 border border-slate-700'
                                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
-                            }`}
+                                }`}
                             title={isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode'}
                             aria-label="Toggle Theme"
                         >

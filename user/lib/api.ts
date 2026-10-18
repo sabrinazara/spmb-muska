@@ -129,12 +129,12 @@ export async function sendAiChatMessage(question: string): Promise<{ answer: str
         return {
             answer:
                 'SMK Muhammadiyah Sekampung membuka 8 Program Keahlian unggulan: ' +
-                '1. Teknik Jaringan Komputer & Telekomunikasi (TKJ), ' +
-                '2. Teknik Otomotif / Sepeda Motor (TSM), ' +
-                '3. Desain Komunikasi Visual (DKV), ' +
-                '4. Bisnis Digital & Kreatif, ' +
-                '5. Kuliner / Tata Boga, ' +
-                '6. Kecantikan & Tata Rias, ' +
+                '1. Teknik Jaringan Komputer dan Telekomunikasi, ' +
+                '2. Teknik Otomotif (Teknik Sepeda Motor), ' +
+                '3. Desain Komunikasi Visual, ' +
+                '4. Bisnis Digital dan Kreatif, ' +
+                '5. Kulineri (Tata Boga), ' +
+                '6. Kecantikan dan Tata Rias, ' +
                 '7. Teknik Pemesinan (CNC), ' +
                 '8. Teknik Pengelasan (Welding).',
             source: 'Basis Pengetahuan Lokal SPMB',

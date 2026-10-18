@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { LengkapiDataDto } from './dto/lengkapi-data.dto';
 import PDFDocument from 'pdfkit';
 import * as QRCode from 'qrcode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class PendaftaranService {
@@ -270,21 +272,34 @@ export class PendaftaranService {
             doc.rect(35, 30, 525, 4).fill('#065f46'); // Hijau Tua
             doc.rect(35, 35, 525, 2).fill('#d97706'); // Kuning Emas
 
-            // === 2. TEKS KOP SURAT ===
+            // === 2. TEKS KOP SURAT & LOGO ===
+            const logoPath = path.join(process.cwd(), 'uploads', 'logo.png');
+            const hasLogo = fs.existsSync(logoPath);
+            if (hasLogo) {
+                try {
+                    doc.image(logoPath, 42, 42, { width: 48 });
+                } catch (e) {
+                    console.error('Failed to embed logo in PDF:', e);
+                }
+            }
+
+            const kopTextX = hasLogo ? 92 : 35;
+            const kopTextW = hasLogo ? 468 : 525;
+
             doc.fillColor('#065f46')
                 .fontSize(9)
                 .font('Helvetica-Bold')
-                .text('MAJELIS PENDIDIKAN DASAR DAN MENENGAH MUHAMMADIYAH', 35, 45, { align: 'center', width: 525 });
+                .text('MAJELIS PENDIDIKAN DASAR DAN MENENGAH MUHAMMADIYAH', kopTextX, 45, { align: 'center', width: kopTextW });
             
             doc.fontSize(14)
                 .fillColor('#047857')
-                .text('SMK MUHAMMADIYAH SEKAMPUNG', 35, 58, { align: 'center', width: 525 });
+                .text('SMK MUHAMMADIYAH SEKAMPUNG', kopTextX, 58, { align: 'center', width: kopTextW });
 
             doc.fontSize(7.5)
                 .font('Helvetica')
                 .fillColor('#4b5563')
-                .text('NPSN: 10806085 | Terakreditasi B | Bidang Keahlian: Teknologi Rekayasa, TIK, Bisnis Manajemen', 35, 75, { align: 'center', width: 525 });
-            doc.text('Alamat: Jl. Raya Sekampung No. 01, Kec. Sekampung, Kab. Lampung Timur 34382 | Website: muska.sch.id', 35, 85, { align: 'center', width: 525 });
+                .text('NPSN: 10806085 | Terakreditasi B | Bidang Keahlian: Teknologi Rekayasa, TIK, Bisnis Manajemen', kopTextX, 75, { align: 'center', width: kopTextW });
+            doc.text('Alamat: Jl. Raya Sekampung No. 01, Kec. Sekampung, Kab. Lampung Timur 34382 | Website: muska.sch.id', kopTextX, 85, { align: 'center', width: kopTextW });
 
             // Garis Pembatas Kop
             doc.strokeColor('#047857').lineWidth(1.2).moveTo(35, 98).lineTo(560, 98).stroke();

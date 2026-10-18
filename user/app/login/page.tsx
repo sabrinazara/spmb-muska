@@ -60,14 +60,18 @@ export default function LoginPage() {
                 <div className="p-8 sm:p-10">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 font-bold text-xl mb-3 shadow-inner">
-                            MUSKA
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white shadow-md border border-slate-100 p-2 mb-3">
+                            <img
+                                src="/logo.png"
+                                alt="Logo SMK Muhammadiyah Sekampung"
+                                className="w-full h-full object-contain"
+                            />
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight">
                             Selamat Datang
                         </h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Portal SPMB SMK Muhammadiyah 1 Wonosobo
+                            Portal SPMB SMK Muhammadiyah Sekampung
                         </p>
                     </div>
 

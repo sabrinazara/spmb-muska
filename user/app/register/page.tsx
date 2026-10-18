@@ -13,7 +13,7 @@ export default function RegisterPage() {
         password: '',
         nik: '',
         nisn: '',
-        jurusanPilihan: 'TKJ',
+        jurusanPilihan: 'Teknik Jaringan Komputer dan Telekomunikasi',
     });
 
     const [loading, setLoading] = useState(false);
@@ -78,14 +78,18 @@ export default function RegisterPage() {
                 <div className="p-8 sm:p-10">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 font-bold text-xl mb-3 shadow-inner">
-                            MUSKA
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white shadow-md border border-slate-100 p-2 mb-3">
+                            <img
+                                src="/logo.png"
+                                alt="Logo SMK Muhammadiyah Sekampung"
+                                className="w-full h-full object-contain"
+                            />
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 tracking-tight">
                             Pendaftaran Akun Baru
                         </h1>
                         <p className="text-sm text-slate-500 mt-1">
-                            Portal SPMB SMK Muhammadiyah 1 Wonosobo
+                            Portal SPMB SMK Muhammadiyah Sekampung
                         </p>
                     </div>
 
@@ -203,12 +207,16 @@ export default function RegisterPage() {
                                 name="jurusanPilihan"
                                 value={formData.jurusanPilihan}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition text-sm"
                             >
-                                <option value="TKJ">Teknik Jaringan Komputer dan Telekomunikasi (TKJ)</option>
-                                <option value="TBSM">Teknik dan Bisnis Sepeda Motor (TBSM)</option>
-                                <option value="TKR">Teknik Kendaraan Ringan Otomotif (TKR)</option>
-                                <option value="AKL">Akuntansi dan Keuangan Lembaga (AKL)</option>
+                                <option value="Teknik Jaringan Komputer dan Telekomunikasi">Teknik Jaringan Komputer dan Telekomunikasi</option>
+                                <option value="Teknik Otomotif (Teknik Sepeda Motor)">Teknik Otomotif (Teknik Sepeda Motor)</option>
+                                <option value="Desain Komunikasi Visual">Desain Komunikasi Visual</option>
+                                <option value="Bisnis Digital dan Kreatif">Bisnis Digital dan Kreatif</option>
+                                <option value="Kulineri (Tata Boga)">Kulineri (Tata Boga)</option>
+                                <option value="Kecantikan dan Tata Rias">Kecantikan dan Tata Rias</option>
+                                <option value="Teknik Pemesinan (CNC)">Teknik Pemesinan (CNC)</option>
+                                <option value="Teknik Pengelasan (Welding)">Teknik Pengelasan (Welding)</option>
                             </select>
                         </div>
 

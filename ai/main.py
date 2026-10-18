@@ -327,12 +327,12 @@ SPMB_KNOWLEDGE = """
 Sekolah: SMK Muhammadiyah Sekampung (MUSKA), Lampung Timur.
 Status Akreditasi: Terakreditasi A (Unggul).
 Program Keahlian / Jurusan:
-1. Teknik Jaringan Komputer & Telekomunikasi (TKJ)
-2. Teknik Otomotif / Sepeda Motor (TSM)
-3. Desain Komunikasi Visual (DKV)
-4. Bisnis Digital & Kewirausahaan Kreatif
-5. Kuliner / Tata Boga
-6. Kecantikan & Tata Rias
+1. Teknik Jaringan Komputer dan Telekomunikasi
+2. Teknik Otomotif (Teknik Sepeda Motor)
+3. Desain Komunikasi Visual
+4. Bisnis Digital dan Kreatif
+5. Kulineri (Tata Boga)
+6. Kecantikan dan Tata Rias
 7. Teknik Pemesinan (CNC)
 8. Teknik Pengelasan (Welding)
 
@@ -349,15 +349,15 @@ async def chat_spmb(payload: ChatRequest):
     if "jurusan" in q or "prodi" in q or "kejuruan" in q:
         ans = (
             "SMK Muhammadiyah Sekampung memiliki 8 Program Keahlian unggulan berstandar industri:\n"
-            "1. Teknik Komputer & Jaringan (TKJ)\n"
-            "2. Teknik Otomotif / TSM\n"
-            "3. Desain Komunikasi Visual (DKV)\n"
-            "4. Bisnis Digital\n"
-            "5. Kuliner / Tata Boga\n"
-            "6. Kecantikan & Tata Rias\n"
-            "7. Teknik Pemesinan\n"
-            "8. Teknik Pengelasan\n"
-            "Semuanya didukung fasilitas bengkel dan laboratorium modern."
+            "1. Teknik Jaringan Komputer dan Telekomunikasi\n"
+            "2. Teknik Otomotif (Teknik Sepeda Motor)\n"
+            "3. Desain Komunikasi Visual\n"
+            "4. Bisnis Digital dan Kreatif\n"
+            "5. Kulineri (Tata Boga)\n"
+            "6. Kecantikan dan Tata Rias\n"
+            "7. Teknik Pemesinan (CNC)\n"
+            "8. Teknik Pengelasan (Welding)\n"
+            "Semuanya didukung fasilitas bengkel dan laboratorium modern standar industri."
         )
     elif "biaya" in q or "bayar" in q or "uang" in q:
         ans = (

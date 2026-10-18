@@ -26,26 +26,30 @@ export class AdminService {
         const tidakLulus = await this.prisma.pendaftaran.count({ where: { statusKelulusan: 'TIDAK_LULUS' } });
         const menungguUjian = await this.prisma.pendaftaran.count({ where: { statusKelulusan: 'MENUNGGU' } });
 
-        // Distribusi Pendaftar per Jurusan
+        // Distribusi Pendaftar per 8 Jurusan Resmi
         const listJurusan = [
-            'Teknik Kendaraan Ringan (TKR)',
-            'Teknik dan Bisnis Sepeda Motor (TBSM)',
-            'Teknik Komputer dan Jaringan (TKJ)',
-            'Rekayasa Perangkat Lunak (RPL)',
-            'Akuntansi dan Keuangan Lembaga (AKL)',
-            'Otomatisasi dan Tata Kelola Perkantoran (OTKP)',
-            'Bisnis Daring dan Pemasaran (BDP)',
-            'Desain Pemodelan dan Informasi Bangunan (DPIB)',
+            { nama: 'Teknik Jaringan Komputer dan Telekomunikasi', singkatan: 'TJKT', keywords: ['Jaringan', 'TKJ', 'Telekomunikasi'] },
+            { nama: 'Teknik Otomotif (Teknik Sepeda Motor)', singkatan: 'TSM', keywords: ['Otomotif', 'Sepeda Motor', 'TBSM', 'TSM'] },
+            { nama: 'Desain Komunikasi Visual', singkatan: 'DKV', keywords: ['Desain', 'DKV'] },
+            { nama: 'Bisnis Digital dan Kreatif', singkatan: 'BDK', keywords: ['Bisnis Digital', 'BDK'] },
+            { nama: 'Kulineri (Tata Boga)', singkatan: 'BOGA', keywords: ['Kuliner', 'Kulineri', 'Boga'] },
+            { nama: 'Kecantikan dan Tata Rias', singkatan: 'TATA RIAS', keywords: ['Kecantikan', 'Rias'] },
+            { nama: 'Teknik Pemesinan (CNC)', singkatan: 'CNC', keywords: ['Pemesinan', 'CNC'] },
+            { nama: 'Teknik Pengelasan (Welding)', singkatan: 'LAS', keywords: ['Pengelasan', 'Welding', 'Las'] },
         ];
 
         const jurusanStats = await Promise.all(
-            listJurusan.map(async (jur) => {
+            listJurusan.map(async (item) => {
                 const count = await this.prisma.pendaftaran.count({
-                    where: { jurusan: { contains: jur.split(' ')[0] } }
+                    where: {
+                        OR: item.keywords.map((kw) => ({
+                            jurusan: { contains: kw, mode: 'insensitive' as const }
+                        }))
+                    }
                 });
                 return {
-                    jurusan: jur,
-                    singkatan: jur.match(/\((.*?)\)/)?.[1] || jur,
+                    jurusan: item.nama,
+                    singkatan: item.singkatan,
                     count,
                 };
             })
