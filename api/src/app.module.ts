@@ -7,10 +7,18 @@ import { AuthModule } from './auth/auth.module';
 import { DokumenModule } from './dokumen/dokumen.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PendaftaranModule } from './pendaftaran/pendaftaran.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }),
-    AiIntegrationModule, AuthModule, DokumenModule, PrismaModule, PendaftaranModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    AiIntegrationModule,
+    AuthModule,
+    DokumenModule,
+    PrismaModule,
+    PendaftaranModule,
+    AdminModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

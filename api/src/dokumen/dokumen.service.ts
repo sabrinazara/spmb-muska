@@ -137,8 +137,19 @@ export class DokumenService {
             },
         });
 
+        // Khusus Bukti Transfer Pembayaran
+        if (jenisDokumen.toUpperCase() === 'BUKTI_TRANSFER' || jenisDokumen.toLowerCase().includes('bayar')) {
+            await this.prisma.pendaftaran.update({
+                where: { id: pendaftaran.id },
+                data: {
+                    buktiPembayaran: `/uploads/${safeFilename}`,
+                    statusPembayaran: 'MENUNGGU_VERIFIKASI',
+                },
+            });
+        }
+
         // Jika dokumen ini VALID dan jenisnya KTP/KK, otomatis perbarui status Pendaftaran menjadi VALID jika disetujui
-        if (statusValidasi === 'VALID') {
+        if (statusValidasi === 'VALID' && (jenisDokumen.toUpperCase() === 'KTP' || jenisDokumen.toUpperCase() === 'KK')) {
             await this.prisma.pendaftaran.update({
                 where: { id: pendaftaran.id },
                 data: {

@@ -58,4 +58,9 @@ export class PendaftaranController {
         res.setHeader('Content-Length', buffer.length);
         res.end(buffer);
     }
+
+    @Get('pengumuman')
+    async getPengumuman() {
+        return this.pendaftaranService.getPengumumanStatus();
+    }
 }

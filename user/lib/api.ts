@@ -4,7 +4,9 @@
  */
 
 export const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== 'http://localhost:3000')
+        ? process.env.NEXT_PUBLIC_API_URL
+        : 'http://localhost:3001';
 
 export const AI_BASE_URL =
     process.env.NEXT_PUBLIC_AI_URL || 'http://localhost:8000';
@@ -25,6 +27,7 @@ export const API_ENDPOINTS = {
         LENGKAPI_DATA: `${API_BASE_URL}/pendaftaran/lengkapi-data`,
         KARTU_UJIAN: `${API_BASE_URL}/pendaftaran/kartu-ujian`,
         RINGKASAN_FORMULIR: `${API_BASE_URL}/pendaftaran/ringkasan-formulir`,
+        PENGUMUMAN: `${API_BASE_URL}/pendaftaran/pengumuman`,
     },
 
     // Upload & Verifikasi Dokumen

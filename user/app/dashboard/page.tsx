@@ -2,6 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import {
+    Edit3,
+    UploadCloud,
+    CheckCircle2,
+    CreditCard,
+    FileText,
+    ArrowRight,
+    Award,
+    AlertCircle,
+    Loader2,
+    Clock,
+    Building2,
+    Sparkles,
+} from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
 
 interface DokumenItem {
@@ -64,7 +78,7 @@ export default function DashboardBeranda() {
             'TBSM': '2. Teknik Otomotif (Teknik Sepeda Motor)',
             'DKV': '3. Desain Komunikasi Visual',
             'BDK': '4. Bisnis Digital dan Kreatif',
-            'BOGA': '5. Kulineri (Tata Boga)',
+            'BOGA': '5. Kuliner (Tata Boga)',
             'TATA_RIAS': '6. Kecantikan dan Tata Rias',
             'CNC': '7. Teknik Pemesinan (CNC)',
             'LAS': '8. Teknik Pengelasan (Welding)',
@@ -72,46 +86,53 @@ export default function DashboardBeranda() {
         return (code && map[code]) || code || '-';
     };
 
+    // SKELETON LOADING
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-20">
-                <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="space-y-6 font-sans animate-pulse">
+                <div className="h-56 bg-slate-200 rounded-3xl"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div className="h-20 bg-slate-200 rounded-2xl"></div>
+                    <div className="h-20 bg-slate-200 rounded-2xl"></div>
+                    <div className="h-20 bg-slate-200 rounded-2xl"></div>
+                    <div className="h-20 bg-slate-200 rounded-2xl"></div>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 h-72 bg-slate-200 rounded-2xl"></div>
+                    <div className="h-72 bg-slate-200 rounded-2xl"></div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 font-sans pb-12 animate-in fade-in duration-300">
             {/* Banner Utama */}
-            <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-700 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
                 <div className="relative z-10 max-w-2xl">
                     <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-xs rounded-full text-xs font-semibold tracking-wide text-amber-200 mb-3">
-                        Tahun Ajaran 2026/2027 • Gelombang 1
+                        Tahun Ajaran 2026/2027 • Pendaftaran Gratis
                     </span>
                     <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                         Selamat Datang, {pendaftaran?.namaLengkap || pendaftaran?.user?.nama || 'Calon Siswa'}!
                     </h1>
-                    <p className="mt-2 text-sm sm:text-base text-emerald-100 leading-relaxed">
+                    <p className="mt-2 text-xs sm:text-sm text-emerald-100 leading-relaxed">
                         Sistem Informasi Penerimaan Peserta Didik Baru (SPMB) Berbasis OCR dan AI Verifikasi SMK Muhammadiyah Sekampung.
                     </p>
                     <div className="mt-5 flex flex-wrap gap-3">
                         <Link
                             href="/dashboard/lengkapi-data"
-                            className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold text-xs sm:text-sm rounded-xl shadow-sm transition inline-flex items-center gap-2"
+                            className="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold text-xs sm:text-sm rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
                         >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
+                            <Edit3 className="w-4 h-4 text-slate-900" />
                             <span>Lengkapi Formulir Data</span>
                         </Link>
                         <Link
                             href="/dashboard/upload"
-                            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-semibold text-xs sm:text-sm rounded-xl backdrop-blur-xs border border-white/20 transition inline-flex items-center gap-2"
+                            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white font-semibold text-xs sm:text-sm rounded-xl backdrop-blur-xs border border-white/20 transition inline-flex items-center gap-2 cursor-pointer"
                         >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                            </svg>
-                            <span>Upload Dokumen OCR</span>
+                            <UploadCloud className="w-4 h-4" />
+                            <span>Upload Dokumen (KK/SKL)</span>
                         </Link>
                     </div>
                 </div>
@@ -130,9 +151,7 @@ export default function DashboardBeranda() {
                     {/* Step 1 */}
                     <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900">
                         <span className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                            </svg>
+                            <CheckCircle2 className="w-4 h-4" />
                         </span>
                         <div>
                             <div className="text-[11px] text-emerald-700 font-semibold uppercase">Langkah 1</div>
@@ -154,13 +173,7 @@ export default function DashboardBeranda() {
                                 pendaftaran?.namaLengkap ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'
                             }`}
                         >
-                            {pendaftaran?.namaLengkap ? (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                </svg>
-                            ) : (
-                                '2'
-                            )}
+                            {pendaftaran?.namaLengkap ? <CheckCircle2 className="w-4 h-4" /> : '2'}
                         </span>
                         <div>
                             <div className="text-[11px] font-semibold uppercase">Langkah 2</div>
@@ -187,9 +200,7 @@ export default function DashboardBeranda() {
                             }`}
                         >
                             {pendaftaran?.dokumen && pendaftaran.dokumen.length > 0 ? (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                </svg>
+                                <CheckCircle2 className="w-4 h-4" />
                             ) : (
                                 '3'
                             )}
@@ -214,13 +225,7 @@ export default function DashboardBeranda() {
                                 pendaftaran?.status === 'VALID' ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'
                             }`}
                         >
-                            {pendaftaran?.status === 'VALID' ? (
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                </svg>
-                            ) : (
-                                '4'
-                            )}
+                            {pendaftaran?.status === 'VALID' ? <CheckCircle2 className="w-4 h-4" /> : '4'}
                         </span>
                         <div>
                             <div className="text-[11px] font-semibold uppercase">Langkah 4</div>
@@ -280,7 +285,7 @@ export default function DashboardBeranda() {
                                 </div>
                                 <div>
                                     <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                                        NIK
+                                        NIK (KK/KIA)
                                     </span>
                                     <span className="font-mono font-medium text-slate-800">
                                         {pendaftaran.nik}
@@ -323,7 +328,7 @@ export default function DashboardBeranda() {
                         <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
                             <div>
                                 <h2 className="text-base font-bold text-slate-800">
-                                    Dokumen Persyaratan & OCR
+                                    Dokumen Persyaratan & Verifikasi AI OCR
                                 </h2>
                                 <p className="text-xs text-slate-500">
                                     Berkas digital yang telah diunggah untuk verifikasi
@@ -331,7 +336,7 @@ export default function DashboardBeranda() {
                             </div>
                             <Link
                                 href="/dashboard/upload"
-                                className="px-3 py-1.5 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg transition"
+                                className="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition"
                             >
                                 + Unggah Berkas
                             </Link>
@@ -343,9 +348,7 @@ export default function DashboardBeranda() {
                                     <div key={doc.id} className="py-3 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
-                                                <svg className="w-4 h-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
+                                                <FileText className="w-4 h-4 text-emerald-700" />
                                             </div>
                                             <div>
                                                 <div className="font-semibold text-slate-800">{doc.jenisDokumen}</div>
@@ -357,21 +360,17 @@ export default function DashboardBeranda() {
                                         <div>
                                             {doc.status === 'VALID' ? (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                    <svg className="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                                    </svg>
+                                                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                                                     <span>Terverifikasi (Valid)</span>
                                                 </span>
                                             ) : doc.status === 'INVALID' ? (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-rose-100 text-rose-800 border border-rose-200">
-                                                    <svg className="w-3 h-3 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    <AlertCircle className="w-3 h-3 text-rose-600" />
                                                     <span>Perlu Perbaikan</span>
                                                 </span>
                                             ) : (
                                                 <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-200">
-                                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                    <Loader2 className="w-3 h-3 text-amber-600 animate-spin" />
                                                     <span>Menunggu Verifikasi</span>
                                                 </span>
                                             )}
@@ -380,14 +379,14 @@ export default function DashboardBeranda() {
                                 ))
                             ) : (
                                 <div className="text-center py-6 text-xs text-slate-400">
-                                    Belum ada berkas yang diunggah. Unggah foto KTP/KK untuk verifikasi otomatis AI.
+                                    Belum ada berkas yang diunggah. Unggah foto Kartu Keluarga (KK) atau SKL untuk verifikasi otomatis AI.
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* 1 Kolom Kanan: Status & Kartu Ujian Card */}
+                {/* 1 Kolom Kanan: Status & Kartu Ujian & Pengumuman */}
                 <div className="space-y-6">
                     {/* Status Card */}
                     <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs">
@@ -416,12 +415,27 @@ export default function DashboardBeranda() {
                         </div>
                     </div>
 
+                    {/* Pengumuman Kelulusan Banner Card */}
+                    <div className="bg-gradient-to-br from-emerald-900 to-teal-950 text-white rounded-2xl p-6 shadow-xs border border-emerald-800">
+                        <div className="flex items-center gap-2 text-amber-300 font-bold text-sm mb-2">
+                            <Award className="w-4 h-4 text-amber-300" />
+                            <span>Pengumuman Kelulusan</span>
+                        </div>
+                        <p className="text-xs text-emerald-100/90 leading-relaxed mb-4">
+                            Cek status hasil kelulusan ujian seleksi PPDB SMK Muhammadiyah Sekampung secara online.
+                        </p>
+                        <Link
+                            href="/dashboard/kelulusan"
+                            className="w-full block text-center py-2.5 px-4 rounded-xl font-bold text-xs bg-amber-400 hover:bg-amber-300 text-emerald-950 transition shadow-sm"
+                        >
+                            Buka Pengumuman Hasil Seleksi
+                        </Link>
+                    </div>
+
                     {/* Kartu Ujian Box */}
                     <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200/80 p-6 shadow-xs">
                         <div className="flex items-center gap-2 text-amber-900 font-bold text-sm mb-2">
-                            <svg className="w-4 h-4 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                            </svg>
+                            <CreditCard className="w-4 h-4 text-amber-700" />
                             <span>Kartu Peserta Ujian</span>
                         </div>
                         <p className="text-xs text-amber-800/80 leading-relaxed mb-4">
@@ -444,9 +458,7 @@ export default function DashboardBeranda() {
                     {/* Kontak Bantuan */}
                     <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-xs text-xs space-y-2">
                         <div className="font-bold text-slate-800 text-sm mb-1 flex items-center gap-1.5">
-                            <svg className="w-4 h-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
+                            <Building2 className="w-4 h-4 text-emerald-700" />
                             <span>Sekretariat SPMB MUSKA</span>
                         </div>
                         <div className="text-slate-600">SMK Muhammadiyah Sekampung, Kab. Lampung Timur</div>

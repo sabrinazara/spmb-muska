@@ -3,6 +3,21 @@
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+    Home,
+    FileText,
+    UploadCloud,
+    CheckCircle2,
+    Award,
+    CreditCard,
+    LogOut,
+    Menu,
+    X,
+    ChevronRight,
+    User,
+    Loader2,
+    AlertCircle,
+} from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
 import ChatbotRAG from '@/components/ChatbotRAG';
 
@@ -66,56 +81,42 @@ export default function DashboardLayout({
         {
             label: 'Beranda',
             href: '/dashboard',
-            icon: (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-            ),
+            icon: Home,
         },
         {
             label: 'Lengkapi Data',
             href: '/dashboard/lengkapi-data',
-            icon: (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-            ),
+            icon: FileText,
         },
         {
             label: 'Upload Dokumen',
             href: '/dashboard/upload',
-            icon: (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-            ),
+            icon: UploadCloud,
         },
         {
             label: 'Status Pendaftaran',
             href: '/dashboard/status',
-            icon: (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-            ),
+            icon: CheckCircle2,
         },
         {
-            label: 'Unduh Kartu Ujian',
+            label: 'Kartu Peserta Ujian',
             href: '/dashboard/kartu-ujian',
-            icon: (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                </svg>
-            ),
+            icon: CreditCard,
+        },
+        {
+            label: 'Pengumuman Kelulusan',
+            href: '/dashboard/kelulusan',
+            icon: Award,
         },
     ];
 
     const getPageTitle = () => {
         if (pathname === '/dashboard') return 'Beranda';
         if (pathname === '/dashboard/lengkapi-data') return 'Formulir Kelengkapan Data';
-        if (pathname === '/dashboard/upload') return 'Unggah Dokumen & OCR';
+        if (pathname === '/dashboard/upload') return 'Unggah Dokumen Persyaratan';
         if (pathname === '/dashboard/status') return 'Status Pendaftaran';
         if (pathname === '/dashboard/kartu-ujian') return 'Kartu Peserta Ujian';
+        if (pathname === '/dashboard/kelulusan') return 'Pengumuman Hasil Seleksi';
         return 'Dashboard Siswa';
     };
 
@@ -168,6 +169,7 @@ export default function DashboardLayout({
 
                         {navItems.map((item) => {
                             const isActive = pathname === item.href;
+                            const IconComponent = item.icon;
                             return (
                                 <Link
                                     key={item.href}
@@ -180,7 +182,7 @@ export default function DashboardLayout({
                                     }`}
                                 >
                                     <span className={`${isActive ? 'text-amber-400' : 'text-emerald-300'}`}>
-                                        {item.icon}
+                                        <IconComponent className="w-5 h-5" />
                                     </span>
                                     <span>{item.label}</span>
                                 </Link>
@@ -194,9 +196,7 @@ export default function DashboardLayout({
                     <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2.5 min-w-0">
                             <div className="w-9 h-9 rounded-xl bg-emerald-800 text-amber-400 flex items-center justify-center shrink-0 border border-emerald-700/50">
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                                <User className="w-5 h-5" />
                             </div>
                             <div className="min-w-0">
                                 <div className="text-xs font-bold text-white truncate">
@@ -211,12 +211,10 @@ export default function DashboardLayout({
                         <button
                             onClick={handleLogout}
                             title="Keluar dari akun"
-                            className="p-2 text-rose-300 hover:text-white hover:bg-rose-900/40 rounded-lg transition shrink-0"
+                            className="p-2 text-rose-300 hover:text-white hover:bg-rose-900/40 rounded-lg transition shrink-0 cursor-pointer"
                             aria-label="Logout"
                         >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
+                            <LogOut className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
@@ -231,19 +229,15 @@ export default function DashboardLayout({
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={() => setSidebarOpen(true)}
-                                className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none"
+                                className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 focus:outline-none cursor-pointer"
                                 aria-label="Buka Menu Navigasi"
                             >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
+                                <Menu className="w-5 h-5" />
                             </button>
 
                             <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                                 <span className="text-slate-400">Portal Siswa</span>
-                                <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
+                                <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
                                 <span className="font-bold text-slate-800">{getPageTitle()}</span>
                             </div>
                         </div>
@@ -252,35 +246,26 @@ export default function DashboardLayout({
                         <div className="flex items-center gap-3">
                             {statusPendaftaran === 'VALID' ? (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                                    <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                    </svg>
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                                     <span>Terverifikasi</span>
                                 </span>
                             ) : statusPendaftaran === 'INVALID' ? (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
-                                    <svg className="w-3.5 h-3.5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
                                     <span>Perlu Perbaikan</span>
                                 </span>
                             ) : (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                                    <svg className="w-3.5 h-3.5 text-amber-600 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                                    </svg>
+                                    <Loader2 className="w-3.5 h-3.5 text-amber-600 animate-spin" />
                                     <span>Menunggu Verifikasi</span>
                                 </span>
                             )}
 
                             <button
                                 onClick={handleLogout}
-                                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition shadow-2xs"
+                                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition shadow-2xs cursor-pointer"
                             >
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
+                                <LogOut className="w-3.5 h-3.5" />
                                 <span>Keluar</span>
                             </button>
                         </div>

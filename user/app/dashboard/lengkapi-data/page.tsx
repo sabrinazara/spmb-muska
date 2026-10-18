@@ -305,16 +305,26 @@ export default function LengkapiDataPage() {
                     }`}
                 >
                     <div className="flex items-center gap-2.5">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${message.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}`}>
-                            {message.type === 'success' ? '✓' : '!'}
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${message.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}`}>
+                            {message.type === 'success' ? (
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                </svg>
+                            ) : (
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            )}
                         </span>
                         <span>{message.text}</span>
                     </div>
                     <button
                         onClick={() => setMessage(null)}
-                        className="text-slate-400 hover:text-slate-600 text-sm ml-2"
+                        className="text-slate-400 hover:text-slate-600 ml-2"
                     >
-                        ✕
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                 </div>
             )}
@@ -339,14 +349,23 @@ export default function LengkapiDataPage() {
                                 }`}
                             >
                                 <div className="flex items-center justify-between w-full mb-1">
-                                    <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${
+                                    <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-1.5 py-0.5 rounded ${
                                         isActive
                                             ? 'bg-amber-400 text-emerald-950'
                                             : isDone
                                             ? 'bg-emerald-600 text-white'
                                             : 'bg-slate-200 text-slate-600'
                                     }`}>
-                                        {isDone ? '✓ SELESAI' : `STEP ${step.id}`}
+                                        {isDone ? (
+                                            <>
+                                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <span>SELESAI</span>
+                                            </>
+                                        ) : (
+                                            `STEP ${step.id}`
+                                        )}
                                     </span>
                                 </div>
                                 <div className="text-xs font-bold truncate">{step.title}</div>
@@ -1018,9 +1037,12 @@ export default function LengkapiDataPage() {
                             type="button"
                             onClick={() => handleSubmit()}
                             disabled={saving}
-                            className="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition border border-slate-300 disabled:opacity-50 cursor-pointer"
+                            className="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition border border-slate-300 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
                         >
-                            {saving ? 'Menyimpan...' : '💾 Simpan Sementara'}
+                            <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg>
+                            <span>{saving ? 'Menyimpan...' : 'Simpan Sementara'}</span>
                         </button>
 
                         {/* NEXT OR FINAL SUBMIT BUTTON */}
@@ -1034,7 +1056,9 @@ export default function LengkapiDataPage() {
                                 className="flex-1 sm:flex-initial px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
                             >
                                 <span>Selanjutnya</span>
-                                <span>→</span>
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             </button>
                         ) : (
                             <button
@@ -1048,7 +1072,12 @@ export default function LengkapiDataPage() {
                                         <span>Menyimpan Formulir...</span>
                                     </>
                                 ) : (
-                                    <span>✓ Simpan & Selesaikan Formulir</span>
+                                    <>
+                                        <svg className="w-4 h-4 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span>Simpan & Selesaikan Formulir</span>
+                                    </>
                                 )}
                             </button>
                         )}

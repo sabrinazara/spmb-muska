@@ -122,8 +122,8 @@ export class PendaftaranService {
         });
 
         const nomorPendaftaran = pendaftaran?.nomorPendaftaran || `MUSKA-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
-        const jadwalUjian = pendaftaran?.jadwalUjian || 'Senin, 18 Mei 2026 (08.00 - 10.00 WIB)';
-        const ruangUjian = pendaftaran?.ruangUjian || 'Ruang CBT Kampus 1 SMK Muhammadiyah Sekampung';
+        const jadwalUjian = pendaftaran?.jadwalUjian || null;
+        const ruangUjian = pendaftaran?.ruangUjian || null;
 
         if (pendaftaran) {
             // Update existing pendaftaran
@@ -243,15 +243,16 @@ export class PendaftaranService {
         }
 
         const nomorPendaftaran = pendaftaran.nomorPendaftaran || `MUSKA-2026-${Math.floor(10000 + Math.random() * 90000)}`;
-        const nama = pendaftaran.namaLengkap || pendaftaran.user.nama || 'Calon Siswa';
-        const qrText = `SPMB MUSKA 2026 | No: ${nomorPendaftaran} | NISN: ${pendaftaran.nisn} | Nama: ${nama} | Status: VALID`;
-        const qrDataUrl = await QRCode.toDataURL(qrText, { margin: 1, width: 140 });
+        const nama = pendaftaran.namaLengkap || pendaftaran.user?.nama || 'Calon Siswa';
+        const qrText = `SPMB MUSKA 2026 | No: ${nomorPendaftaran} | NISN: ${pendaftaran.nisn} | Nama: ${nama} | Status: RESMI TERVERIFIKASI`;
+        const qrDataUrl = await QRCode.toDataURL(qrText, { margin: 1, width: 120 });
         const qrBuffer = Buffer.from(qrDataUrl.split(',')[1], 'base64');
 
         return new Promise((resolve, reject) => {
             const doc = new PDFDocument({
                 size: 'A4',
-                margin: 40,
+                margin: 35,
+                autoFirstPage: true,
             });
 
             const buffers: Buffer[] = [];
@@ -260,124 +261,145 @@ export class PendaftaranService {
                 const pdfBuffer = Buffer.concat(buffers);
                 resolve({
                     buffer: pdfBuffer,
-                    filename: `Kartu-Ujian-PPDB-${pendaftaran.nisn}.pdf`,
+                    filename: `Kartu-Ujian-SPMB-${pendaftaran.nisn}.pdf`,
                 });
             });
             doc.on('error', reject);
 
-            // === HEADER KOP SURAT ===
-            doc.rect(40, 40, 515, 6).fill('#047857'); // Garis hijau emerald atas
-            doc.rect(40, 47, 515, 2).fill('#d97706'); // Garis kuning emas
+            // === 1. DEKORASI KOP SURAT (HERO STRIPES) ===
+            doc.rect(35, 30, 525, 4).fill('#065f46'); // Hijau Tua
+            doc.rect(35, 35, 525, 2).fill('#d97706'); // Kuning Emas
 
-            doc.moveDown(1.5);
+            // === 2. TEKS KOP SURAT ===
             doc.fillColor('#065f46')
-                .fontSize(10)
+                .fontSize(9)
                 .font('Helvetica-Bold')
-                .text('MAJELIS PENDIDIKAN DASAR DAN MENENGAH MUHAMMADIYAH', { align: 'center' });
+                .text('MAJELIS PENDIDIKAN DASAR DAN MENENGAH MUHAMMADIYAH', 35, 45, { align: 'center', width: 525 });
             
             doc.fontSize(14)
                 .fillColor('#047857')
-                .text('SMK MUHAMMADIYAH SEKAMPUNG', { align: 'center' });
+                .text('SMK MUHAMMADIYAH SEKAMPUNG', 35, 58, { align: 'center', width: 525 });
 
-            doc.fontSize(8)
+            doc.fontSize(7.5)
                 .font('Helvetica')
                 .fillColor('#4b5563')
-                .text('Jl. Raya Sekampung No. 01, Kab. Lampung Timur | Telp/WA: 0812-3456-7890 | Website: muska.sch.id', { align: 'center' });
+                .text('NPSN: 10806085 | Terakreditasi B | Bidang Keahlian: Teknologi Rekayasa, TIK, Bisnis Manajemen', 35, 75, { align: 'center', width: 525 });
+            doc.text('Alamat: Jl. Raya Sekampung No. 01, Kec. Sekampung, Kab. Lampung Timur 34382 | Website: muska.sch.id', 35, 85, { align: 'center', width: 525 });
 
-            doc.moveDown(0.5);
-            doc.strokeColor('#047857').lineWidth(1.5).moveTo(40, doc.y).lineTo(555, doc.y).stroke();
-            doc.strokeColor('#d97706').lineWidth(0.5).moveTo(40, doc.y + 2).lineTo(555, doc.y + 2).stroke();
+            // Garis Pembatas Kop
+            doc.strokeColor('#047857').lineWidth(1.2).moveTo(35, 98).lineTo(560, 98).stroke();
+            doc.strokeColor('#d97706').lineWidth(0.5).moveTo(35, 101).lineTo(560, 101).stroke();
 
-            // === JUDUL KARTU ===
-            doc.moveDown(1.5);
-            doc.rect(40, doc.y, 515, 28).fill('#047857');
+            // === 3. BANNER JUDUL KARTU ===
+            doc.rect(35, 108, 525, 24).fill('#047857');
             doc.fillColor('#ffffff')
-                .fontSize(12)
+                .fontSize(10.5)
                 .font('Helvetica-Bold')
-                .text('KARTU TANDA PESERTA UJIAN SELEKSI PPDB TA 2026/2027', 40, doc.y - 20, { align: 'center' });
+                .text('KARTU TANDA PESERTA UJIAN SELEKSI SPMB TA 2026/2027', 35, 114, { align: 'center', width: 525 });
 
-            doc.moveDown(2);
-
-            // === KOTAK STATUS RESMI ===
-            const statusY = doc.y;
-            doc.roundedRect(40, statusY, 515, 34, 6).fillAndStroke('#ecfdf5', '#059669');
+            // === 4. BADGE STATUS VALIDASI RESMI ===
+            doc.roundedRect(35, 138, 525, 26, 4).fillAndStroke('#ecfdf5', '#10b981');
             doc.fillColor('#065f46')
-                .fontSize(10)
+                .fontSize(8.5)
                 .font('Helvetica-Bold')
-                .text('STATUS: RESMI TERVERIFIKASI (LULUS SELEKSI BERKAS)', 55, statusY + 11);
-            doc.fontSize(9)
-                .font('Helvetica')
+                .text('STATUS: RESMI TERVERIFIKASI PANITIA SPMB', 48, 146);
+            doc.fontSize(8)
+                .font('Helvetica-Bold')
                 .fillColor('#047857')
-                .text(`Nomor Registrasi: ${nomorPendaftaran}`, 330, statusY + 11);
+                .text(`NO. REG: ${nomorPendaftaran}`, 380, 146, { align: 'right', width: 165 });
 
-            doc.moveDown(2.5);
+            // === 5. GRID BIODATA (KOLOM KIRI) & FOTO/QR (KOLOM KANAN) ===
+            const gridTopY = 172;
+            const leftColX = 35;
+            const leftColWidth = 380;
+            const labelW = 125;
+            const valueX = leftColX + labelW;
 
-            // === DATA SISWA & UJIAN (GRID 2 KOLOM) ===
-            const startDataY = doc.y;
-            const leftX = 45;
-            const labelWidth = 135;
-            const valueX = leftX + labelWidth;
+            // Box kontainer biodata kiri
+            doc.roundedRect(leftColX, gridTopY, leftColWidth, 195, 4).fillAndStroke('#ffffff', '#e2e8f0');
 
-            const rows = [
-                ['Nomor Pendaftaran', nomorPendaftaran],
-                ['Nama Lengkap', nama],
-                ['NISN / NIK', `${pendaftaran.nisn} / ${pendaftaran.nik}`],
+            const studentData = [
+                ['Nomor Registrasi', nomorPendaftaran],
+                ['Nama Lengkap Siswa', nama],
+                ['NISN', pendaftaran.nisn],
+                ['NIK (Kartu Keluarga)', pendaftaran.nik],
                 ['Jenis Kelamin', pendaftaran.jenisKelamin || '-'],
-                ['Asal Sekolah', pendaftaran.sekolahAsal || '-'],
-                ['Program Keahlian', pendaftaran.jurusan || '-'],
-                ['Jadwal Ujian Seleksi', pendaftaran.jadwalUjian || 'Senin, 18 Mei 2026 | 08.00 WIB'],
-                ['Ruang Ujian', pendaftaran.ruangUjian || 'Lab Komputer CBT 1'],
+                ['Asal Sekolah (SMP/MTs)', pendaftaran.sekolahAsal || '-'],
+                ['Pilihan Program Keahlian', pendaftaran.jurusan || '-'],
+                ['Jadwal Pelaksanaan Ujian', pendaftaran.jadwalUjian || 'Senin, 18 Mei 2026 (08.00 WIB)'],
+                ['Ruang / Laboratorium Ujian', pendaftaran.ruangUjian || 'Ruang CBT 1 Kampus SMK Muska'],
             ];
 
-            doc.font('Helvetica').fontSize(9.5);
-            let currentY = startDataY;
-
-            rows.forEach(([label, val]) => {
-                doc.fillColor('#6b7280').font('Helvetica-Bold').text(label, leftX, currentY);
-                doc.fillColor('#111827').font('Helvetica').text(`:  ${val}`, valueX, currentY);
-                currentY += 20;
+            let rowY = gridTopY + 10;
+            doc.fontSize(8.5);
+            studentData.forEach(([label, val], idx) => {
+                if (idx % 2 === 0) {
+                    doc.rect(leftColX + 2, rowY - 2, leftColWidth - 4, 18).fill('#f8fafc');
+                }
+                doc.fillColor('#475569').font('Helvetica-Bold').text(label, leftColX + 8, rowY);
+                doc.fillColor('#0f172a').font('Helvetica').text(`:  ${val}`, valueX, rowY, { width: leftColWidth - labelW - 12 });
+                rowY += 20;
             });
 
-            // === KOLOM KANAN: FOTO & QR CODE ===
-            const rightBoxX = 420;
+            // Box Pas Foto & QR Code Kanan
+            const rightColX = 425;
+            const rightColW = 135;
+            doc.roundedRect(rightColX, gridTopY, rightColW, 195, 4).fillAndStroke('#f8fafc', '#e2e8f0');
+
             // Kotak Pas Foto 3x4
-            doc.roundedRect(rightBoxX, startDataY, 95, 120, 4).strokeColor('#9ca3af').lineWidth(1).stroke();
-            doc.fillColor('#9ca3af')
-                .fontSize(8)
+            const photoW = 75;
+            const photoH = 95;
+            const photoX = rightColX + (rightColW - photoW) / 2;
+            doc.roundedRect(photoX, gridTopY + 10, photoW, photoH, 3).strokeColor('#cbd5e1').lineWidth(1).stroke();
+            doc.fillColor('#94a3b8')
+                .fontSize(7)
                 .font('Helvetica')
-                .text('TEMPEL FOTO\n3 x 4\n(Latar Merah/Biru)', rightBoxX, startDataY + 45, { align: 'center', width: 95 });
+                .text('PAS FOTO\n3 x 4 cm\n(Warna/Hitam Putih)', photoX, gridTopY + 45, { align: 'center', width: photoW });
 
-            // QR Code
-            doc.image(qrBuffer, rightBoxX - 5, startDataY + 130, { width: 105 });
-            doc.fontSize(7).fillColor('#6b7280').text('Scan untuk validasi keaslian', rightBoxX - 5, startDataY + 235, { align: 'center', width: 105 });
+            // QR Code Keaslian
+            const qrSize = 65;
+            const qrX = rightColX + (rightColW - qrSize) / 2;
+            doc.image(qrBuffer, qrX, gridTopY + 112, { width: qrSize, height: qrSize });
+            doc.fontSize(6.5)
+                .fillColor('#059669')
+                .font('Helvetica-Bold')
+                .text('QR VERIFIED - PANITIA', rightColX, gridTopY + 180, { align: 'center', width: rightColW });
 
-            // === TATA TERTIB UJIAN ===
-            doc.y = currentY + 70;
-            doc.roundedRect(40, doc.y, 515, 95, 6).fillAndStroke('#f9fafb', '#e5e7eb');
-            const rulesY = doc.y + 10;
-            doc.fillColor('#1f2937').fontSize(9).font('Helvetica-Bold').text('TATA TERTIB UJIAN SELEKSI OFFLINE:', 55, rulesY);
-            doc.font('Helvetica').fontSize(8).fillColor('#4b5563');
-            const rules = [
-                '1. Peserta wajib hadir 15 menit sebelum ujian dimulai dengan mengenakan seragam sekolah asal rapi.',
-                '2. Membawa Kartu Tanda Peserta Ujian ini yang sudah dicetak dan ditempel pas foto 3x4.',
-                '3. Membawa alat tulis (pensil 2B, pulpen hitam, penghapus) dan kartu identitas diri.',
-                '4. Tidak diperkenankan membawa alat komunikasi atau gadget ke dalam ruang ujian selama tes berlangsung.',
+            // === 6. TATA TERTIB UJIAN SELEKSI ===
+            const rulesBoxY = 376;
+            doc.roundedRect(35, rulesBoxY, 525, 82, 4).fillAndStroke('#f8fafc', '#cbd5e1');
+            doc.fillColor('#0f172a').fontSize(8).font('Helvetica-Bold').text('TATA TERTIB PESERTA UJIAN SELEKSI SPMB:', 45, rulesBoxY + 8);
+            
+            const examRules = [
+                '1. Peserta wajib hadir di lokasi ujian 15 menit sebelum waktu ujian dimulai dan mengenakan seragam SMP/MTs rapi.',
+                '2. Membawa Kartu Tanda Peserta Ujian resmi ini yang telah dicetak dan ditempel pas foto 3x4.',
+                '3. Membawa alat tulis lengkap (pensil 2B, pulpen hitam, dan penghapus) serta kartu identitas (Kartu Pelajar / KK).',
+                '4. Tidak diperkenankan membawa gawai/ponsel, contekan, atau buku ke dalam ruang ujian selama tes berlangsung.',
             ];
-            let ruleStepY = rulesY + 16;
-            rules.forEach(rule => {
-                doc.text(rule, 55, ruleStepY, { width: 485 });
-                ruleStepY += 14;
+
+            let ruleY = rulesBoxY + 22;
+            doc.font('Helvetica').fontSize(7.5).fillColor('#334155');
+            examRules.forEach((rule) => {
+                doc.text(rule, 45, ruleY, { width: 505 });
+                ruleY += 13;
             });
 
-            // === TANDA TANGAN PANITIA ===
-            doc.moveDown(7.5);
-            const signY = doc.y;
-            doc.fillColor('#374151').fontSize(8.5).font('Helvetica');
-            doc.text('Sekampung, .................................... 2026', 360, signY);
-            doc.text('Ketua Panitia SPMB,', 360, signY + 15);
-            doc.moveDown(3);
-            doc.font('Helvetica-Bold').text('( Panitia SPMB SMK Muhammadiyah )', 360, signY + 65);
-            doc.font('Helvetica').fontSize(7.5).text('NBM. 1092 8472 9182', 360, signY + 78);
+            // === 7. AREA PENGESAHAN & TANDA TANGAN (DUAL SIGNATURE) ===
+            const signY = 468;
+            // Tanda Tangan Peserta (Kiri)
+            doc.fillColor('#334155').fontSize(8).font('Helvetica');
+            doc.text('Calon Siswa Peserta,', 65, signY);
+            doc.font('Helvetica-Bold').text(`( ${nama.slice(0, 26)} )`, 45, signY + 55, { align: 'left' });
+
+            // Tanda Tangan Panitia (Kanan)
+            doc.font('Helvetica').text('Sekampung, .................................... 2026', 360, signY);
+            doc.text('Ketua Panitia SPMB SMK Muska,', 360, signY + 12);
+            doc.font('Helvetica-Bold').text('( Panitia SPMB SMK Muhammadiyah )', 360, signY + 55);
+            doc.font('Helvetica').fontSize(7).text('NBM / NIP: 1092 8472 9182', 360, signY + 67);
+
+            // Garis potong kecil bawah
+            doc.strokeColor('#e2e8f0').lineWidth(0.5).moveTo(35, 555).lineTo(560, 555).stroke();
+            doc.fontSize(6.5).fillColor('#94a3b8').text('Dicetak otomatis oleh Sistem Informasi SPMB SMK Muhammadiyah Sekampung pada ' + new Date().toLocaleString('id-ID'), 35, 560, { align: 'center', width: 525 });
 
             doc.end();
         });
@@ -510,5 +532,20 @@ export class PendaftaranService {
 
             doc.end();
         });
+    }
+
+    async getPengumumanStatus() {
+        const settings = await this.prisma.systemSetting.findMany();
+        const map: Record<string, string> = {};
+        settings.forEach((s) => {
+            map[s.key] = s.value;
+        });
+
+        return {
+            pengumumanDibuka: map['pengumumanDibuka'] === 'true',
+            tanggalPengumuman: map['tanggalPengumuman'] || '2026-06-01T10:00:00',
+            tahunAjaran: map['tahunAjaran'] || '2026/2027',
+            waktuServer: new Date().toISOString(),
+        };
     }
 }

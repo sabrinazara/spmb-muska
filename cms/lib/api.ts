@@ -3,7 +3,9 @@
  */
 
 export const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== 'http://localhost:3000')
+        ? process.env.NEXT_PUBLIC_API_URL
+        : 'http://localhost:3001';
 
 export const AI_BASE_URL =
     process.env.NEXT_PUBLIC_AI_URL || 'http://localhost:8000';
@@ -19,10 +21,14 @@ export const API_ENDPOINTS = {
         PENDAFTAR: `${API_BASE_URL}/admin/pendaftar`,
         DETAIL_PENDAFTAR: (id: string) => `${API_BASE_URL}/admin/pendaftar/${id}`,
         VERIFIKASI_DOKUMEN: (id: string) => `${API_BASE_URL}/admin/verifikasi/${id}`,
+        VERIFIKASI_PEMBAYARAN: (id: string) => `${API_BASE_URL}/admin/verifikasi-pembayaran/${id}`,
         INPUT_NILAI: (id: string) => `${API_BASE_URL}/admin/nilai/${id}`,
         KNOWLEDGE_BASE: `${API_BASE_URL}/admin/knowledge-base`,
         AUDIT_LOGS: `${API_BASE_URL}/admin/audit-logs`,
         EXPORT_EXCEL: `${API_BASE_URL}/admin/export-excel`,
+        USERS: `${API_BASE_URL}/admin/users`,
+        SETTINGS: `${API_BASE_URL}/admin/settings`,
+        NOTIFICATIONS: `${API_BASE_URL}/admin/notifications`,
     },
     AI: {
         CHAT: `${API_BASE_URL}/ai/chat`,
