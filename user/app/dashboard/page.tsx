@@ -123,7 +123,7 @@ export default function DashboardBeranda() {
             <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
                 <div className="relative z-10 max-w-2xl">
                     <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-xs rounded-full text-xs font-semibold tracking-wide text-amber-200 mb-3">
-                        Tahun Ajaran 2026/2027 • Pendaftaran Online Gratis (Rp 0)
+                        Tahun Ajaran 2026/2027
                     </span>
                     <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                         Selamat Datang, {pendaftaran?.namaLengkap || pendaftaran?.user?.nama || 'Calon Siswa'}!

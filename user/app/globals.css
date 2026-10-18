@@ -247,6 +247,28 @@ body {
   animation-play-state: paused;
 }
 
+/* MARQUEE ANIMATION KIRI KE KANAN (LEFT TO RIGHT) UNTUK LOGO JURUSAN */
+@keyframes marquee-scroll-reverse {
+  0% {
+    transform: translateX(-50%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-reverse {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll-reverse 38s linear infinite;
+}
+
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+
 /* ROTATING CONIC GLOW ANIMATION UNTUK FOTO KEPALA SEKOLAH */
 @keyframes muskaRotatingGlow {
   0% {

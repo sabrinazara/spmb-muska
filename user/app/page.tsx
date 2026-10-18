@@ -342,14 +342,14 @@ export default function HomePage() {
               href="/login"
               className="px-4 py-2 rounded-xl border border-emerald-600/30 hover:border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold text-xs transition"
             >
-              Masuk Akun
+              Masuk
             </Link>
             <Link
               href="/register"
               className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer transform active:scale-95"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-current" />
-              <span>Daftar SPMB</span>
+              {/* <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-current" /> */}
+              <span>Daftar</span>
             </Link>
           </div>
 
@@ -468,7 +468,7 @@ export default function HomePage() {
                   <div className="relative z-20 max-w-7xl mx-auto h-full px-6 sm:px-12 flex flex-col justify-center">
                     <div className="max-w-3xl space-y-4 animate-in fade-in slide-in-from-left duration-500">
                       <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-600/30 border border-emerald-400/40 text-emerald-300 text-xs font-extrabold uppercase tracking-widest backdrop-blur-xs">
-                        <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-current" />
+                        {/* <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-current" /> */}
                         <span>{s.badgeText || 'Penerimaan Siswa Baru TA 2026/2027'}</span>
                       </div>
 
