@@ -32,6 +32,14 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
 
             const L = (await import('leaflet')).default;
 
+            if (!isMounted || !mapContainerRef.current || mapInstanceRef.current) return;
+
+            // Reset _leaflet_id jika container pernah dipakai oleh instance sebelumnya
+            const container = mapContainerRef.current as any;
+            if (container._leaflet_id != null) {
+                container._leaflet_id = null;
+            }
+
             // Fix default marker icon Leaflet di Next.js bundler
             const customIcon = L.divIcon({
                 className: 'custom-leaflet-marker',
@@ -63,11 +71,13 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
             });
 
             // Inisialisasi peta Leaflet
-            const map = L.map(mapContainerRef.current, {
+            const map = L.map(container, {
                 center: [currentLat, currentLng],
                 zoom: latitude ? 15 : 13,
                 zoomControl: true,
             });
+
+            mapInstanceRef.current = map;
 
             // Gunakan OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -80,6 +90,8 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
                 draggable: true,
                 icon: customIcon,
             }).addTo(map);
+
+            markerRef.current = marker;
 
             marker.bindPopup('<b>Lokasi Rumah Anda</b><br>Geser pin atau klik peta untuk menandai titik tepat.').openPopup();
 
@@ -97,11 +109,6 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
                 marker.openPopup();
                 onChange({ latitude: Number(lat.toFixed(6)), longitude: Number(lng.toFixed(6)) });
             });
-
-            if (isMounted) {
-                mapInstanceRef.current = map;
-                markerRef.current = marker;
-            }
         };
 
         initMap();
@@ -109,9 +116,19 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
         return () => {
             isMounted = false;
             if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
+                try {
+                    mapInstanceRef.current.remove();
+                } catch (e) {
+                    console.error('Error removing leaflet map:', e);
+                }
                 mapInstanceRef.current = null;
             }
+            if (mapContainerRef.current) {
+                try {
+                    (mapContainerRef.current as any)._leaflet_id = null;
+                } catch {}
+            }
+            markerRef.current = null;
         };
     }, []);
 

@@ -57,6 +57,14 @@ export default function GisMapViewer({
 
             const L = (await import('leaflet')).default;
 
+            if (!isMounted || !mapContainerRef.current || mapInstanceRef.current) return;
+
+            // Reset _leaflet_id jika container pernah dipakai oleh instance sebelumnya
+            const container = mapContainerRef.current as any;
+            if (container._leaflet_id != null) {
+                container._leaflet_id = null;
+            }
+
             // Pin Ikon Calon Siswa (Emerald)
             const studentIcon = L.divIcon({
                 className: 'student-pin-marker',
@@ -120,11 +128,13 @@ export default function GisMapViewer({
             const centerLat = hasCoords ? (studentLat + SEKOLAH_COORDS[0]) / 2 : SEKOLAH_COORDS[0];
             const centerLng = hasCoords ? (studentLng + SEKOLAH_COORDS[1]) / 2 : SEKOLAH_COORDS[1];
 
-            const map = L.map(mapContainerRef.current, {
+            const map = L.map(container, {
                 center: [centerLat, centerLng],
                 zoom: hasCoords ? 13 : 14,
                 zoomControl: true,
             });
+
+            mapInstanceRef.current = map;
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors',
@@ -179,8 +189,6 @@ export default function GisMapViewer({
                 );
                 if (isMounted) setDistanceKm(dist);
             }
-
-            mapInstanceRef.current = map;
         };
 
         initMap();
@@ -188,8 +196,17 @@ export default function GisMapViewer({
         return () => {
             isMounted = false;
             if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
+                try {
+                    mapInstanceRef.current.remove();
+                } catch (e) {
+                    console.error('Error removing leaflet map in CMS:', e);
+                }
                 mapInstanceRef.current = null;
+            }
+            if (mapContainerRef.current) {
+                try {
+                    (mapContainerRef.current as any)._leaflet_id = null;
+                } catch {}
             }
         };
     }, [studentLat, studentLng, hasCoords, namaLengkap, alamat]);
