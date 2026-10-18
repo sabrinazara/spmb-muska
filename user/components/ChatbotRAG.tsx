@@ -8,8 +8,9 @@ import {
     RotateCcw,
     Bot,
     User,
-    HelpCircle,
     Sparkles,
+    HelpCircle,
+    ChevronDown,
 } from 'lucide-react';
 import { sendAiChatMessage } from '@/lib/api';
 
@@ -22,23 +23,22 @@ interface Message {
 }
 
 const QUICK_QUESTIONS = [
-    'Apa saja 8 jurusan di SMK Muska?',
+    'Apa saja 8 program keahlian di SMK Muska?',
     'Apa saja syarat berkas yang harus diunggah?',
     'Bagaimana panduan memilih ukuran baju seragam?',
     'Kapan dan di mana jadwal ujian seleksi CBT?',
-    'Apakah biaya pendaftaran awal gratis?',
+    'Apakah pendaftaran awal ini dipungut biaya?',
 ];
 
 export default function ChatbotRAG() {
     const [isOpen, setIsOpen] = useState(false);
-    const [showTooltip, setShowTooltip] = useState(true);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: 'welcome-1',
             sender: 'bot',
-            text: 'Assalamu’alaikum Warahmatullahi Wabarakatuh.\n\nSelamat datang di Layanan Informasi Digital SPMB SMK Muhammadiyah Sekampung. Saya Asisten Virtual Sistem Informasi Pendaftaran yang siap membantu menjawab pertanyaan seputar program keahlian, berkas persyaratan, dan alur seleksi.',
+            text: 'Assalamu’alaikum Warahmatullahi Wabarakatuh.\n\nSelamat datang di Layanan Informasi SPMB SMK Muhammadiyah Sekampung. Silakan tanyakan seputar jurusan, berkas pendaftaran, jadwal ujian, atau panduan seragam sekolah.',
             source: 'Sistem RAG SPMB MUSKA',
             timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
         },
@@ -79,7 +79,7 @@ export default function ChatbotRAG() {
                 id: `bot-${Date.now()}`,
                 sender: 'bot',
                 text: response.answer,
-                source: response.source || 'Asisten Informasi',
+                source: response.source || 'Asisten AI Muska',
                 timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
             };
             setMessages((prev) => [...prev, botMsg]);
@@ -106,78 +106,58 @@ export default function ChatbotRAG() {
 
     return (
         <div className="fixed bottom-6 right-6 z-50 font-sans">
-            {/* MINIMALIST ROUND FLOATING BUTTON WITH DISMISSIBLE "Tanya di sini" POPUP */}
+            {/* MINIMALIST COMPACT FLOATING LAUNCHER */}
             {!isOpen && (
-                <div className="relative flex items-center gap-3">
-                    {/* Tooltip bubble "Tanya di sini" */}
-                    {showTooltip && (
-                        <div className="flex items-center gap-2 bg-white text-slate-800 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-slate-200 animate-in fade-in slide-in-from-right-2 duration-300">
-                            <span
-                                onClick={() => setIsOpen(true)}
-                                className="cursor-pointer hover:text-emerald-700 transition"
-                            >
-                                Tanya di sini
-                            </span>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowTooltip(false);
-                                }}
-                                className="text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-100 transition cursor-pointer"
-                                aria-label="Tutup teks"
-                            >
-                                <X className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Circular Button */}
-                    <button
-                        onClick={() => setIsOpen(true)}
-                        className="w-14 h-14 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white shadow-xl hover:shadow-emerald-900/40 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-600 cursor-pointer relative group"
-                        aria-label="Buka Chatbot Layanan Informasi"
-                    >
-                        <MessageSquare className="w-6 h-6 text-amber-300 group-hover:scale-110 transition-transform" />
-                        <span className="absolute top-0 right-0 flex h-3.5 w-3.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400 border-2 border-emerald-800"></span>
-                        </span>
-                    </button>
-                </div>
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white shadow-xl hover:shadow-2xl border border-emerald-500/30 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer group"
+                    aria-label="Buka Chat Asisten AI SPMB"
+                >
+                    <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 group-hover:bg-emerald-500 transition-colors">
+                        <Bot className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-semibold tracking-wide text-slate-100 group-hover:text-white">
+                        Tanya Asisten AI
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </button>
             )}
 
-            {/* EXPANDED CHAT WINDOW */}
+            {/* EXPANDED MINIMALIST & PROFESSIONAL CHAT CARD */}
             {isOpen && (
-                <div className="w-[92vw] sm:w-[400px] h-[560px] max-h-[85vh] bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    {/* CHAT HEADER */}
-                    <div className="bg-emerald-800 text-white px-4 py-3 flex items-center justify-between border-b border-emerald-700 shrink-0">
+                <div className="w-[92vw] sm:w-[380px] h-[520px] max-h-[82vh] bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    {/* MINIMALIST HEADER */}
+                    <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 shrink-0">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-9 h-9 rounded-xl bg-emerald-700 p-1.5 flex items-center justify-center text-amber-300">
-                                <Bot className="w-5 h-5" />
+                            <div className="w-8 h-8 rounded-xl bg-emerald-600/90 flex items-center justify-center text-white shrink-0">
+                                <Bot className="w-4 h-4" />
                             </div>
                             <div>
-                                <h3 className="text-xs sm:text-sm font-bold tracking-tight text-white leading-tight">
-                                    Layanan Informasi AI
-                                </h3>
-                                <p className="text-[10px] text-emerald-200">
-                                    SMK Muhammadiyah Sekampung
-                                </p>
+                                <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <span>Asisten SPMB MUSKA</span>
+                                    <span className="text-[10px] font-medium text-emerald-400 bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-800/60">
+                                        AI
+                                    </span>
+                                </div>
+                                <div className="text-[10px] text-slate-400 flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                                    <span>Siap Menjawab 24 Jam</span>
+                                </div>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setMessages([messages[0]])}
-                                title="Reset Percakapan"
-                                className="p-1.5 text-emerald-200 hover:text-white hover:bg-emerald-700 rounded-lg transition cursor-pointer"
-                                aria-label="Bersihkan Percakapan"
+                                title="Mulai Ulang Percakapan"
+                                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer"
+                                aria-label="Reset Chat"
                             >
-                                <RotateCcw className="w-4 h-4" />
+                                <RotateCcw className="w-3.5 h-3.5" />
                             </button>
-
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="p-1.5 text-emerald-200 hover:text-white hover:bg-emerald-700 rounded-lg transition cursor-pointer"
+                                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer"
                                 aria-label="Tutup Chat"
                             >
                                 <X className="w-4 h-4" />
@@ -185,18 +165,14 @@ export default function ChatbotRAG() {
                         </div>
                     </div>
 
-                    {/* QUICK QUESTIONS */}
-                    <div className="bg-slate-50 px-3 py-2 border-b border-slate-200 overflow-x-auto whitespace-nowrap flex items-center gap-1.5 shrink-0 text-xs no-scrollbar">
-                        <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500 shrink-0 pr-1">
-                            <HelpCircle className="w-3.5 h-3.5 text-emerald-700" />
-                            <span>Pilihan:</span>
-                        </div>
+                    {/* QUICK PROMPTS */}
+                    <div className="bg-slate-50 dark:bg-slate-900/60 px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 overflow-x-auto whitespace-nowrap flex items-center gap-1.5 shrink-0 text-xs no-scrollbar">
                         {QUICK_QUESTIONS.map((q, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => handleSend(q)}
                                 disabled={loading}
-                                className="inline-block px-2.5 py-1 bg-white hover:bg-emerald-50 hover:border-emerald-300 text-slate-700 hover:text-emerald-800 text-[11px] font-medium rounded-full border border-slate-200 shadow-2xs transition shrink-0 cursor-pointer disabled:opacity-50"
+                                className="inline-block px-2.5 py-1 bg-white dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-700 hover:text-emerald-700 dark:hover:text-emerald-400 text-slate-600 dark:text-slate-300 text-[11px] font-medium rounded-full border border-slate-200 dark:border-slate-700 shadow-2xs transition shrink-0 cursor-pointer disabled:opacity-50"
                             >
                                 {q}
                             </button>
@@ -204,17 +180,17 @@ export default function ChatbotRAG() {
                     </div>
 
                     {/* MESSAGE HISTORY */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-slate-50/50">
+                    <div className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-slate-50/40 dark:bg-slate-950/40">
                         {messages.map((msg) => (
                             <div
                                 key={msg.id}
                                 className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                             >
                                 <div
-                                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed shadow-2xs whitespace-pre-wrap ${
+                                    className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed shadow-2xs whitespace-pre-wrap ${
                                         msg.sender === 'user'
-                                            ? 'bg-emerald-700 text-white rounded-br-2xs'
-                                            : 'bg-white text-slate-800 border border-slate-200 rounded-bl-2xs'
+                                            ? 'bg-emerald-600 text-white rounded-br-2xs'
+                                            : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-bl-2xs'
                                     }`}
                                 >
                                     {msg.text}
@@ -222,7 +198,7 @@ export default function ChatbotRAG() {
 
                                 <div className="flex items-center gap-1.5 mt-1 px-1">
                                     {msg.source && (
-                                        <span className="text-[9px] font-medium text-emerald-800 bg-emerald-100/70 px-1.5 py-0.5 rounded">
+                                        <span className="text-[9px] font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 px-1.5 py-0.5 rounded">
                                             {msg.source}
                                         </span>
                                     )}
@@ -234,14 +210,14 @@ export default function ChatbotRAG() {
                         {/* TYPING INDICATOR */}
                         {loading && (
                             <div className="flex flex-col items-start">
-                                <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-2xs px-3.5 py-2.5 shadow-2xs flex items-center gap-2">
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl rounded-bl-2xs px-3.5 py-2.5 shadow-2xs flex items-center gap-2">
                                     <div className="flex gap-1">
-                                        <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce"></span>
-                                        <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                                        <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce"></span>
+                                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
                                     </div>
-                                    <span className="text-[11px] text-slate-500 font-medium">
-                                        Memproses jawaban...
+                                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                        Menganalisis jawaban...
                                     </span>
                                 </div>
                             </div>
@@ -250,9 +226,9 @@ export default function ChatbotRAG() {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* CHAT INPUT FORM */}
-                    <div className="p-3 bg-white border-t border-slate-200 shrink-0">
-                        <div className="flex items-center gap-2">
+                    {/* CHAT INPUT BAR */}
+                    <div className="p-2.5 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 rounded-xl px-2.5 py-1.5 border border-slate-200 dark:border-slate-800 focus-within:border-emerald-500 transition-colors">
                             <input
                                 type="text"
                                 value={input}
@@ -260,15 +236,15 @@ export default function ChatbotRAG() {
                                 onKeyDown={handleKeyDown}
                                 disabled={loading}
                                 placeholder="Ketik pertanyaan di sini..."
-                                className="flex-1 px-3.5 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-emerald-600 focus:bg-white focus:ring-1 focus:ring-emerald-500 transition disabled:bg-slate-100"
+                                className="flex-1 text-xs bg-transparent text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none disabled:opacity-50"
                             />
                             <button
                                 onClick={() => handleSend()}
                                 disabled={!input.trim() || loading}
-                                className="p-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 text-white rounded-xl shadow-xs transition shrink-0 cursor-pointer disabled:cursor-not-allowed"
+                                className="p-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white rounded-lg transition shrink-0 cursor-pointer disabled:cursor-not-allowed"
                                 aria-label="Kirim Pesan"
                             >
-                                <Send className="w-4 h-4 text-amber-300" />
+                                <Send className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </div>
@@ -277,3 +253,4 @@ export default function ChatbotRAG() {
         </div>
     );
 }
+

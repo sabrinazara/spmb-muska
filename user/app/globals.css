@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --font-sans: var(--font-poppins), sans-serif;
   --color-primary: #047857;
@@ -7,20 +9,19 @@
   --color-secondary: #d97706;
 }
 
-/* Palet Warna Khas SMK Muhammadiyah 1 Wonosobo */
 :root {
   --primary-color: #047857;
-  /* Hijau Utama yang Elegan */
   --primary-hover: #065f46;
-  /* Hijau Gelap untuk Hover */
   --secondary-color: #d97706;
-  /* Kuning Emas / Amber */
   --dark-color: #0f172a;
-  /* Teks Utama (Slate Dark) */
   --light-color: #f8fafc;
-  /* Latar Belakang Lembut */
   --card-bg: #ffffff;
-  /* Warna Kartu Putih Bersih */
+}
+
+.dark {
+  --dark-color: #f8fafc;
+  --light-color: #020617;
+  --card-bg: #090d16;
 }
 
 body {
@@ -29,6 +30,7 @@ body {
   font-family: var(--font-poppins), 'Poppins', sans-serif;
   background-color: var(--light-color);
   color: var(--dark-color);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .login-container {

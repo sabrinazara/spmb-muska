@@ -24,6 +24,40 @@ import {
 } from 'lucide-react';
 import { API_ENDPOINTS, API_BASE_URL, getAuthHeaders } from '@/lib/api';
 
+interface ParsedIdCard {
+    nik?: string;
+    nomor_kk?: string;
+    nama?: string;
+    tempat_lahir?: string;
+    tanggal_lahir?: string;
+    jenis_kelamin?: string;
+    gol_darah?: string;
+    alamat?: string;
+    rt_rw?: string;
+    kel_desa?: string;
+    kecamatan?: string;
+    agama?: string;
+    status_perkawinan?: string;
+    pekerjaan?: string;
+    kewarganegaraan?: string;
+}
+
+const parseOcrPayload = (raw: string | null): { text: string; parsed: ParsedIdCard | null } => {
+    if (!raw) return { text: '', parsed: null };
+    try {
+        const obj = JSON.parse(raw);
+        if (obj && typeof obj === 'object') {
+            return {
+                text: obj.text || (typeof obj === 'string' ? obj : ''),
+                parsed: obj.parsed || null,
+            };
+        }
+    } catch {
+        // Raw plain text
+    }
+    return { text: raw, parsed: null };
+};
+
 interface DokumenItem {
     id: string;
     jenisDokumen: string;
@@ -217,8 +251,8 @@ function DetailPendaftarContent({ id }: { id: string }) {
     }
 
     const currentDoc = data.dokumen[selectedDocIndex] || null;
-    const docText = currentDoc?.hasiltEkstraksi || '';
-    const nikMatch = docText.includes(data.nik);
+    const { text: rawDocText, parsed: parsedOcr } = parseOcrPayload(currentDoc?.hasiltEkstraksi || null);
+    const nikMatch = (parsedOcr?.nik && parsedOcr.nik !== '-' && parsedOcr.nik === data.nik) || (rawDocText && rawDocText.includes(data.nik));
 
     return (
         <div className="space-y-6 font-sans pb-12 animate-in fade-in duration-300">
@@ -364,48 +398,106 @@ function DetailPendaftarContent({ id }: { id: string }) {
                         {/* RIGHT: Hasil Ekstraksi OCR vs Data Registrasi */}
                         <div className="space-y-4 flex flex-col justify-between">
                             <div className="space-y-3">
-                                <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Hasil Pencocokan Data AI OCR
+                                <div className="flex items-center justify-between">
+                                    <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                        <Sparkles className="w-4 h-4 text-emerald-500" />
+                                        <span>Hasil Ekstraksi Lengkap AI OCR</span>
+                                    </div>
+                                    {nikMatch ? (
+                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700 px-2 py-0.5 rounded-full">
+                                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                            <span>NIK Valid & Terverifikasi</span>
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700 px-2 py-0.5 rounded-full">
+                                            <AlertCircle className="w-3 h-3 text-amber-600" />
+                                            <span>Periksa Mandiri</span>
+                                        </span>
+                                    )}
                                 </div>
 
-                                {/* Comparison Row: NIK */}
-                                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-                                    <div className="flex items-center justify-between text-xs">
-                                        <span className="text-slate-500 dark:text-slate-400 font-medium">Nomor Induk Kependudukan (NIK):</span>
-                                        {nikMatch ? (
-                                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded">
-                                                <CheckCircle2 className="w-3 h-3" />
-                                                <span>Cocok Otomatis</span>
+                                {/* Full Structured Identity Table */}
+                                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800/80 text-xs shadow-2xs">
+                                    <div className="grid grid-cols-2 p-2.5 bg-slate-50/70 dark:bg-slate-900/40">
+                                        <div>
+                                            <span className="text-[10px] uppercase font-bold text-slate-400 block">NIK Terbaca AI:</span>
+                                            <span className="font-mono font-bold text-slate-900 dark:text-white">
+                                                {parsedOcr?.nik && parsedOcr.nik !== '-' ? parsedOcr.nik : (nikMatch ? data.nik : 'Tidak terdeteksi')}
                                             </span>
-                                        ) : (
-                                            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded">
-                                                <AlertCircle className="w-3 h-3" />
-                                                <span>Periksa Manual</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Kesesuaian NIK:</span>
+                                            <span className={nikMatch ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-rose-500 font-semibold'}>
+                                                {nikMatch ? '100% Cocok dengan Siswa' : 'Berbeda / Buram'}
                                             </span>
-                                        )}
+                                        </div>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                                        <div className="bg-white dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                                            <span className="text-[10px] text-slate-400 block">NIK Terdaftar:</span>
-                                            <span className="font-bold text-slate-900 dark:text-white">{data.nik}</span>
-                                        </div>
-                                        <div className="bg-white dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                                            <span className="text-[10px] text-slate-400 block">Status di Dokumen:</span>
-                                            <span className={nikMatch ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-500'}>
-                                                {nikMatch ? 'Terdeteksi di Dokumen' : 'Periksa teks OCR'}
-                                            </span>
-                                        </div>
-                                    </div>
+                                    {parsedOcr ? (
+                                        <>
+                                            <div className="grid grid-cols-2 p-2.5">
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Nama di KTP/KK:</span>
+                                                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                        {parsedOcr.nama || '-'}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Nama Terdaftar:</span>
+                                                    <span className="text-slate-600 dark:text-slate-400">
+                                                        {data.namaLengkap || data.user?.nama || '-'}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 p-2.5 bg-slate-50/40 dark:bg-slate-900/20">
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Tempat & Tgl Lahir:</span>
+                                                    <span className="text-slate-800 dark:text-slate-200">
+                                                        {parsedOcr.tempat_lahir || '-'}, {parsedOcr.tanggal_lahir || '-'}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Jenis Kelamin:</span>
+                                                    <span className="text-slate-800 dark:text-slate-200">
+                                                        {parsedOcr.jenis_kelamin || '-'}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="p-2.5">
+                                                <span className="text-[10px] uppercase font-bold text-slate-400 block">Alamat / RT-RW / Desa:</span>
+                                                <span className="text-slate-800 dark:text-slate-200">
+                                                    {parsedOcr.alamat !== '-' ? parsedOcr.alamat : ''} {parsedOcr.rt_rw !== '-' ? `RT/RW ${parsedOcr.rt_rw}` : ''} {parsedOcr.kel_desa !== '-' ? `Desa ${parsedOcr.kel_desa}` : ''} {parsedOcr.kecamatan !== '-' ? `Kec. ${parsedOcr.kecamatan}` : ''}
+                                                    {parsedOcr.alamat === '-' && parsedOcr.rt_rw === '-' && parsedOcr.kel_desa === '-' ? '-' : ''}
+                                                </span>
+                                            </div>
+
+                                            <div className="grid grid-cols-3 p-2.5 bg-slate-50/40 dark:bg-slate-900/20 text-[11px]">
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Agama:</span>
+                                                    <span>{parsedOcr.agama || '-'}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Pekerjaan:</span>
+                                                    <span>{parsedOcr.pekerjaan || '-'}</span>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400 block">Nomor KK:</span>
+                                                    <span className="font-mono">{parsedOcr.nomor_kk || '-'}</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : null}
                                 </div>
 
                                 {/* Raw OCR Text Container */}
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                                        Teks Mentah Hasil Ekstraksi OCR:
+                                    <label className="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                                        Teks Mentah Hasil Pemindaian OCR (OpenCV Enhanced):
                                     </label>
-                                    <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 font-mono text-xs text-slate-700 dark:text-slate-300 h-32 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
-                                        {currentDoc.hasiltEkstraksi || '(Tidak ada teks terdeteksi atau berkas belum dipindai)'}
+                                    <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 font-mono text-[11px] text-slate-700 dark:text-slate-300 h-28 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text shadow-inner">
+                                        {rawDocText || '(Tidak ada teks terdeteksi atau berkas belum dipindai)'}
                                     </div>
                                 </div>
                             </div>
@@ -484,24 +576,63 @@ function DetailPendaftarContent({ id }: { id: string }) {
                         </label>
                         <input
                             type="text"
+                            list="ruang-presets"
                             value={ruangUjian}
                             onChange={(e) => setRuangUjian(e.target.value)}
                             placeholder="Contoh: Lab CBT Kampus 1"
                             className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                         />
+                        <datalist id="ruang-presets">
+                            <option value="Lab CBT 1 - Kampus Utama" />
+                            <option value="Lab CBT 2 - Gedung Multimedia" />
+                            <option value="Lab Komputer TKJ" />
+                            <option value="Ruang CBT Mandiri" />
+                        </datalist>
                     </div>
 
                     <div>
-                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Jadwal Ujian Seleksi *
+                        <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                            <span>Jadwal Ujian (Wajib Tanggal & Jam) *</span>
                         </label>
                         <input
                             type="text"
                             value={jadwalUjian}
                             onChange={(e) => setJadwalUjian(e.target.value)}
-                            placeholder="Contoh: Senin, 18 Mei 2026 (08.00 WIB)"
-                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                            placeholder="Contoh: Senin, 18 Mei 2026 • 08:00 - 10:00 WIB"
+                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-medium"
                         />
+                        <div className="flex gap-1.5 mt-1.5">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const todayStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                                    setJadwalUjian(`${todayStr} • 08:00 - 10:00 WIB`);
+                                }}
+                                className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 cursor-pointer"
+                            >
+                                Sesi 1 (08:00)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const todayStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                                    setJadwalUjian(`${todayStr} • 10:30 - 12:30 WIB`);
+                                }}
+                                className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 cursor-pointer"
+                            >
+                                Sesi 2 (10:30)
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const todayStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                                    setJadwalUjian(`${todayStr} • 13:30 - 15:30 WIB`);
+                                }}
+                                className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 cursor-pointer"
+                            >
+                                Sesi 3 (13:30)
+                            </button>
+                        </div>
                     </div>
 
                     <div>

@@ -39,19 +39,22 @@ export class DokumenService {
         }
 
         let teksEkstraksi = '';
+        let ocrResult: any = null;
         try {
-            const ocrResult = await this.aiIntegrationService.scanDocument(file);
+            ocrResult = await this.aiIntegrationService.scanDocument(file);
             teksEkstraksi = ocrResult?.text || '';
         } catch (error) {
             console.warn('Layanan OCR Python offline atau gagal:', (error as any)?.message);
         }
 
-        const detectedNik = this.extractPotentialNik(teksEkstraksi);
+        const detectedNik = ocrResult?.detectedNik || ocrResult?.parsed_data?.nik || this.extractPotentialNik(teksEkstraksi);
 
         return {
             filename: file.originalname,
             text: teksEkstraksi,
-            detectedNik,
+            detectedNik: detectedNik !== '-' ? detectedNik : null,
+            parsedData: ocrResult?.parsed_data || null,
+            confidence: ocrResult?.confidence || 'MEDIUM',
         };
     }
 
@@ -61,6 +64,7 @@ export class DokumenService {
         jenisDokumen: string,
         confirmedNik?: string,
         confirmedText?: string,
+        confirmedParsedData?: string | any,
     ) {
         if (!file) {
             throw new BadRequestException('Berkas dokumen wajib diunggah');
@@ -83,10 +87,23 @@ export class DokumenService {
 
         // Ekstraksi OCR jika confirmedText belum ada
         let teksEkstraksi = confirmedText || '';
-        if (!teksEkstraksi) {
+        let parsedDataObj: any = null;
+
+        if (confirmedParsedData) {
+            try {
+                parsedDataObj = typeof confirmedParsedData === 'string'
+                    ? JSON.parse(confirmedParsedData)
+                    : confirmedParsedData;
+            } catch {
+                parsedDataObj = null;
+            }
+        }
+
+        if (!teksEkstraksi || !parsedDataObj) {
             try {
                 const ocrResult = await this.aiIntegrationService.scanDocument(file);
-                teksEkstraksi = ocrResult?.text || '';
+                if (!teksEkstraksi) teksEkstraksi = ocrResult?.text || '';
+                if (!parsedDataObj) parsedDataObj = ocrResult?.parsed_data || null;
             } catch (error) {
                 console.warn('Layanan OCR Python offline atau gagal:', (error as any)?.message);
             }
@@ -96,7 +113,12 @@ export class DokumenService {
         let statusValidasi: 'PENDING' | 'VALID' | 'INVALID' = 'PENDING';
 
         const nikPendaftar = pendaftaran.nik.replace(/[\s\W_]+/g, '');
-        const nikToCompare = (confirmedNik || this.extractPotentialNik(teksEkstraksi) || '').replace(/[\s\W_]+/g, '');
+        const nikToCompare = (
+            confirmedNik ||
+            parsedDataObj?.nik ||
+            this.extractPotentialNik(teksEkstraksi) ||
+            ''
+        ).replace(/[\s\W_]+/g, '');
 
         if (jenisDokumen.toUpperCase() === 'KTP' || jenisDokumen.toUpperCase() === 'KK') {
             let teksBersihOCR = teksEkstraksi.replace(/[\s\W_]+/g, '').toUpperCase();
@@ -126,13 +148,20 @@ export class DokumenService {
         const filePath = path.join(uploadDir, safeFilename);
         fs.writeFileSync(filePath, file.buffer);
 
+        // Simpan payload ekstraksi berstruktur (JSON) ke database
+        const hasiltEkstraksiToSave = JSON.stringify({
+            text: teksEkstraksi,
+            parsed: parsedDataObj,
+            detectedNik: nikToCompare || null,
+        });
+
         // Simpan ke database
         const dokumen = await this.prisma.dokumen.create({
             data: {
                 pendaftaranId: pendaftaran.id,
                 jenisDokumen: jenisDokumen,
                 fileUrl: `/uploads/${safeFilename}`,
-                hasiltEkstraksi: teksEkstraksi,
+                hasiltEkstraksi: hasiltEkstraksiToSave,
                 status: statusValidasi,
             },
         });
@@ -154,7 +183,7 @@ export class DokumenService {
                 where: { id: pendaftaran.id },
                 data: {
                     status: 'VALID',
-                    catatanVerifikasi: `Dokumen ${jenisDokumen} berhasil diverifikasi secara otomatis oleh sistem OCR. NIK cocok.`,
+                    catatanVerifikasi: `Dokumen ${jenisDokumen} berhasil diverifikasi secara otomatis oleh sistem OCR. NIK cocok (${nikPendaftar}).`,
                 },
             });
         }
@@ -166,6 +195,7 @@ export class DokumenService {
             status: statusValidasi,
             data: dokumen,
             teksEkstraksi,
+            parsedData: parsedDataObj,
         };
     }
 }

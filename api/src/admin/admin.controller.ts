@@ -54,6 +54,7 @@ export class AdminController {
         @Query('status') status?: string,
         @Query('statusPembayaran') statusPembayaran?: string,
         @Query('statusKelulusan') statusKelulusan?: string,
+        @Query('tahunAjaran') tahunAjaran?: string,
         @Query('page') page?: number,
         @Query('limit') limit?: number,
     ) {
@@ -63,6 +64,7 @@ export class AdminController {
             status,
             statusPembayaran,
             statusKelulusan,
+            tahunAjaran,
             page,
             limit,
         });
@@ -119,6 +121,16 @@ export class AdminController {
         return this.adminService.getAuditLogs();
     }
 
+    @Delete('audit-logs')
+    async clearAuditLogs(@Request() req: any) {
+        return this.adminService.clearAuditLogs(req.user);
+    }
+
+    @Delete('audit-logs/:id')
+    async deleteAuditLog(@Param('id') id: string, @Request() req: any) {
+        return this.adminService.deleteAuditLog(id, req.user);
+    }
+
     @Get('knowledge-base')
     async getKnowledgeBase() {
         return this.adminService.getKnowledgeBase();
@@ -159,6 +171,15 @@ export class AdminController {
         return this.adminService.createAdminUser(body, req.user);
     }
 
+    @Put('users/:id')
+    async updateAdminUser(
+        @Param('id') id: string,
+        @Body() body: { nama?: string; email?: string; password?: string; role?: string },
+        @Request() req: any,
+    ) {
+        return this.adminService.updateAdminUser(id, body, req.user);
+    }
+
     @Delete('users/:id')
     async deleteAdminUser(@Param('id') id: string, @Request() req: any) {
         return this.adminService.deleteAdminUser(id, req.user);
@@ -171,7 +192,7 @@ export class AdminController {
 
     @Put('settings')
     async updateSettings(
-        @Body() body: { pengumumanDibuka?: boolean; tanggalPengumuman?: string; tahunAjaran?: string },
+        @Body() body: { pengumumanDibuka?: boolean; tanggalPengumuman?: string; tahunAjaran?: string; bukaPendaftaran?: boolean },
         @Request() req: any,
     ) {
         return this.adminService.updateSettings(body, req.user);

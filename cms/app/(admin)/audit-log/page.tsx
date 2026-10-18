@@ -8,6 +8,9 @@ import {
     User,
     CheckCircle2,
     Calendar,
+    Trash2,
+    AlertCircle,
+    X,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
 
@@ -24,6 +27,7 @@ interface AuditLogItem {
 export default function AuditTrailPage() {
     const [logs, setLogs] = useState<AuditLogItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [actionMsg, setActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     const fetchLogs = async () => {
         setLoading(true);
@@ -33,9 +37,10 @@ export default function AuditTrailPage() {
             });
             if (!res.ok) throw new Error('Gagal memuat catatan audit trail');
             const data = await res.json();
-            setLogs(data);
+            setLogs(data || []);
         } catch (err) {
             console.error('Error fetching audit logs:', err);
+            setActionMsg({ type: 'error', text: 'Gagal memuat catatan audit trail.' });
         } finally {
             setLoading(false);
         }
@@ -45,32 +50,77 @@ export default function AuditTrailPage() {
         fetchLogs();
     }, []);
 
+    const handleDeleteLog = async (id: string) => {
+        if (!confirm('Apakah Anda yakin ingin menghapus catatan audit ini?')) return;
+        try {
+            const res = await fetch(`${API_ENDPOINTS.ADMIN.AUDIT_LOGS}/${id}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders(),
+            });
+            const result = await res.json();
+            if (res.ok) {
+                setActionMsg({ type: 'success', text: result.message || 'Catatan audit berhasil dihapus.' });
+                fetchLogs();
+            } else {
+                setActionMsg({ type: 'error', text: result.message || 'Gagal menghapus catatan audit.' });
+            }
+        } catch {
+            setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
+        }
+    };
+
+    const handleClearAllLogs = async () => {
+        if (!confirm('PERINGATAN: Apakah Anda yakin ingin membersihkan SELURUH riwayat audit log? Tindakan ini tidak dapat dikembalikan.')) return;
+        try {
+            const res = await fetch(API_ENDPOINTS.ADMIN.AUDIT_LOGS, {
+                method: 'DELETE',
+                headers: getAuthHeaders(),
+            });
+            const result = await res.json();
+            if (res.ok) {
+                setActionMsg({ type: 'success', text: result.message || 'Seluruh riwayat audit log berhasil dibersihkan.' });
+                fetchLogs();
+            } else {
+                setActionMsg({ type: 'error', text: result.message || 'Gagal membersihkan audit log.' });
+            }
+        } catch {
+            setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
+        }
+    };
+
     const getActionBadge = (aksi: string) => {
         switch (aksi) {
             case 'VERIFIKASI_BERKAS':
                 return (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/15 text-teal-600 dark:text-teal-400 border border-teal-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
                         VERIFIKASI BERKAS
                     </span>
                 );
             case 'PENILAIAN_DAN_KELULUSAN':
                 return (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                         PENILAIAN & KELULUSAN
                     </span>
                 );
             case 'UPLOAD_KNOWLEDGE_BASE':
             case 'HAPUS_KNOWLEDGE_BASE':
                 return (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                         AI KNOWLEDGE BASE
                     </span>
                 );
             case 'TAMBAH_ADMIN':
+            case 'UPDATE_ADMIN':
             case 'HAPUS_ADMIN':
                 return (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                         MANAJEMEN ADMIN
+                    </span>
+                );
+            case 'UPDATE_PENGATURAN':
+                return (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        PENGATURAN SISTEM
                     </span>
                 );
             default:
@@ -96,14 +146,51 @@ export default function AuditTrailPage() {
                     </p>
                 </div>
 
-                <button
-                    onClick={fetchLogs}
-                    className="self-start sm:self-auto px-3.5 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700/80 transition flex items-center gap-1.5 cursor-pointer"
-                >
-                    <RefreshCw className="w-4 h-4 text-slate-400" />
-                    <span>Segarkan Log</span>
-                </button>
+                <div className="flex items-center gap-2.5 self-start sm:self-auto">
+                    <button
+                        onClick={fetchLogs}
+                        className="px-3.5 py-2 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-800 transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                        title="Segarkan Log"
+                    >
+                        <RefreshCw className="w-4 h-4 text-slate-400" />
+                        <span>Segarkan</span>
+                    </button>
+
+                    {logs.length > 0 && (
+                        <button
+                            onClick={handleClearAllLogs}
+                            className="px-3.5 py-2 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-semibold rounded-xl border border-rose-200 dark:border-rose-800 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                            title="Bersihkan Semua Catatan Audit Log"
+                        >
+                            <Trash2 className="w-4 h-4 text-rose-500" />
+                            <span>Bersihkan Semua Log</span>
+                        </button>
+                    )}
+                </div>
             </div>
+
+            {/* Notification alert */}
+            {actionMsg && (
+                <div
+                    className={`p-4 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${
+                        actionMsg.type === 'success'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                            : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                    }`}
+                >
+                    <div className="flex items-center gap-2">
+                        {actionMsg.type === 'success' ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        ) : (
+                            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                        )}
+                        <span>{actionMsg.text}</span>
+                    </div>
+                    <button onClick={() => setActionMsg(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
 
             {/* Table */}
             <div className="bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-xs overflow-hidden">
@@ -115,13 +202,14 @@ export default function AuditTrailPage() {
                                 <th className="p-3.5">Administrator</th>
                                 <th className="p-3.5">Jenis Tindakan</th>
                                 <th className="p-3.5">Detail & Catatan</th>
-                                <th className="p-3.5">Siswa Terkait</th>
+                                <th className="p-3.5">Target Sistem / Siswa</th>
+                                <th className="p-3.5 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
+                                    <td colSpan={6} className="py-12 text-center text-slate-400 text-xs">
                                         Memuat riwayat log...
                                     </td>
                                 </tr>
@@ -135,26 +223,41 @@ export default function AuditTrailPage() {
                                                 year: 'numeric',
                                                 hour: '2-digit',
                                                 minute: '2-digit',
+                                                second: '2-digit',
                                             })}
                                         </td>
                                         <td className="p-3.5 font-bold text-slate-900 dark:text-white">
-                                            {log.adminNama || 'System Admin'}
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold flex items-center justify-center shrink-0">
+                                                    AD
+                                                </div>
+                                                <span className="truncate max-w-[140px]">{log.adminNama || 'Admin'}</span>
+                                            </div>
                                         </td>
                                         <td className="p-3.5">
                                             {getActionBadge(log.aksi)}
                                         </td>
-                                        <td className="p-3.5 text-xs text-slate-600 dark:text-slate-300 max-w-xs">
+                                        <td className="p-3.5 text-slate-600 dark:text-slate-300 max-w-xs text-xs">
                                             {log.detail || '-'}
                                         </td>
-                                        <td className="p-3.5 font-mono text-xs text-slate-500 dark:text-slate-400">
+                                        <td className="p-3.5 font-mono text-[11px] text-slate-500 dark:text-slate-400">
                                             {log.targetUser || '-'}
+                                        </td>
+                                        <td className="p-3.5 text-right">
+                                            <button
+                                                onClick={() => handleDeleteLog(log.id)}
+                                                className="p-1.5 text-rose-500 hover:text-white hover:bg-rose-600 rounded-lg transition cursor-pointer"
+                                                title="Hapus Catatan Log Ini"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-slate-400 text-xs">
-                                        Belum ada rekaman audit trail.
+                                    <td colSpan={6} className="py-12 text-center text-xs text-slate-400">
+                                        Belum ada riwayat aktivitas audit trail yang tercatat.
                                     </td>
                                 </tr>
                             )}

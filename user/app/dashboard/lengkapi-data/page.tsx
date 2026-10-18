@@ -2,6 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+    CheckCircle2,
+    AlertCircle,
+    ChevronDown,
+    Check,
+    Save,
+    ArrowRight,
+    ArrowLeft,
+    Sparkles,
+    User,
+    Activity,
+    Users,
+    Award,
+    BookOpen,
+    X,
+} from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
 
 export default function LengkapiDataPage() {
@@ -104,11 +120,11 @@ export default function LengkapiDataPage() {
     ];
 
     const STEPS = [
-        { id: 1, title: 'Data Diri', desc: 'Identitas pribadi calon siswa' },
-        { id: 2, title: 'Data Fisik', desc: 'Tinggi & berat badan' },
-        { id: 3, title: 'Orang Tua & Wali', desc: 'Kontak keluarga & wali' },
-        { id: 4, title: 'Jurusan & Seragam', desc: 'Pilihan kejuruan & ukuran' },
-        { id: 5, title: 'Minat & Organisasi', desc: 'Intra & ekstrakurikuler' },
+        { id: 1, title: 'Data Diri', desc: 'Identitas pribadi calon siswa', icon: User },
+        { id: 2, title: 'Data Fisik', desc: 'Tinggi & berat badan', icon: Activity },
+        { id: 3, title: 'Orang Tua & Wali', desc: 'Kontak keluarga & wali', icon: Users },
+        { id: 4, title: 'Jurusan & Seragam', desc: 'Pilihan kejuruan & ukuran', icon: Award },
+        { id: 5, title: 'Minat & Organisasi', desc: 'Intra & ekstrakurikuler', icon: BookOpen },
     ];
 
     useEffect(() => {
@@ -199,16 +215,16 @@ export default function LengkapiDataPage() {
         if (!bb || !tb || tb <= 0) return null;
         const bmi = bb / (tb * tb);
         let category = 'Normal';
-        let color = 'text-emerald-700 bg-emerald-50 border-emerald-200';
+        let color = 'text-emerald-700 bg-emerald-50 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
         if (bmi < 18.5) {
             category = 'Berat Badan Kurang';
-            color = 'text-amber-700 bg-amber-50 border-amber-200';
+            color = 'text-amber-700 bg-amber-50 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800';
         } else if (bmi >= 25 && bmi < 29.9) {
             category = 'Kelebihan Berat Badan';
-            color = 'text-amber-700 bg-amber-50 border-amber-200';
+            color = 'text-amber-700 bg-amber-50 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800';
         } else if (bmi >= 30) {
             category = 'Obesitas';
-            color = 'text-rose-700 bg-rose-50 border-rose-200';
+            color = 'text-rose-700 bg-rose-50 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-800';
         }
         return { value: bmi.toFixed(1), category, color };
     };
@@ -267,8 +283,8 @@ export default function LengkapiDataPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-24 font-sans">
-                <div className="w-12 h-12 border-4 border-emerald-700 border-t-amber-400 rounded-full animate-spin"></div>
-                <p className="mt-4 text-xs font-semibold text-slate-500 tracking-wide uppercase">
+                <div className="w-10 h-10 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="mt-4 text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide uppercase">
                     Memuat Data Formulir SPMB...
                 </p>
             </div>
@@ -280,17 +296,17 @@ export default function LengkapiDataPage() {
     return (
         <div className="space-y-6 font-sans antialiased pb-12">
             {/* PAGE TITLE & PROGRESS BANNER */}
-            <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white rounded-2xl p-6 sm:p-8 shadow-md border-b-4 border-amber-400 relative overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
                 <div className="relative z-10 max-w-2xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-3">
-                        <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                        Portal SPMB SMK Muhammadiyah Sekampung
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Portal SPMB SMK Muhammadiyah Sekampung</span>
                     </div>
                     <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
                         Formulir Kelengkapan Data Diri Calon Siswa
                     </h1>
                     <p className="text-xs sm:text-sm text-emerald-100/90 mt-2 leading-relaxed">
-                        Lengkapi 5 tahapan biodata berikut secara akurat sesuai berkas Kartu Keluarga, KTP, dan Ijazah untuk verifikasi penerimaan peserta didik baru.
+                        Lengkapi 5 tahapan biodata berikut secara akurat sesuai berkas Kartu Keluarga, KIA/KTP, dan Ijazah untuk verifikasi pendaftaran.
                     </p>
                 </div>
             </div>
@@ -298,43 +314,40 @@ export default function LengkapiDataPage() {
             {/* ALERT NOTIFICATION */}
             {message && (
                 <div
-                    className={`p-4 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-xs animate-in fade-in duration-200 ${
+                    className={`p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${
                         message.type === 'success'
-                            ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
-                            : 'bg-rose-50 text-rose-900 border-rose-200'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
+                            : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
                     }`}
                 >
                     <div className="flex items-center gap-2.5">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${message.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}`}>
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                            message.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+                        }`}>
                             {message.type === 'success' ? (
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                </svg>
+                                <Check className="w-3.5 h-3.5" />
                             ) : (
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <AlertCircle className="w-3.5 h-3.5" />
                             )}
                         </span>
                         <span>{message.text}</span>
                     </div>
                     <button
                         onClick={() => setMessage(null)}
-                        className="text-slate-400 hover:text-slate-600 ml-2"
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-2 cursor-pointer"
                     >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
             )}
 
             {/* STEPPER NAVIGATION TABS */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-4 shadow-xs">
+            <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-3 sm:p-4 shadow-xs">
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                     {STEPS.map((step) => {
                         const isActive = currentStep === step.id;
                         const isDone = currentStep > step.id;
+                        const StepIcon = step.icon;
 
                         return (
                             <button
@@ -342,34 +355,33 @@ export default function LengkapiDataPage() {
                                 onClick={() => setCurrentStep(step.id)}
                                 className={`flex flex-col text-left p-3 rounded-xl transition-all cursor-pointer relative ${
                                     isActive
-                                        ? 'bg-emerald-700 text-white shadow-md ring-2 ring-emerald-500/20'
+                                        ? 'bg-emerald-600 text-white shadow-md'
                                         : isDone
-                                        ? 'bg-emerald-50/70 hover:bg-emerald-100/60 text-emerald-900 border border-emerald-200'
-                                        : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/80'
+                                        ? 'bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100/60 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                        : 'bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
                                 }`}
                             >
-                                <div className="flex items-center justify-between w-full mb-1">
+                                <div className="flex items-center justify-between w-full mb-1.5">
                                     <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-1.5 py-0.5 rounded ${
                                         isActive
-                                            ? 'bg-amber-400 text-emerald-950'
+                                            ? 'bg-amber-400 text-slate-950'
                                             : isDone
                                             ? 'bg-emerald-600 text-white'
-                                            : 'bg-slate-200 text-slate-600'
+                                            : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                                     }`}>
                                         {isDone ? (
                                             <>
-                                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                                </svg>
+                                                <Check className="w-3 h-3 stroke-[3]" />
                                                 <span>SELESAI</span>
                                             </>
                                         ) : (
                                             `STEP ${step.id}`
                                         )}
                                     </span>
+                                    <StepIcon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                                 </div>
                                 <div className="text-xs font-bold truncate">{step.title}</div>
-                                <div className={`text-[10px] truncate ${isActive ? 'text-emerald-100' : 'text-slate-400'}`}>
+                                <div className={`text-[10px] truncate ${isActive ? 'text-emerald-100' : 'text-slate-400 dark:text-slate-500'}`}>
                                     {step.desc}
                                 </div>
                             </button>
@@ -382,24 +394,24 @@ export default function LengkapiDataPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* STEP 1: DATA DIRI */}
                 {currentStep === 1 && (
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200">
-                        <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-amber-400 font-extrabold flex items-center justify-center text-sm shadow-xs">
+                    <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200">
+                        <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-xs">
                                 01
                             </div>
                             <div>
-                                <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                                     Data Diri Calon Peserta Didik
                                 </h2>
-                                <p className="text-xs text-slate-500">
-                                    Isi identitas pribadi sesuai dokumen Akta Kelahiran, KK, atau KTP
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    Isi identitas pribadi sesuai dokumen Akta Kelahiran, KK, atau KTP/KIA
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div className="sm:col-span-2">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Nama Lengkap Calon Siswa *
                                 </label>
                                 <input
@@ -409,45 +421,53 @@ export default function LengkapiDataPage() {
                                     value={formData.namaLengkap}
                                     onChange={handleInputChange}
                                     placeholder="Contoh: Muhammad Faiz Nuaim"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
 
+                            {/* MODERN DROPDOWN: Jenis Kelamin */}
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Jenis Kelamin *
                                 </label>
-                                <select
-                                    name="jenisKelamin"
-                                    value={formData.jenisKelamin}
-                                    onChange={handleInputChange}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                                >
-                                    <option value="Laki-laki">Laki-laki</option>
-                                    <option value="Perempuan">Perempuan</option>
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        name="jenisKelamin"
+                                        value={formData.jenisKelamin}
+                                        onChange={handleInputChange}
+                                        className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-slate-900 dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
+                                    >
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                    </select>
+                                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-3.5 pointer-events-none" />
+                                </div>
                             </div>
 
+                            {/* MODERN DROPDOWN: Agama */}
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Agama *
                                 </label>
-                                <select
-                                    name="agama"
-                                    value={formData.agama}
-                                    onChange={handleInputChange}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
-                                >
-                                    {AGAMA_OPTIONS.map((item) => (
-                                        <option key={item} value={item}>
-                                            {item}
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        name="agama"
+                                        value={formData.agama}
+                                        onChange={handleInputChange}
+                                        className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-medium text-slate-900 dark:text-white appearance-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
+                                    >
+                                        {AGAMA_OPTIONS.map((item) => (
+                                            <option key={item} value={item}>
+                                                {item}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3.5 top-3.5 pointer-events-none" />
+                                </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Tempat Lahir *
                                 </label>
                                 <input
@@ -457,12 +477,12 @@ export default function LengkapiDataPage() {
                                     value={formData.tempatLahir}
                                     onChange={handleInputChange}
                                     placeholder="Contoh: Sekampung / Lampung Timur"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Tanggal Lahir *
                                 </label>
                                 <input
@@ -471,12 +491,12 @@ export default function LengkapiDataPage() {
                                     required
                                     value={formData.tanggalLahir}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     NISN (10 Digit) *
                                 </label>
                                 <input
@@ -487,12 +507,12 @@ export default function LengkapiDataPage() {
                                     value={formData.nisn}
                                     onChange={handleInputChange}
                                     placeholder="Nomor Induk Siswa Nasional"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     NIK Siswa (16 Digit) *
                                 </label>
                                 <input
@@ -502,13 +522,13 @@ export default function LengkapiDataPage() {
                                     maxLength={16}
                                     value={formData.nik}
                                     onChange={handleInputChange}
-                                    placeholder="Sesuai Kartu Keluarga / KTP"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    placeholder="Sesuai Kartu Keluarga / KIA"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-mono text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Sekolah Asal (SMP / MTs) *
                                 </label>
                                 <input
@@ -518,12 +538,12 @@ export default function LengkapiDataPage() {
                                     value={formData.sekolahAsal}
                                     onChange={handleInputChange}
                                     placeholder="Contoh: SMP Muhammadiyah 1 Sekampung"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     No. Handphone / WhatsApp Siswa *
                                 </label>
                                 <input
@@ -533,12 +553,12 @@ export default function LengkapiDataPage() {
                                     value={formData.noHpWa}
                                     onChange={handleInputChange}
                                     placeholder="Contoh: 081234567890"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
 
                             <div className="sm:col-span-2">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Alamat Lengkap Tempat Tinggal *
                                 </label>
                                 <textarea
@@ -548,7 +568,7 @@ export default function LengkapiDataPage() {
                                     value={formData.alamat}
                                     onChange={handleInputChange}
                                     placeholder="Dusun/Jalan, RT/RW, Desa/Kelurahan, Kecamatan, Kabupaten"
-                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                 />
                             </div>
                         </div>
@@ -557,24 +577,24 @@ export default function LengkapiDataPage() {
 
                 {/* STEP 2: DATA FISIK */}
                 {currentStep === 2 && (
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200">
-                        <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-6">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-amber-400 font-extrabold flex items-center justify-center text-sm shadow-xs">
+                    <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200">
+                        <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                            <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-xs">
                                 02
                             </div>
                             <div>
-                                <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                                <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                                     Data Fisik Calon Siswa
                                 </h2>
-                                <p className="text-xs text-slate-500">
-                                    Digunakan untuk pendataan kesehatan dan standar kejuruan teknik
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    Digunakan untuk pendataan kesehatan dan penyesuaian seragam praktik
                                 </p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Berat Badan (kg) *
                                 </label>
                                 <div className="relative">
@@ -586,19 +606,19 @@ export default function LengkapiDataPage() {
                                         value={formData.beratBadan}
                                         onChange={handleInputChange}
                                         placeholder="Contoh: 48"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 pr-12"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 pr-12 transition"
                                     />
                                     <span className="absolute right-4 top-2.5 text-xs font-bold text-slate-400">
                                         KG
                                     </span>
                                 </div>
-                                <span className="text-[11px] text-slate-400 mt-1 block">
-                                    Rentang berat badan normal siswa SMA/SMK (30 - 75 kg)
+                                <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block">
+                                    Rentang berat badan normal siswa SMP/SMK (30 - 75 kg)
                                 </span>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Tinggi Badan (cm) *
                                 </label>
                                 <div className="relative">
@@ -610,26 +630,26 @@ export default function LengkapiDataPage() {
                                         value={formData.tinggiBadan}
                                         onChange={handleInputChange}
                                         placeholder="Contoh: 165"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 pr-12"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 pr-12 transition"
                                     />
                                     <span className="absolute right-4 top-2.5 text-xs font-bold text-slate-400">
                                         CM
                                     </span>
                                 </div>
-                                <span className="text-[11px] text-slate-400 mt-1 block">
+                                <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-1 block">
                                     Rentang tinggi badan (135 - 190 cm)
                                 </span>
                             </div>
 
                             {/* BMI CALCULATOR WIDGET */}
                             {bmiInfo && (
-                                <div className="sm:col-span-2 p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                                <div className="sm:col-span-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
                                     <div>
-                                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                             Indeks Massa Tubuh (BMI)
                                         </span>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-lg font-extrabold text-slate-800">
+                                            <span className="text-lg font-extrabold text-slate-900 dark:text-white">
                                                 {bmiInfo.value}
                                             </span>
                                             <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${bmiInfo.color}`}>
@@ -637,7 +657,7 @@ export default function LengkapiDataPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="text-right text-xs text-slate-400 hidden sm:block">
+                                    <div className="text-right text-xs text-slate-400 dark:text-slate-500 hidden sm:block">
                                         Kalkulasi otomatis sistem kesehatan sekolah
                                     </div>
                                 </div>
@@ -648,17 +668,17 @@ export default function LengkapiDataPage() {
 
                 {/* STEP 3: ORANG TUA & WALI */}
                 {currentStep === 3 && (
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200 space-y-8">
+                    <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200 space-y-8">
                         <div>
-                            <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-6">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-700 text-amber-400 font-extrabold flex items-center justify-center text-sm shadow-xs">
+                            <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-xs">
                                     03
                                 </div>
                                 <div>
-                                    <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                                    <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                                         Data Orang Tua Kandung & Wali
                                     </h2>
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
                                         Informasi kontak dan pekerjaan orang tua/wali murid
                                     </p>
                                 </div>
@@ -666,7 +686,7 @@ export default function LengkapiDataPage() {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         Nama Ayah Kandung *
                                     </label>
                                     <input
@@ -676,12 +696,12 @@ export default function LengkapiDataPage() {
                                         value={formData.namaAyah}
                                         onChange={handleInputChange}
                                         placeholder="Nama lengkap ayah"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         Pekerjaan Ayah
                                     </label>
                                     <input
@@ -690,12 +710,12 @@ export default function LengkapiDataPage() {
                                         value={formData.pekerjaanAyah}
                                         onChange={handleInputChange}
                                         placeholder="Petani / Wiraswasta / PNS / Buruh / dll"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         Nama Ibu Kandung *
                                     </label>
                                     <input
@@ -705,12 +725,12 @@ export default function LengkapiDataPage() {
                                         value={formData.namaIbuKandung || formData.namaIbu}
                                         onChange={handleInputChange}
                                         placeholder="Nama lengkap ibu kandung"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         Pekerjaan Ibu
                                     </label>
                                     <input
@@ -719,12 +739,12 @@ export default function LengkapiDataPage() {
                                         value={formData.pekerjaanIbu}
                                         onChange={handleInputChange}
                                         placeholder="Ibu Rumah Tangga / Guru / Pedagang / dll"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         Alamat Orang Tua
                                     </label>
                                     <input
@@ -733,12 +753,12 @@ export default function LengkapiDataPage() {
                                         value={formData.alamatOrtu}
                                         onChange={handleInputChange}
                                         placeholder="Kosongkan jika sama dengan alamat siswa"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         No. Handphone / WhatsApp Orang Tua *
                                     </label>
                                     <input
@@ -748,24 +768,24 @@ export default function LengkapiDataPage() {
                                         value={formData.noHpOrtu}
                                         onChange={handleInputChange}
                                         placeholder="Nomor HP aktif ayah/ibu"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* DATA WALI */}
-                        <div className="pt-6 border-t border-slate-200">
-                            <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">
+                        <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
+                            <h3 className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider mb-1">
                                 Data Wali Murid (Opsional)
                             </h3>
-                            <p className="text-xs text-slate-500 mb-4">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
                                 Hanya diisi jika calon siswa tinggal bersama wali (bukan orang tua kandung)
                             </p>
 
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         Nama Wali
                                     </label>
                                     <input
@@ -774,12 +794,12 @@ export default function LengkapiDataPage() {
                                         value={formData.namaWali}
                                         onChange={handleInputChange}
                                         placeholder="Nama lengkap wali"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         Alamat Wali
                                     </label>
                                     <input
@@ -788,12 +808,12 @@ export default function LengkapiDataPage() {
                                         value={formData.alamatWali}
                                         onChange={handleInputChange}
                                         placeholder="Alamat tempat tinggal wali"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                         No. HP / WhatsApp Wali
                                     </label>
                                     <input
@@ -802,7 +822,7 @@ export default function LengkapiDataPage() {
                                         value={formData.noHpWali}
                                         onChange={handleInputChange}
                                         placeholder="08xxxxxxxxxx"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition"
                                     />
                                 </div>
                             </div>
@@ -812,24 +832,24 @@ export default function LengkapiDataPage() {
 
                 {/* STEP 4: PILIHAN JURUSAN & UKURAN BAJU */}
                 {currentStep === 4 && (
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200 space-y-8">
+                    <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200 space-y-8">
                         <div>
-                            <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-6">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-700 text-amber-400 font-extrabold flex items-center justify-center text-sm shadow-xs">
+                            <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-xs">
                                     04
                                 </div>
                                 <div>
-                                    <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                                    <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                                         Pilihan Jurusan & Ukuran Seragam
                                     </h2>
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
                                         Pilih 1 dari 8 Program Keahlian unggulan SMK Muhammadiyah Sekampung
                                     </p>
                                 </div>
                             </div>
 
-                            {/* JURUSAN SELECTION CARDS */}
-                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
+                            {/* MODERN RADIO CARDS: Jurusan */}
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3">
                                 Program Keahlian Pilihan (Wajib Pilih 1) *
                             </label>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-8">
@@ -838,26 +858,23 @@ export default function LengkapiDataPage() {
                                     return (
                                         <label
                                             key={idx}
+                                            onClick={() => setFormData(prev => ({ ...prev, jurusan: item }))}
                                             className={`flex items-start gap-3.5 p-4 rounded-xl border cursor-pointer transition-all ${
                                                 isSelected
-                                                    ? 'bg-emerald-50/90 border-emerald-600 ring-2 ring-emerald-500/20 shadow-xs'
-                                                    : 'border-slate-200 hover:bg-slate-50'
+                                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 text-emerald-950 dark:text-emerald-100 ring-2 ring-emerald-500/20 shadow-xs'
+                                                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-800 dark:text-slate-200'
                                             }`}
                                         >
-                                            <input
-                                                type="radio"
-                                                name="jurusan"
-                                                value={item}
-                                                checked={isSelected}
-                                                onChange={handleInputChange}
-                                                className="mt-1 text-emerald-700 focus:ring-emerald-500 h-4 w-4"
-                                            />
+                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${
+                                                isSelected ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                                            }`}>
+                                                {isSelected && <span className="w-2 h-2 rounded-full bg-white"></span>}
+                                            </div>
                                             <div className="min-w-0 flex-1">
-                                                <div className={`text-sm font-bold ${isSelected ? 'text-emerald-950' : 'text-slate-800'}`}>
-                                                    {item}
-                                                </div>
-                                                <div className="text-[11px] text-slate-500 mt-0.5">
-                                                    Standar kurikulum industri & sertifikasi LSP
+                                                <div className="text-sm font-bold">{item}</div>
+                                                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                                                    <span>Standar kurikulum industri & sertifikasi kompetensi</span>
                                                 </div>
                                             </div>
                                         </label>
@@ -865,12 +882,12 @@ export default function LengkapiDataPage() {
                                 })}
                             </div>
 
-                            {/* UKURAN BAJU */}
-                            <div className="pt-6 border-t border-slate-200">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            {/* MODERN RADIO CARDS: Ukuran Baju */}
+                            <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Pilihan Ukuran Baju Seragam Sekolah *
                                 </label>
-                                <p className="text-xs text-slate-500 mb-3">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
                                     Disesuaikan dengan berat badan Anda untuk kelayakan seragam praktik dan almamater
                                 </p>
 
@@ -880,20 +897,18 @@ export default function LengkapiDataPage() {
                                         return (
                                             <label
                                                 key={size}
-                                                className={`flex items-center gap-2.5 p-3 rounded-xl border text-center cursor-pointer transition ${
+                                                onClick={() => setFormData(prev => ({ ...prev, ukuranBaju: size }))}
+                                                className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition ${
                                                     isSelected
-                                                        ? 'bg-amber-50 border-amber-500 text-amber-950 font-bold ring-2 ring-amber-400/20'
-                                                        : 'border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm'
+                                                        ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200 font-bold ring-2 ring-amber-400/20'
+                                                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300 text-xs sm:text-sm'
                                                 }`}
                                             >
-                                                <input
-                                                    type="radio"
-                                                    name="ukuranBaju"
-                                                    value={size}
-                                                    checked={isSelected}
-                                                    onChange={handleInputChange}
-                                                    className="text-amber-600 focus:ring-amber-500 h-3.5 w-3.5"
-                                                />
+                                                <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 border ${
+                                                    isSelected ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                                                }`}>
+                                                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>}
+                                                </div>
                                                 <span className="text-xs sm:text-sm">{size}</span>
                                             </label>
                                         );
@@ -901,8 +916,8 @@ export default function LengkapiDataPage() {
                                 </div>
 
                                 {formData.ukuranBaju === 'Lainnya' && (
-                                    <div className="p-4 bg-amber-50/60 rounded-xl border border-amber-300 animate-in fade-in duration-200">
-                                        <label className="block text-xs font-bold text-amber-950 uppercase tracking-wider mb-1.5">
+                                    <div className="p-4 bg-amber-50/60 dark:bg-amber-950/30 rounded-xl border border-amber-300 dark:border-amber-700/80 animate-in fade-in duration-200">
+                                        <label className="block text-xs font-bold text-amber-950 dark:text-amber-200 uppercase tracking-wider mb-1.5">
                                             Tuliskan Ukuran Seragam Khusus *
                                         </label>
                                         <input
@@ -912,7 +927,7 @@ export default function LengkapiDataPage() {
                                             value={formData.ukuranBajuLainnya}
                                             onChange={handleInputChange}
                                             placeholder="Contoh: 5XL / Lingkar Dada 125 cm"
-                                            className="w-full px-4 py-2.5 rounded-xl border border-amber-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600"
+                                            className="w-full px-4 py-2.5 rounded-xl border border-amber-300 dark:border-amber-600 bg-white dark:bg-slate-900 text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600"
                                         />
                                     </div>
                                 )}
@@ -923,28 +938,28 @@ export default function LengkapiDataPage() {
 
                 {/* STEP 5: INTRAKURIKULER & EKSTRAKURIKULER */}
                 {currentStep === 5 && (
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200 space-y-8">
+                    <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs animate-in fade-in duration-200 space-y-8">
                         <div>
-                            <div className="flex items-center gap-3 pb-4 border-b border-slate-100 mb-6">
-                                <div className="w-10 h-10 rounded-xl bg-emerald-700 text-amber-400 font-extrabold flex items-center justify-center text-sm shadow-xs">
+                            <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-extrabold flex items-center justify-center text-sm shadow-xs">
                                     05
                                 </div>
                                 <div>
-                                    <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                                    <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
                                         Minat Organisasi & Pengembangan Diri
                                     </h2>
-                                    <p className="text-xs text-slate-500">
-                                        Wadah pembinaan karakter dan minat bakat di SMK Muhammadiyah Sekampung
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        Wadah pembinaan karakter dan bakat di SMK Muhammadiyah Sekampung
                                     </p>
                                 </div>
                             </div>
 
-                            {/* INTRAKURIKULER (RADIO) */}
+                            {/* MODERN RADIO CARDS: INTRAKURIKULER */}
                             <div className="mb-8">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Organisasi Intrakurikuler (Wajib Pilih 1) *
                                 </label>
-                                <p className="text-xs text-slate-500 mb-3">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
                                     Organisasi resmi kesiswaan Muhammadiyah dan kepanduan
                                 </p>
 
@@ -954,20 +969,18 @@ export default function LengkapiDataPage() {
                                         return (
                                             <label
                                                 key={item}
+                                                onClick={() => setFormData(prev => ({ ...prev, intrakurikuler: item }))}
                                                 className={`flex items-center gap-3.5 p-4 rounded-xl border cursor-pointer transition ${
                                                     isChecked
-                                                        ? 'bg-emerald-50/90 border-emerald-600 text-emerald-950 font-bold shadow-xs'
-                                                        : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 text-emerald-950 dark:text-emerald-100 font-bold shadow-xs'
+                                                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300'
                                                 }`}
                                             >
-                                                <input
-                                                    type="radio"
-                                                    name="intrakurikuler"
-                                                    value={item}
-                                                    checked={isChecked}
-                                                    onChange={handleInputChange}
-                                                    className="text-emerald-700 focus:ring-emerald-500 h-4 w-4"
-                                                />
+                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${
+                                                    isChecked ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                                                }`}>
+                                                    {isChecked && <span className="w-2 h-2 rounded-full bg-white"></span>}
+                                                </div>
                                                 <span className="text-sm font-semibold">{item}</span>
                                             </label>
                                         );
@@ -975,12 +988,12 @@ export default function LengkapiDataPage() {
                                 </div>
                             </div>
 
-                            {/* EKSTRAKURIKULER (CHECKBOX) */}
-                            <div className="pt-6 border-t border-slate-200">
-                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                            {/* MODERN CHECKLIST CARDS: EKSTRAKURIKULER */}
+                            <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                                     Ekstrakurikuler Pilihan (Bisa Pilih Lebih Dari Satu)
                                 </label>
-                                <p className="text-xs text-slate-500 mb-3">
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
                                     Pilih kegiatan seni, olahraga, dan teknologi yang diminati
                                 </p>
 
@@ -990,18 +1003,18 @@ export default function LengkapiDataPage() {
                                         return (
                                             <label
                                                 key={item}
-                                                className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition ${
+                                                onClick={() => handleCheckboxChange(item)}
+                                                className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition select-none ${
                                                     isChecked
-                                                        ? 'bg-amber-50 border-amber-500 text-amber-950 font-bold shadow-xs'
-                                                        : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                                                        ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200 font-bold shadow-xs'
+                                                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300'
                                                 }`}
                                             >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isChecked}
-                                                    onChange={() => handleCheckboxChange(item)}
-                                                    className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4"
-                                                />
+                                                <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
+                                                    isChecked ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                                                }`}>
+                                                    {isChecked && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                                                </div>
                                                 <span className="text-xs sm:text-sm">{item}</span>
                                             </label>
                                         );
@@ -1013,7 +1026,7 @@ export default function LengkapiDataPage() {
                 )}
 
                 {/* BOTTOM NAVIGATION CONTROLS */}
-                <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+                <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
                     <div>
                         {currentStep > 1 ? (
                             <button
@@ -1022,12 +1035,13 @@ export default function LengkapiDataPage() {
                                     setCurrentStep((prev) => Math.max(1, prev - 1));
                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
-                                className="w-full sm:w-auto px-5 py-2.5 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
+                                className="w-full sm:w-auto px-5 py-2.5 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
                             >
-                                ← Sebelumnya
+                                <ArrowLeft className="w-4 h-4" />
+                                <span>Sebelumnya</span>
                             </button>
                         ) : (
-                            <span className="text-xs text-slate-400 italic">Langkah 1 dari 5</span>
+                            <span className="text-xs text-slate-400 dark:text-slate-500 italic">Langkah 1 dari 5</span>
                         )}
                     </div>
 
@@ -1037,11 +1051,9 @@ export default function LengkapiDataPage() {
                             type="button"
                             onClick={() => handleSubmit()}
                             disabled={saving}
-                            className="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl transition border border-slate-300 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+                            className="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-semibold rounded-xl transition border border-slate-300 dark:border-slate-700 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
                         >
-                            <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                            </svg>
+                            <Save className="w-4 h-4 text-slate-500" />
                             <span>{saving ? 'Menyimpan...' : 'Simpan Sementara'}</span>
                         </button>
 
@@ -1053,18 +1065,16 @@ export default function LengkapiDataPage() {
                                     setCurrentStep((prev) => Math.min(5, prev + 1));
                                     window.scrollTo({ top: 0, behavior: 'smooth' });
                                 }}
-                                className="flex-1 sm:flex-initial px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
+                                className="flex-1 sm:flex-initial px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
                             >
                                 <span>Selanjutnya</span>
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
+                                <ArrowRight className="w-4 h-4" />
                             </button>
                         ) : (
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="flex-1 sm:flex-initial px-7 py-2.5 bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg shadow-emerald-700/20 transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer border border-amber-400"
+                                className="flex-1 sm:flex-initial px-7 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                             >
                                 {saving ? (
                                     <>
@@ -1073,9 +1083,7 @@ export default function LengkapiDataPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <svg className="w-4 h-4 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                                        </svg>
+                                        <CheckCircle2 className="w-4 h-4 text-amber-300" />
                                         <span>Simpan & Selesaikan Formulir</span>
                                     </>
                                 )}

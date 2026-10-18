@@ -47,6 +47,7 @@ export default function PendaftarManagementPage() {
     const [jurusan, setJurusan] = useState('ALL');
     const [status, setStatus] = useState('ALL');
     const [statusKelulusan, setStatusKelulusan] = useState('ALL');
+    const [tahunAjaran, setTahunAjaran] = useState('ALL');
 
     const fetchPendaftar = async (targetPage = page) => {
         setLoading(true);
@@ -56,6 +57,7 @@ export default function PendaftarManagementPage() {
             if (jurusan !== 'ALL') query.set('jurusan', jurusan);
             if (status !== 'ALL') query.set('status', status);
             if (statusKelulusan !== 'ALL') query.set('statusKelulusan', statusKelulusan);
+            if (tahunAjaran !== 'ALL') query.set('tahunAjaran', tahunAjaran);
             query.set('page', String(targetPage));
             query.set('limit', '12');
 
@@ -81,7 +83,7 @@ export default function PendaftarManagementPage() {
             fetchPendaftar(1);
         }, 300);
         return () => clearTimeout(debounce);
-    }, [search, jurusan, status, statusKelulusan]);
+    }, [search, jurusan, status, statusKelulusan, tahunAjaran]);
 
     const handleExportExcel = () => {
         const token = localStorage.getItem('access_token');
@@ -129,7 +131,7 @@ export default function PendaftarManagementPage() {
 
             {/* Filter Bar */}
             <div className="p-4 rounded-2xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 shadow-xs space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                     {/* Search Input */}
                     <div className="relative">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
@@ -182,6 +184,20 @@ export default function PendaftarManagementPage() {
                             <option value="LULUS">Dinyatakan Lulus</option>
                             <option value="TIDAK_LULUS">Tidak Lulus</option>
                             <option value="MENUNGGU">Menunggu Penilaian</option>
+                        </select>
+                    </div>
+
+                    {/* Filter Tahun Ajaran / Arsip */}
+                    <div>
+                        <select
+                            value={tahunAjaran}
+                            onChange={(e) => setTahunAjaran(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                        >
+                            <option value="ALL">Arsip Tahun: Semua</option>
+                            <option value="2026/2027">TA 2026/2027 (Aktif)</option>
+                            <option value="2025/2026">Arsip TA 2025/2026</option>
+                            <option value="2024/2025">Arsip TA 2024/2025</option>
                         </select>
                     </div>
                 </div>

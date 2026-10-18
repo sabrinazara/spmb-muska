@@ -31,6 +31,7 @@ export class DokumenController {
         @Body('jenisDokumen') jenisDokumen?: string,
         @Body('confirmedNik') confirmedNik?: string,
         @Body('confirmedText') confirmedText?: string,
+        @Body('confirmedParsedData') confirmedParsedData?: string,
     ) {
         const idToUse = bodyPendaftaranId || req.user.sub;
         return this.dokumenService.prosesUploadDokumen(
@@ -39,6 +40,7 @@ export class DokumenController {
             jenisDokumen || 'KTP',
             confirmedNik,
             confirmedText,
+            confirmedParsedData,
         );
     }
 }

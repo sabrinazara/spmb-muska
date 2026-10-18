@@ -5,21 +5,23 @@ import { LengkapiDataDto } from './dto/lengkapi-data.dto';
 import type { Response } from 'express';
 
 @Controller('pendaftaran')
-@UseGuards(AuthGuard)
 export class PendaftaranController {
     constructor(private readonly pendaftaranService: PendaftaranService) { }
 
     @Get('saya')
+    @UseGuards(AuthGuard)
     async getPendaftaranSaya(@Request() req: any) {
         return this.pendaftaranService.getPendaftaranByUserId(req.user.sub);
     }
 
     @Get('status')
+    @UseGuards(AuthGuard)
     async getStatusPendaftaran(@Request() req: any) {
         return this.pendaftaranService.getStatusPendaftaran(req.user.sub);
     }
 
     @Post('buat')
+    @UseGuards(AuthGuard)
     async buatPendaftaran(
         @Request() req: any,
         @Body('userId') bodyUserId?: string,
@@ -32,16 +34,19 @@ export class PendaftaranController {
     }
 
     @Post('lengkapi-data')
+    @UseGuards(AuthGuard)
     async simpanLengkapiDataPost(@Request() req: any, @Body() dto: LengkapiDataDto) {
         return this.pendaftaranService.simpanLengkapiData(req.user.sub, dto);
     }
 
     @Put('lengkapi-data')
+    @UseGuards(AuthGuard)
     async simpanLengkapiDataPut(@Request() req: any, @Body() dto: LengkapiDataDto) {
         return this.pendaftaranService.simpanLengkapiData(req.user.sub, dto);
     }
 
     @Get('kartu-ujian')
+    @UseGuards(AuthGuard)
     async downloadKartuUjian(@Request() req: any, @Res() res: Response) {
         const { buffer, filename } = await this.pendaftaranService.generateKartuUjianPdf(req.user.sub);
         res.setHeader('Content-Type', 'application/pdf');
@@ -51,6 +56,7 @@ export class PendaftaranController {
     }
 
     @Get('ringkasan-formulir')
+    @UseGuards(AuthGuard)
     async downloadRingkasanFormulir(@Request() req: any, @Res() res: Response) {
         const { buffer, filename } = await this.pendaftaranService.generateRingkasanFormulirPdf(req.user.sub);
         res.setHeader('Content-Type', 'application/pdf');
@@ -59,8 +65,15 @@ export class PendaftaranController {
         res.end(buffer);
     }
 
+    // Public: Pengumuman Kelulusan countdown & status pendaftaran SPMB
     @Get('pengumuman')
     async getPengumuman() {
+        return this.pendaftaranService.getPengumumanStatus();
+    }
+
+    // Public: Status SPMB (Buka/Tutup, Tahun Ajaran)
+    @Get('status-sistem')
+    async getStatusSistem() {
         return this.pendaftaranService.getPengumumanStatus();
     }
 }

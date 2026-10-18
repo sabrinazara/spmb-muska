@@ -203,7 +203,7 @@ export default function KnowledgeBaseManagementPage() {
                                 value={judul}
                                 onChange={(e) => setJudul(e.target.value)}
                                 placeholder="Contoh: Brosur Jurusan TKJ TA 2026"
-                                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs"
                             />
                         </div>
 
@@ -214,7 +214,7 @@ export default function KnowledgeBaseManagementPage() {
                             <select
                                 value={kategori}
                                 onChange={(e) => setKategori(e.target.value)}
-                                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                                className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs cursor-pointer"
                             >
                                 <option value="Brosur">Brosur & Profil Sekolah</option>
                                 <option value="Jurusan">Program Keahlian (8 Jurusan)</option>
@@ -234,7 +234,7 @@ export default function KnowledgeBaseManagementPage() {
                             accept="application/pdf"
                             required
                             onChange={handleFileChange}
-                            className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 dark:file:bg-emerald-950 dark:file:text-emerald-300 hover:file:bg-emerald-100 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900"
+                            className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 dark:file:bg-emerald-950 dark:file:text-emerald-300 hover:file:bg-emerald-100 cursor-pointer border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900"
                         />
                     </div>
 
@@ -247,7 +247,7 @@ export default function KnowledgeBaseManagementPage() {
                             value={deskripsi}
                             onChange={(e) => setDeskripsi(e.target.value)}
                             placeholder="Catatan ringkas mengenai isi dokumen..."
-                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+                            className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs"
                         />
                     </div>
 

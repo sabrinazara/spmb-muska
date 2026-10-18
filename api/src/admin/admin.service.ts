@@ -112,6 +112,7 @@ export class AdminService {
         status?: string;
         statusPembayaran?: string;
         statusKelulusan?: string;
+        tahunAjaran?: string;
         page?: number;
         limit?: number;
     }) {
@@ -149,6 +150,19 @@ export class AdminService {
             where.statusKelulusan = params.statusKelulusan;
         }
 
+        if (params.tahunAjaran && params.tahunAjaran !== 'ALL') {
+            const parts = params.tahunAjaran.split('/');
+            const startYear = parseInt(parts[0], 10);
+            if (!isNaN(startYear)) {
+                const start = new Date(startYear, 0, 1);
+                const end = new Date(startYear + 1, 6, 31, 23, 59, 59);
+                where.createdAt = {
+                    gte: start,
+                    lte: end,
+                };
+            }
+        }
+
         const [total, items] = await Promise.all([
             this.prisma.pendaftaran.count({ where }),
             this.prisma.pendaftaran.findMany({
@@ -165,6 +179,7 @@ export class AdminService {
 
         return {
             items,
+            arsipTahun: ['2026/2027', '2025/2026', '2024/2025'],
             pagination: {
                 total,
                 page,
@@ -619,6 +634,96 @@ export class AdminService {
     }
 
     /**
+     * Memperbarui akun Administrator (Nama, Email, Password, Role)
+     */
+    async updateAdminUser(
+        id: string,
+        data: { nama?: string; email?: string; password?: string; role?: string },
+        adminUser: { sub: string; email: string }
+    ) {
+        const target = await this.prisma.user.findUnique({ where: { id } });
+        if (!target) {
+            throw new NotFoundException('Akun administrator tidak ditemukan');
+        }
+
+        const updateData: any = {};
+        if (data.nama !== undefined && data.nama.trim() !== '') {
+            updateData.nama = data.nama.trim();
+        }
+        if (data.email !== undefined && data.email.trim() !== '' && data.email.trim().toLowerCase() !== target.email) {
+            const emailLower = data.email.trim().toLowerCase();
+            const existing = await this.prisma.user.findUnique({ where: { email: emailLower } });
+            if (existing) {
+                throw new BadRequestException('Email sudah digunakan oleh akun lain');
+            }
+            updateData.email = emailLower;
+        }
+        if (data.password && data.password.trim().length >= 6) {
+            const bcrypt = await import('bcrypt');
+            updateData.password = await bcrypt.hash(data.password.trim(), 10);
+        }
+        if (data.role && (data.role === 'ADMIN' || data.role === 'USER')) {
+            updateData.role = data.role as any;
+        }
+
+        const updated = await this.prisma.user.update({
+            where: { id },
+            data: updateData,
+            select: {
+                id: true,
+                nama: true,
+                email: true,
+                role: true,
+                createdAt: true,
+            }
+        });
+
+        await this.prisma.auditLog.create({
+            data: {
+                adminId: adminUser.sub,
+                adminNama: adminUser.email,
+                aksi: 'UPDATE_ADMIN',
+                detail: `Memperbarui akun admin: ${updated.email} (${updated.nama})`,
+                targetUser: updated.email,
+            }
+        });
+
+        return {
+            message: 'Akun administrator berhasil diperbarui',
+            user: updated,
+        };
+    }
+
+    /**
+     * Menghapus satu catatan audit log
+     */
+    async deleteAuditLog(id: string, adminUser: { sub: string; email: string }) {
+        const log = await this.prisma.auditLog.findUnique({ where: { id } });
+        if (!log) {
+            throw new NotFoundException('Catatan audit log tidak ditemukan');
+        }
+        await this.prisma.auditLog.delete({ where: { id } });
+        return { message: 'Catatan audit log berhasil dihapus' };
+    }
+
+    /**
+     * Menghapus seluruh riwayat audit log
+     */
+    async clearAuditLogs(adminUser: { sub: string; email: string }) {
+        await this.prisma.auditLog.deleteMany({});
+        await this.prisma.auditLog.create({
+            data: {
+                adminId: adminUser.sub,
+                adminNama: adminUser.email,
+                aksi: 'BERSIHKAN_LOG',
+                detail: `Seluruh riwayat audit log telah dibersihkan oleh ${adminUser.email}`,
+                targetUser: 'SYSTEM',
+            }
+        });
+        return { message: 'Semua catatan audit log berhasil dibersihkan' };
+    }
+
+    /**
      * Mengambil Pengaturan Sistem (Termasuk Jadwal & Status Pengumuman Kelulusan)
      */
     async getSettings() {
@@ -632,6 +737,7 @@ export class AdminService {
             pengumumanDibuka: map['pengumumanDibuka'] === 'true',
             tanggalPengumuman: map['tanggalPengumuman'] || '2026-06-01T10:00:00',
             tahunAjaran: map['tahunAjaran'] || '2026/2027',
+            bukaPendaftaran: map['bukaPendaftaran'] !== 'false',
             waktuServer: new Date().toISOString(),
         };
     }
@@ -640,7 +746,7 @@ export class AdminService {
      * Memperbarui Pengaturan Sistem
      */
     async updateSettings(
-        data: { pengumumanDibuka?: boolean; tanggalPengumuman?: string; tahunAjaran?: string },
+        data: { pengumumanDibuka?: boolean; tanggalPengumuman?: string; tahunAjaran?: string; bukaPendaftaran?: boolean },
         adminUser: { sub: string; email: string }
     ) {
         if (data.pengumumanDibuka !== undefined) {
@@ -648,6 +754,14 @@ export class AdminService {
                 where: { key: 'pengumumanDibuka' },
                 update: { value: String(data.pengumumanDibuka) },
                 create: { key: 'pengumumanDibuka', value: String(data.pengumumanDibuka) },
+            });
+        }
+
+        if (data.bukaPendaftaran !== undefined) {
+            await this.prisma.systemSetting.upsert({
+                where: { key: 'bukaPendaftaran' },
+                update: { value: String(data.bukaPendaftaran) },
+                create: { key: 'bukaPendaftaran', value: String(data.bukaPendaftaran) },
             });
         }
 
@@ -672,7 +786,7 @@ export class AdminService {
                 adminId: adminUser.sub,
                 adminNama: adminUser.email,
                 aksi: 'UPDATE_PENGATURAN',
-                detail: `Memperbarui pengaturan: Status Pengumuman=${data.pengumumanDibuka ?? '-'}, Tgl Pengumuman=${data.tanggalPengumuman ?? '-'}`,
+                detail: `Memperbarui pengaturan: BukaPendaftaran=${data.bukaPendaftaran ?? '-'}, Pengumuman=${data.pengumumanDibuka ?? '-'}, Tahun=${data.tahunAjaran ?? '-'}`,
                 targetUser: 'SYSTEM',
             }
         });

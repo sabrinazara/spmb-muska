@@ -545,6 +545,7 @@ export class PendaftaranService {
             pengumumanDibuka: map['pengumumanDibuka'] === 'true',
             tanggalPengumuman: map['tanggalPengumuman'] || '2026-06-01T10:00:00',
             tahunAjaran: map['tahunAjaran'] || '2026/2027',
+            bukaPendaftaran: map['bukaPendaftaran'] !== 'false',
             waktuServer: new Date().toISOString(),
         };
     }
