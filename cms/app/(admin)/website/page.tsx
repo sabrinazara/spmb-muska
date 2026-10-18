@@ -352,14 +352,31 @@ export default function WebsiteManagerPage() {
                                 </div>
 
                                 <div className="sm:col-span-2">
-                                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Semboyan / Motto Sekolah *</label>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="block font-bold text-slate-700 dark:text-slate-300">
+                                            Semboyan / Motto Sekolah *
+                                        </label>
+                                        <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                                            Font: Dancing Script
+                                        </span>
+                                    </div>
                                     <input
                                         type="text"
                                         required
                                         value={profil.motto || ''}
                                         onChange={(e) => setProfil({ ...profil, motto: e.target.value })}
+                                        placeholder="Contoh: Sukses · Jaya · Bermanfaat · Inspiratif"
                                         className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-medium focus:outline-none focus:border-emerald-600"
                                     />
+                                    {/* Pratinjau Font Dancing Script */}
+                                    <div className="mt-2 p-3 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                                            Pratinjau Live:
+                                        </span>
+                                        <span className="font-dancing text-lg sm:text-xl font-bold text-emerald-700 dark:text-emerald-300 tracking-wide truncate">
+                                            &ldquo;{profil.motto || 'Sukses · Jaya · Bermanfaat · Inspiratif'}&rdquo;
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div className="sm:col-span-2">

@@ -16,8 +16,14 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins), sans-serif;
+  --font-dancing: var(--font-dancing-script), cursive;
   --font-mono: monospace;
 }
+
+.font-dancing {
+  font-family: var(--font-dancing-script), cursive;
+}
+
 
 body {
   background: var(--background);

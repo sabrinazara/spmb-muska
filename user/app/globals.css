@@ -4,10 +4,16 @@
 
 @theme inline {
   --font-sans: var(--font-poppins), sans-serif;
+  --font-dancing: var(--font-dancing-script), cursive;
   --color-primary: #047857;
   --color-primary-hover: #065f46;
   --color-secondary: #d97706;
 }
+
+.font-dancing {
+  font-family: var(--font-dancing-script), cursive;
+}
+
 
 :root {
   --primary-color: #047857;
@@ -79,7 +85,8 @@ body {
   color: var(--dark-color);
 }
 
-.form-group input, .form-group select {
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid #cbd5e1;
@@ -90,7 +97,8 @@ body {
   transition: all 0.2s ease;
 }
 
-.form-group input:focus, .form-group select:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.15);
@@ -134,10 +142,13 @@ body {
 
 /* Smooth Blit & Floating Glowing Graphics */
 @keyframes blit-float-1 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0px, 0px) scale(1);
     opacity: 0.35;
   }
+
   50% {
     transform: translate(30px, -40px) scale(1.12);
     opacity: 0.75;
@@ -145,10 +156,13 @@ body {
 }
 
 @keyframes blit-float-2 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0px, 0px) scale(1);
     opacity: 0.25;
   }
+
   50% {
     transform: translate(-35px, 35px) scale(0.92);
     opacity: 0.7;
@@ -156,14 +170,18 @@ body {
 }
 
 @keyframes blit-float-3 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0px, 0px) scale(1);
     opacity: 0.3;
   }
+
   33% {
     transform: translate(25px, 25px) scale(1.08);
     opacity: 0.75;
   }
+
   66% {
     transform: translate(-25px, 15px) scale(0.95);
     opacity: 0.4;
@@ -171,10 +189,13 @@ body {
 }
 
 @keyframes blit-pulse-smooth {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.2;
     transform: scale(0.92);
   }
+
   50% {
     opacity: 0.85;
     transform: scale(1.08);
@@ -184,18 +205,23 @@ body {
 .animate-blit-float-1 {
   animation: blit-float-1 9s ease-in-out infinite;
 }
+
 .animate-blit-float-2 {
   animation: blit-float-2 12s ease-in-out infinite;
 }
+
 .animate-blit-float-3 {
   animation: blit-float-3 15s ease-in-out infinite;
 }
+
 .animate-blit-pulse {
   animation: blit-pulse-smooth 4.5s ease-in-out infinite;
 }
+
 .animate-blit-pulse-delay-1 {
   animation: blit-pulse-smooth 5s ease-in-out infinite 1.5s;
 }
+
 .animate-blit-pulse-delay-2 {
   animation: blit-pulse-smooth 6s ease-in-out infinite 3s;
 }
@@ -205,6 +231,7 @@ body {
   0% {
     transform: translateX(0%);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -218,4 +245,38 @@ body {
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* ROTATING CONIC GLOW ANIMATION UNTUK FOTO KEPALA SEKOLAH */
+@keyframes muskaRotatingGlow {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.muska-rotating-glow-bg {
+  background: conic-gradient(from 0deg,
+      #047857 0deg,
+      #10b981 60deg,
+      #d97706 130deg,
+      #f59e0b 190deg,
+      #0d9488 260deg,
+      #047857 360deg);
+  animation: muskaRotatingGlow 6s linear infinite;
+}
+
+.group:hover .muska-rotating-glow-bg {
+  animation-duration: 3.5s;
+}
+
+.muska-rotating-glow-canvas {
+  position: absolute;
+  top: -150%;
+  left: -150%;
+  width: 400%;
+  height: 400%;
 }
