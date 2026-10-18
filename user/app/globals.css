@@ -199,3 +199,23 @@ body {
 .animate-blit-pulse-delay-2 {
   animation: blit-pulse-smooth 6s ease-in-out infinite 3s;
 }
+
+/* MARQUEE ANIMATION UNTUK MITRA DUDI */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 28s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

@@ -8,6 +8,7 @@ import { DokumenModule } from './dokumen/dokumen.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PendaftaranModule } from './pendaftaran/pendaftaran.module';
 import { AdminModule } from './admin/admin.module';
+import { LandingPageModule } from './landing-page/landing-page.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AdminModule } from './admin/admin.module';
     PrismaModule,
     PendaftaranModule,
     AdminModule,
+    LandingPageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

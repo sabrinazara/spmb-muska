@@ -148,3 +148,100 @@ model SystemSetting {
   updatedAt DateTime @default(now()) @updatedAt
 }
 
+// ==========================================
+// FASE 5: MODEL LANDING PAGE & CMS WEBSITE
+// ==========================================
+
+model HeroSlider {
+  id        String   @id @default(uuid())
+  imageUrl  String
+  title     String
+  subtitle  String?
+  linkUrl   String?
+  badgeText String?
+  ctaText   String?
+  isActive  Boolean  @default(true)
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model ProfilSekolah {
+  id             String   @id @default("default")
+  sambutanKepsek String   @db.Text
+  fotoKepsek     String
+  namaKepsek     String
+  motto          String
+  videoProfilUrl String?
+  sejarahSingkat String?  @db.Text
+  visi           String?  @db.Text
+  misi           String?  @db.Text
+  alamatLengkap  String?
+  emailResmi     String?
+  teleponResmi   String?
+  whatsappResmi  String?
+  mapsEmbedUrl   String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+}
+
+model ProfilWKS {
+  id        String   @id @default(uuid())
+  nama      String
+  jabatan   String
+  fotoUrl   String
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Guru {
+  id            String   @id @default(uuid())
+  nama          String
+  nip           String?
+  mataPelajaran String
+  pendidikan    String?
+  fotoUrl       String?
+  urutan        Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+
+model ProgramKeahlian {
+  id        String   @id @default(uuid())
+  nama      String   @unique
+  singkatan String
+  deskripsi String   @db.Text
+  iconUrl   String?
+  kuota     Int      @default(72)
+  urutan    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model MitraIndustri {
+  id              String   @id @default(uuid())
+  namaPerusahaan  String
+  logoUrl         String
+  bidangKerjasama String?
+  urutan          Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+}
+
+model Berita {
+  id             String   @id @default(uuid())
+  judul          String
+  slug           String   @unique
+  ringkasan      String?  @db.Text
+  konten         String   @db.Text
+  thumbnail      String
+  kategori       String   @default("Umum") // Umum, Jurusan, Prestasi, Kegiatan
+  tanggalPublish DateTime @default(now())
+  penulis        String   @default("Humas SMK MUSKA")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+}
+
+

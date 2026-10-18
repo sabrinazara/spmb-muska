@@ -67,7 +67,7 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
                 `,
                 iconSize: [36, 36],
                 iconAnchor: [18, 36],
-                popupAnchor: [0, -36],
+                // popupAnchor: [0, -36],
             });
 
             // Inisialisasi peta Leaflet
@@ -126,7 +126,7 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
             if (mapContainerRef.current) {
                 try {
                     (mapContainerRef.current as any)._leaflet_id = null;
-                } catch {}
+                } catch { }
             }
             markerRef.current = null;
         };

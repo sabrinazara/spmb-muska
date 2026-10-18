@@ -145,7 +145,7 @@ export default function GisMapViewer({
             const schoolMarker = L.marker(SEKOLAH_COORDS, { icon: schoolIcon }).addTo(map);
             schoolMarker.bindPopup(`
                 <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
-                    <strong style="color: #d97706;">🏫 ${SEKOLAH_NAMA}</strong><br/>
+                    <strong style="color: #d97706;">[Kampus] ${SEKOLAH_NAMA}</strong><br/>
                     <span>Pusat Kampus Pelaksanaan SPMB</span>
                 </div>
             `);
@@ -155,7 +155,7 @@ export default function GisMapViewer({
                 const studentMarker = L.marker([studentLat, studentLng], { icon: studentIcon }).addTo(map);
                 studentMarker.bindPopup(`
                     <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
-                        <strong style="color: #059669;">📍 Rumah: ${namaLengkap || 'Calon Siswa'}</strong><br/>
+                        <strong style="color: #059669;">[Lokasi Siswa] ${namaLengkap || 'Calon Siswa'}</strong><br/>
                         <span>${alamat || 'Titik Koordinat Terpilih'}</span>
                     </div>
                 `).openPopup();

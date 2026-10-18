@@ -25,6 +25,7 @@ import {
     PanelLeftOpen,
     Zap,
     HardDrive,
+    Globe,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
 
@@ -258,6 +259,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     exact: false,
                     icon: HardDrive,
                 },
+                {
+                    name: 'Manajemen Website & Landing',
+                    href: '/website',
+                    exact: false,
+                    icon: Globe,
+                },
             ],
         },
     ];
@@ -272,6 +279,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         if (pathname === '/knowledge-base') return 'AI Knowledge Base Management';
         if (pathname === '/audit-log') return 'Audit Trail & Riwayat Aktivitas';
         if (pathname === '/database-manager') return 'Disaster Recovery & Database Manager';
+        if (pathname === '/website') return 'Manajemen Landing Page & Website Publik';
         return 'CMS MUSKA';
     };
 

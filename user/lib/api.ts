@@ -30,6 +30,9 @@ export const API_ENDPOINTS = {
         PENGUMUMAN: `${API_BASE_URL}/pendaftaran/pengumuman`,
     },
 
+    // Landing Page Publik
+    LANDING_PAGE: `${API_BASE_URL}/landing-page`,
+
     // Upload & Verifikasi Dokumen
     DOKUMEN: {
         SCAN_PREVIEW: `${API_BASE_URL}/dokumen/scan-preview`,

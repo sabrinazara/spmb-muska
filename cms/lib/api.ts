@@ -35,6 +35,23 @@ export const API_ENDPOINTS = {
         DB_BACKUP: `${API_BASE_URL}/admin/db/backup`,
         DB_RESTORE: `${API_BASE_URL}/admin/db/restore`,
     },
+    WEBSITE: {
+        PUBLIC_DATA: `${API_BASE_URL}/landing-page`,
+        SLIDERS: `${API_BASE_URL}/landing-page/admin/sliders`,
+        SLIDER_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/sliders/${id}`,
+        PROFIL: `${API_BASE_URL}/landing-page/admin/profil`,
+        WKS: `${API_BASE_URL}/landing-page/admin/wks`,
+        WKS_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/wks/${id}`,
+        GURU: `${API_BASE_URL}/landing-page/admin/guru`,
+        GURU_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/guru/${id}`,
+        PROGRAMS: `${API_BASE_URL}/landing-page/admin/programs`,
+        PROGRAM_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/programs/${id}`,
+        MITRA: `${API_BASE_URL}/landing-page/admin/mitra`,
+        MITRA_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/mitra/${id}`,
+        BERITA: `${API_BASE_URL}/landing-page/admin/berita`,
+        BERITA_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/berita/${id}`,
+        UPLOAD_IMAGE: `${API_BASE_URL}/landing-page/admin/upload`,
+    },
     AI: {
         CHAT: `${API_BASE_URL}/ai/chat`,
         RAG_CHAT_DIRECT: `${AI_BASE_URL}/rag/chat`,
@@ -53,6 +70,15 @@ export function getAuthHeaders(customHeaders: Record<string, string> = {}): Reco
         'Content-Type': 'application/json',
         ...customHeaders,
     };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+export function getAuthUploadHeaders(): Record<string, string> {
+    const token = getAuthToken();
+    const headers: Record<string, string> = {};
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
