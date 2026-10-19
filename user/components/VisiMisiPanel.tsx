@@ -51,7 +51,7 @@ export default function VisiMisiPanel({ className = '', compact = false }: VisiM
                             SMK MUHAMMADIYAH SEKAMPUNG
                         </h2>
                         <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium">
-                            Terakreditasi "A" Unggul · Lampung Timur
+                            Terakreditasi "A" Unggul
                         </p>
                     </div>
                 </div>
@@ -63,8 +63,8 @@ export default function VisiMisiPanel({ className = '', compact = false }: VisiM
                         <span>Visi Sekolah</span>
                     </div>
                     <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs relative group hover:border-emerald-500/40 transition duration-300">
-                        <div className="text-xs sm:text-sm font-semibold text-slate-100 leading-relaxed italic">
-                            &ldquo;Menjadi Sekolah Menengah Kejuruan yang Unggul, Berkarakter Islami, dan Berdaya Saing Global.&rdquo;
+                        <div className="text-xs sm:text-sm font-semibold text-slate-100 leading-relaxed">
+                            &ldquo;Mewujudkan lulusan yang Islami, berjiwa Nasionalis, berintelektualitas tinggi, berorientasi nasional dan berwawasan lingkungan.&rdquo;
                         </div>
                     </div>
                 </div>

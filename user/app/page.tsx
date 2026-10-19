@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   MapPin,
   Phone,
   Mail,
-  Globe,
   Sun,
   Moon,
   ArrowRight,
@@ -16,7 +16,6 @@ import {
   Menu,
   X,
   Sparkles,
-  CheckCircle2,
   Award,
   Building2,
   Users,
@@ -28,14 +27,11 @@ import {
   TrendingUp,
   Utensils,
   Flame,
-  ExternalLink,
   Calendar,
-  Eye,
-  Shield,
-  Clock,
   Zap,
   Quote,
   GraduationCap,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
 import ChatbotRAG from '@/components/ChatbotRAG';
@@ -49,6 +45,79 @@ interface LandingData {
   mitraIndustri: any[];
   berita: any[];
 }
+
+// ========================================================
+// FRAMER MOTION ANIMATION VARIANTS
+// ========================================================
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const fadeInLeft: Variants = {
+  hidden: { opacity: 0, x: -40 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const fadeInRight: Variants = {
+  hidden: { opacity: 0, x: 40 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.09,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const cardVariant: Variants = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const modalBackdropVariant: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.25 } },
+  exit: { opacity: 0, transition: { duration: 0.2 } },
+};
+
+const modalContentVariant: Variants = {
+  hidden: { opacity: 0, scale: 0.92, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: 'spring', damping: 25, stiffness: 320 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.92,
+    y: 20,
+    transition: { duration: 0.2 },
+  },
+};
 
 export default function HomePage() {
   const [data, setData] = useState<LandingData | null>(null);
@@ -77,6 +146,11 @@ export default function HomePage() {
   // Modal Readers / Details
   const [selectedProgram, setSelectedProgram] = useState<any | null>(null);
   const [selectedBerita, setSelectedBerita] = useState<any | null>(null);
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+
+  useEffect(() => {
+    setActivePhotoIdx(0);
+  }, [selectedProgram]);
 
   // Scroll to Top state
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -100,18 +174,15 @@ export default function HomePage() {
         setTypedBrand(fullBrandText.slice(0, typedBrand.length + 1));
       }, brandSpeed);
     } else if (!isDeletingBrand && typedBrand.length === fullBrandText.length) {
-      // Selesai mengetik kalimat penuh, jeda 2.2 detik agar nyaman dibaca
       timer = setTimeout(() => {
         setIsDeletingBrand(true);
         setBrandSpeed(50);
       }, 2200);
     } else if (isDeletingBrand && typedBrand.length > 0) {
-      // Menghapus huruf mundur
       timer = setTimeout(() => {
         setTypedBrand(fullBrandText.slice(0, typedBrand.length - 1));
       }, brandSpeed);
     } else if (isDeletingBrand && typedBrand.length === 0) {
-      // Selesai menghapus, jeda 500ms lalu ulangi mengetik lagi
       timer = setTimeout(() => {
         setIsDeletingBrand(false);
         setBrandSpeed(110);
@@ -140,7 +211,6 @@ export default function HomePage() {
 
   // Fetch Public Landing Data
   useEffect(() => {
-    // Initialize Theme from localStorage
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       setIsDark(true);
@@ -187,16 +257,32 @@ export default function HomePage() {
   const guruList = data?.guru || [];
   const programs = data?.programKeahlian || [];
   const mitraList = data?.mitraIndustri || [];
-  const beritaList = data?.berita || [];
+  const rawBerita = data?.berita || [];
+  const beritaList = rawBerita.some((b: any) => b.slug === 'maklumat-pelayanan-publik')
+    ? rawBerita
+    : [
+        {
+          id: 'maklumat-pelayanan-publik',
+          judul: 'Maklumat Pelayanan Publik SMK Muhammadiyah Sekampung',
+          slug: 'maklumat-pelayanan-publik',
+          ringkasan: 'Komitmen keterbukaan informasi publik dan standar integritas pelayanan pendidikan prima bagi seluruh warga sekolah.',
+          konten: 'Dengan ini, kami seluruh pimpinan, dewan guru, dan tenaga kependidikan SMK Muhammadiyah Sekampung menyatakan sanggup menyelenggarakan pelayanan pendidikan dan administrasi sekolah sesuai dengan standar pelayanan yang telah ditetapkan.\n\nKami berkomitmen:\n1. Memberikan pelayanan yang ramah, cepat, tepat, transparan, dan berkeadilan tanpa diskriminasi kepada seluruh peserta didik, wali murid, dan masyarakat luas.\n2. Meniadakan segala bentuk pungutan liar, gratifikasi, serta praktik percaloan dalam seluruh proses administrasi maupun SPMB.\n3. Menyediakan sarana pengaduan masyarakat yang responsif dan dapat dipertanggungjawabkan.\n4. Senantiasa melakukan perbaikan berkesinambungan demi terwujudnya Zona Integritas dan pelayanan prima berstandar unggul.\n\nApabila kami tidak menepati janji maklumat ini, kami siap menerima evaluasi dan sanksi sesuai dengan peraturan perundang-undangan yang berlaku.',
+          thumbnail: '/banner-spmb.jpg',
+          kategori: 'Zona Integritas',
+          tanggalPublish: '2026-07-20T08:00:00.000Z',
+          penulis: 'Administrator SPMB MUSKA',
+        },
+        ...rawBerita,
+      ];
 
-  // Limits & Pagination for WKS and Dewan Guru (Fitur Selengkapnya / Minimize)
+  // Limits & Pagination for WKS and Dewan Guru
   const INITIAL_WKS_LIMIT = 4;
   const visibleWks = showAllWks ? wksList : wksList.slice(0, INITIAL_WKS_LIMIT);
 
   const INITIAL_GURU_LIMIT = 8;
   const visibleGuru = showAllGuru ? guruList : guruList.slice(0, INITIAL_GURU_LIMIT);
 
-  // Layout helper adaptif untuk WKS agar proporsional dan tidak timpang saat data 1 atau 2
+  // Layout helper adaptif untuk WKS
   const getWksContainerClass = (count: number) => {
     if (count === 1) return 'flex justify-center max-w-sm mx-auto';
     if (count === 2) return 'flex flex-wrap justify-center gap-6 max-w-2xl mx-auto';
@@ -226,7 +312,7 @@ export default function HomePage() {
     return 'w-full';
   };
 
-  // Map icon for program keahlian (fallback jika gambar tidak tersedia)
+  // Map icon for program keahlian
   const getProgramIcon = (singkatan: string) => {
     const s = (singkatan || '').toUpperCase();
     if (s.includes('TKJ') || s.includes('TJKT')) return Server;
@@ -249,33 +335,42 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           {/* Left: Contact Info */}
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>Jl. Raya Sekampung No. 45, Lampung Timur</span>
+              <span>JL. RAYA SEKAMPUNG, Kec. Sekampung, Kab. Lampung Timur, Prov. Lampung.</span>
             </div>
-            <div className="hidden md:flex items-center gap-1.5">
+            <a
+              href="mailto:smkmuhsekampung@gmail.com"
+              className="hidden md:flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            >
               <Mail className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>smkmuhsekampung@gmail.com</span>
-            </div>
-            <div className="hidden lg:flex items-center gap-1.5">
+            </a>
+            <a
+              href="tel:081377653555"
+              className="hidden lg:flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            >
               <Phone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>(0725) 7851234</span>
-            </div>
+              <span>081377653555</span>
+            </a>
           </div>
 
           {/* Right: Quick Links & Theme Toggle */}
           <div className="flex items-center gap-3">
             <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-              NPSN: 10806085 • Akreditasi A
+              NPSN: 10814962 • Akreditasi A
             </span>
             <div className="h-3 w-px bg-slate-300 dark:bg-slate-700" />
-            <button
+            <motion.button
+              whileTap={{ scale: 0.85, rotate: 180 }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
               onClick={toggleTheme}
               className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
               title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
             >
               {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5" />}
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -287,7 +382,11 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4">
           {/* Brand Logo & Name With Typewriter Effect */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-700 p-1.5 flex items-center justify-center shrink-0 shadow-md group-hover:scale-105 transition-transform duration-200">
+            <motion.div
+              whileHover={{ scale: 1.08, rotate: [0, -3, 3, 0] }}
+              transition={{ duration: 0.3 }}
+              className="w-12 h-12 rounded-2xl bg-emerald-700 p-1.5 flex items-center justify-center shrink-0 shadow-md"
+            >
               <img
                 src="/logo.png"
                 onError={(e) => {
@@ -296,239 +395,282 @@ export default function HomePage() {
                 alt="Logo SMK Muhammadiyah Sekampung"
                 className="w-full h-full object-contain"
               />
-            </div>
+            </motion.div>
             <div>
               <div className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white uppercase leading-tight min-h-[22px] flex items-center">
                 <span>{typedBrand || ' '}</span>
                 <span className="inline-block w-0.5 h-4 sm:h-5 bg-amber-500 ml-1 animate-pulse" />
               </div>
               <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 tracking-wide">
-                Pusat Keunggulan Vokasi & Karakter Islami
+                Pusat Keunggulan Vokasi
               </div>
             </div>
           </Link>
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-5 text-xs font-bold text-slate-700 dark:text-slate-300">
-            <a href="#beranda" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            <motion.a whileHover={{ y: -2 }} href="#beranda" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Beranda
-            </a>
-            <a href="#sambutan" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            </motion.a>
+            <motion.a whileHover={{ y: -2 }} href="#sambutan" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Sambutan
-            </a>
-            <a href="#wks" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            </motion.a>
+            <motion.a whileHover={{ y: -2 }} href="#wks" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Pimpinan
-            </a>
-            <a href="#guru" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            </motion.a>
+            <motion.a whileHover={{ y: -2 }} href="#guru" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Dewan Guru
-            </a>
-            <a href="#jurusan" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            </motion.a>
+            <motion.a whileHover={{ y: -2 }} href="#jurusan" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Program Keahlian
-            </a>
-            <a href="#mitra" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            </motion.a>
+            <motion.a whileHover={{ y: -2 }} href="#mitra" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Mitra DUDI
-            </a>
-            <a href="#berita" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            </motion.a>
+            <Link href="/berita" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Berita
-            </a>
-            <a href="#kontak" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            </Link>
+            <motion.a whileHover={{ y: -2 }} href="#kontak" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               Kontak
-            </a>
+            </motion.a>
           </nav>
 
           {/* CTA Buttons */}
           <div className="hidden sm:flex items-center gap-3">
-            <Link
-              href="/login"
-              className="px-4 py-2 rounded-xl border border-emerald-600/30 hover:border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold text-xs transition"
-            >
-              Masuk
-            </Link>
-            <Link
-              href="/register"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer transform active:scale-95"
-            >
-              {/* <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-current" /> */}
-              <span>Daftar</span>
-            </Link>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href="/login"
+                className="px-4 py-2 rounded-xl border border-emerald-600/30 hover:border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold text-xs transition inline-block"
+              >
+                Masuk
+              </Link>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href="/register"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Daftar</span>
+              </Link>
+            </motion.div>
           </div>
 
           {/* Mobile Menu Hamburger */}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.9 }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          </motion.button>
         </div>
 
-        {/* Mobile Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 space-y-3 text-xs font-semibold animate-in slide-in-from-top duration-200">
-            <a
-              href="#beranda"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
+        {/* Mobile Drawer with AnimatePresence */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 space-y-3 text-xs font-semibold"
             >
-              Beranda
-            </a>
-            <a
-              href="#sambutan"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-            >
-              Sambutan Kepala Sekolah
-            </a>
-            <a
-              href="#wks"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-            >
-              Pimpinan Wakil Kepala Sekolah
-            </a>
-            <a
-              href="#guru"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-            >
-              Dewan Guru & Tenaga Pendidik
-            </a>
-            <a
-              href="#jurusan"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-            >
-              Program Keahlian (8 Jurusan)
-            </a>
-            <a
-              href="#mitra"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-            >
-              Mitra Industri & DUDI
-            </a>
-            <a
-              href="#berita"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-            >
-              Berita & Pengumuman
-            </a>
-            <a
-              href="#kontak"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-            >
-              Kontak & Lokasi
-            </a>
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex gap-2">
-              <Link
-                href="/login"
-                className="flex-1 py-2.5 text-center rounded-xl border border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold"
+              <a
+                href="#beranda"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
               >
-                Masuk Akun
-              </Link>
-              <Link
-                href="/register"
-                className="flex-1 py-2.5 text-center rounded-xl bg-emerald-700 text-white font-bold"
+                Beranda
+              </a>
+              <a
+                href="#sambutan"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
               >
-                Daftar SPMB
+                Sambutan Kepala Sekolah
+              </a>
+              <a
+                href="#wks"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
+              >
+                Pimpinan Wakil Kepala Sekolah
+              </a>
+              <a
+                href="#guru"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
+              >
+                Dewan Guru & Tenaga Pendidik
+              </a>
+              <a
+                href="#jurusan"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
+              >
+                Program Keahlian (8 Jurusan)
+              </a>
+              <a
+                href="#mitra"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
+              >
+                Mitra Industri & DUDI
+              </a>
+              <Link
+                href="/berita"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
+              >
+                Berita & Pengumuman
               </Link>
-            </div>
-          </div>
-        )}
+              <a
+                href="#kontak"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
+              >
+                Kontak & Lokasi
+              </a>
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex gap-2">
+                <Link
+                  href="/login"
+                  className="flex-1 py-2.5 text-center rounded-xl border border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold"
+                >
+                  Masuk Akun
+                </Link>
+                <Link
+                  href="/register"
+                  className="flex-1 py-2.5 text-center rounded-xl bg-emerald-700 text-white font-bold"
+                >
+                  Daftar SPMB
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* ========================================================
-                3. HERO SECTION (SLIDER CAROUSEL)
+                3. HERO SECTION (SLIDER CAROUSEL DENGAN FRAMER MOTION)
             ======================================================== */}
       <section id="beranda" className="relative overflow-hidden bg-slate-900 text-white">
         {sliders.length > 0 ? (
           <div className="relative h-[480px] sm:h-[560px] lg:h-[620px] w-full">
-            {sliders.map((s, index) => {
-              const isCurrent = index === currentSlide;
-              return (
-                <div
-                  key={s.id || index}
-                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-                    }`}
+            <AnimatePresence mode="wait">
+              {sliders[currentSlide] && (
+                <motion.div
+                  key={sliders[currentSlide].id || currentSlide}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.7 }}
+                  className="absolute inset-0"
                 >
-                  {/* Background Image with Dark & Emerald Overlay */}
-                  <div
+                  {/* Background Image with subtle scale animation */}
+                  <motion.div
+                    initial={{ scale: 1.08 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 5.5, ease: 'easeOut' }}
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                      backgroundImage: `url(${getFullUrl(s.imageUrl, '/banner-spmb.jpg')})`,
+                      backgroundImage: `url(${getFullUrl(sliders[currentSlide].imageUrl, '/banner-spmb.jpg')})`,
                     }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-emerald-950/60" />
-                  </div>
+                  </motion.div>
 
-                  {/* Slide Content */}
+                  {/* Staggered Slide Content */}
                   <div className="relative z-20 max-w-7xl mx-auto h-full px-6 sm:px-12 flex flex-col justify-center">
-                    <div className="max-w-3xl space-y-4 animate-in fade-in slide-in-from-left duration-500">
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-600/30 border border-emerald-400/40 text-emerald-300 text-xs font-extrabold uppercase tracking-widest backdrop-blur-xs">
-                        {/* <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-current" /> */}
-                        <span>{s.badgeText || 'Penerimaan Siswa Baru TA 2026/2027'}</span>
-                      </div>
+                    <motion.div
+                      variants={staggerContainer}
+                      initial="hidden"
+                      animate="visible"
+                      className="max-w-3xl space-y-4"
+                    >
+                      <motion.div variants={fadeInUp}>
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-600/30 border border-emerald-400/40 text-emerald-300 text-xs font-extrabold uppercase tracking-widest backdrop-blur-xs shadow-lg">
+                          <span>{sliders[currentSlide].badgeText || 'Penerimaan Siswa Baru TA 2026/2027'}</span>
+                        </div>
+                      </motion.div>
 
-                      <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-md">
-                        {s.title}
-                      </h1>
+                      <motion.h1
+                        variants={fadeInUp}
+                        className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-md"
+                      >
+                        {sliders[currentSlide].title}
+                      </motion.h1>
 
-                      <p className="text-sm sm:text-base text-slate-200/90 leading-relaxed max-w-2xl">
-                        {s.subtitle ||
+                      <motion.p
+                        variants={fadeInUp}
+                        className="text-sm sm:text-base text-slate-200/90 leading-relaxed max-w-2xl"
+                      >
+                        {sliders[currentSlide].subtitle ||
                           'Bergabung bersama SMK Muhammadiyah Sekampung. Kampus vokasi berkarakter Islami, dilengkapi AI OCR dan teknologi modern.'}
-                      </p>
+                      </motion.p>
 
-                      <div className="pt-4 flex flex-wrap items-center gap-3">
-                        <Link
-                          href={s.linkUrl || '/register'}
-                          className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-xl hover:shadow-2xl transition flex items-center gap-2 transform active:scale-95 cursor-pointer"
-                        >
-                          <span>{s.ctaText || 'Daftar Sekarang Online'}</span>
-                          <ArrowRight className="w-4 h-4" />
-                        </Link>
-                        <a
-                          href="#sambutan"
-                          className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs uppercase tracking-wider backdrop-blur-md transition cursor-pointer"
-                        >
-                          Pelajari Profil
-                        </a>
-                      </div>
-                    </div>
+                      <motion.div
+                        variants={fadeInUp}
+                        className="pt-4 flex flex-wrap items-center gap-3"
+                      >
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <Link
+                            href={sliders[currentSlide].linkUrl || '/register'}
+                            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-xl hover:shadow-2xl transition flex items-center gap-2 cursor-pointer"
+                          >
+                            <span>{sliders[currentSlide].ctaText || 'Daftar Sekarang Online'}</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                          <a
+                            href="#sambutan"
+                            className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs uppercase tracking-wider backdrop-blur-md transition cursor-pointer inline-block"
+                          >
+                            Pelajari Profil
+                          </a>
+                        </motion.div>
+                      </motion.div>
+                    </motion.div>
                   </div>
-                </div>
-              );
-            })}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Slider Controls: Arrows */}
             {sliders.length > 1 && (
               <>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(5, 150, 105, 0.85)' }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() =>
                     setCurrentSlide((prev) => (prev === 0 ? sliders.length - 1 : prev - 1))
                   }
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 hover:bg-emerald-600 text-white backdrop-blur-md transition cursor-pointer"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
                   aria-label="Previous Slide"
                 >
                   <ChevronLeft className="w-5 h-5" />
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(5, 150, 105, 0.85)' }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setCurrentSlide((prev) => (prev + 1) % sliders.length)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 hover:bg-emerald-600 text-white backdrop-blur-md transition cursor-pointer"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
                   aria-label="Next Slide"
                 >
                   <ChevronRight className="w-5 h-5" />
-                </button>
+                </motion.button>
 
                 {/* Dot Indicators */}
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
                   {sliders.map((_, i) => (
-                    <button
+                    <motion.button
                       key={i}
+                      layout
+                      whileHover={{ scale: 1.25 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => setCurrentSlide(i)}
-                      className={`h-2.5 rounded-full transition-all cursor-pointer ${currentSlide === i ? 'w-8 bg-emerald-400' : 'w-2.5 bg-white/40'
+                      className={`h-2.5 rounded-full transition-colors cursor-pointer ${currentSlide === i ? 'w-8 bg-emerald-400' : 'w-2.5 bg-white/40'
                         }`}
                       aria-label={`Slide ${i + 1}`}
                     />
@@ -547,11 +689,21 @@ export default function HomePage() {
       {/* ========================================================
                 4. SAMBUTAN KEPALA SEKOLAH (2 KOLOM)
             ======================================================== */}
-      <section id="sambutan" className="py-20 max-w-7xl mx-auto px-4 sm:px-8">
+      <motion.section
+        id="sambutan"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="py-20 max-w-7xl mx-auto px-4 sm:px-8"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left: Photo & Frame (5 Cols) */}
-          <div className="lg:col-span-5 flex justify-center">
-            <div className="relative group max-w-md w-full">
+          <motion.div variants={fadeInLeft} className="lg:col-span-5 flex justify-center">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
+              className="relative group max-w-md w-full"
+            >
               {/* Layer 1: Ambient outer blur rotating glow */}
               <div className="absolute -inset-4 rounded-[36px] overflow-hidden blur-2xl opacity-35 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none">
                 <div className="muska-rotating-glow-canvas muska-rotating-glow-bg" />
@@ -568,7 +720,7 @@ export default function HomePage() {
                   <img
                     src={getFullUrl(profil.fotoKepsek, '/kepsek.jpg')}
                     alt={profil.namaKepsek || 'Kepala Sekolah'}
-                    className="w-full h-full object-cover group-hover:scale-103 transition duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                     onError={(e) => {
                       e.currentTarget.src = '/logo.png';
                     }}
@@ -583,14 +735,14 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Right: Message Content (7 Cols) */}
-          <div className="lg:col-span-7 space-y-5">
+          <motion.div variants={fadeInRight} className="lg:col-span-7 space-y-5">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
               <Quote className="w-3.5 h-3.5 fill-current" />
-              <span>Sambutan Resmi Pimpinan</span>
+              <span>Sambutan Kepala Sekolah</span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
@@ -603,29 +755,39 @@ export default function HomePage() {
             </div>
 
             {/* Motto Banner */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50/60 to-amber-50/50 dark:from-emerald-950/40 dark:via-slate-900/50 dark:to-amber-950/20 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center gap-3.5 shadow-2xs">
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+              className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50/60 to-amber-50/50 dark:from-emerald-950/40 dark:via-slate-900/50 dark:to-amber-950/20 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center gap-3.5 shadow-2xs"
+            >
               <div className="w-11 h-11 rounded-2xl bg-emerald-600/10 dark:bg-emerald-400/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
                 <Award className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
               </div>
               <div className="min-w-0">
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Semboyan SMK MUSKA
+                  Moto
                 </div>
                 <div className="font-dancing text-xl sm:text-2xl font-bold text-emerald-900 dark:text-emerald-200 tracking-wide leading-tight mt-0.5">
                   &ldquo;{profil.motto || 'Sukses · Jaya · Bermanfaat · Inspiratif'}&rdquo;
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ========================================================
                 5. PROFIL WAKIL KEPALA SEKOLAH (ADAPTIF & MINIMIZE)
             ======================================================== */}
-      <section id="wks" className="py-16 bg-slate-100/70 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800">
+      <motion.section
+        id="wks"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="py-16 bg-slate-100/70 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-10">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
+          <motion.div variants={fadeInUp} className="text-center max-w-2xl mx-auto space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
               <Users className="w-3.5 h-3.5" />
               <span>Struktur Manajemen</span>
@@ -636,46 +798,59 @@ export default function HomePage() {
             <p className="text-xs text-slate-500">
               Didukung oleh jajaran wakil kepala sekolah berpengalaman dan berdedikasi tinggi
             </p>
-          </div>
+          </motion.div>
 
           {visibleWks.length === 0 ? (
             <div className="text-center py-8 text-slate-400 text-xs">
               Belum ada data pimpinan wakil kepala sekolah.
             </div>
           ) : (
-            <div className={getWksContainerClass(visibleWks.length)}>
-              {visibleWks.map((w) => (
-                <div
-                  key={w.id}
-                  className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 text-center space-y-4 shadow-xs hover:shadow-lg hover:-translate-y-1 transition duration-300 group ${getWksCardClass(visibleWks.length)}`}
-                >
-                  <div className="w-24 h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500 overflow-hidden group-hover:scale-105 transition duration-300">
-                    <img
-                      src={getFullUrl(w.fotoUrl, '/avatar.png')}
-                      alt={w.nama}
-                      className="w-full h-full object-cover rounded-full"
-                      onError={(e) => {
-                        e.currentTarget.src = '/logo.png';
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
-                      {w.nama}
-                    </h3>
-                    <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
-                      {w.jabatan}
+            <motion.div
+              layout
+              variants={staggerContainer}
+              className={getWksContainerClass(visibleWks.length)}
+            >
+              <AnimatePresence>
+                {visibleWks.map((w) => (
+                  <motion.div
+                    key={w.id}
+                    layout
+                    variants={cardVariant}
+                    whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
+                    className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 text-center space-y-4 shadow-xs hover:shadow-xl transition-colors duration-300 group ${getWksCardClass(
+                      visibleWks.length
+                    )}`}
+                  >
+                    <div className="w-24 h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                      <img
+                        src={getFullUrl(w.fotoUrl, '/avatar.png')}
+                        alt={w.nama}
+                        className="w-full h-full object-cover rounded-full"
+                        onError={(e) => {
+                          e.currentTarget.src = '/logo.png';
+                        }}
+                      />
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    <div>
+                      <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                        {w.nama}
+                      </h3>
+                      <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
+                        {w.jabatan}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           )}
 
           {/* Tombol Selengkapnya / Minimize jika data WKS banyak */}
           {wksList.length > INITIAL_WKS_LIMIT && (
             <div className="text-center pt-2">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => setShowAllWks(!showAllWks)}
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:border-emerald-500 shadow-xs hover:shadow-md transition duration-200 cursor-pointer group"
               >
@@ -688,17 +863,23 @@ export default function HomePage() {
                   className={`w-4 h-4 transition-transform duration-300 ${showAllWks ? 'rotate-180' : ''
                     }`}
                 />
-              </button>
+              </motion.button>
             </div>
           )}
         </div>
-      </section>
+      </motion.section>
 
       {/* ========================================================
                 5.5. DEWAN GURU & TENAGA PENDIDIK (ADAPTIF & MINIMIZE)
             ======================================================== */}
-      <section id="guru" className="py-20 max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
+      <motion.section
+        id="guru"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="py-20 max-w-7xl mx-auto px-4 sm:px-8 space-y-12"
+      >
+        <motion.div variants={fadeInUp} className="text-center max-w-2xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
             <GraduationCap className="w-3.5 h-3.5" />
             <span>Pendidik Berpengalaman</span>
@@ -709,54 +890,67 @@ export default function HomePage() {
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Tenaga pendidik tersertifikasi BNSP dan industri, berdedikasi tinggi membimbing potensi dan akhlak mulia siswa
           </p>
-        </div>
+        </motion.div>
 
         {visibleGuru.length === 0 ? (
           <div className="text-center py-8 text-slate-400 text-xs">
             Belum ada data dewan guru.
           </div>
         ) : (
-          <div className={getGuruContainerClass(visibleGuru.length)}>
-            {visibleGuru.map((g) => (
-              <div
-                key={g.id}
-                className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 text-center space-y-4 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-300 group ${getGuruCardClass(visibleGuru.length)}`}
-              >
-                <div className="w-24 h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500/50 overflow-hidden group-hover:scale-105 group-hover:border-emerald-500 transition duration-300">
-                  <img
-                    src={getFullUrl(g.fotoUrl, '/avatar.png')}
-                    alt={g.nama}
-                    className="w-full h-full object-cover rounded-full"
-                    onError={(e) => {
-                      e.currentTarget.src = '/logo.png';
-                    }}
-                  />
-                </div>
-                <div>
-                  <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-snug">
-                    {g.nama}
-                  </h3>
-                  <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1 line-clamp-1">
-                    {g.mataPelajaran}
+          <motion.div
+            layout
+            variants={staggerContainer}
+            className={getGuruContainerClass(visibleGuru.length)}
+          >
+            <AnimatePresence>
+              {visibleGuru.map((g) => (
+                <motion.div
+                  key={g.id}
+                  layout
+                  variants={cardVariant}
+                  whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
+                  className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 text-center space-y-4 shadow-xs hover:shadow-xl transition-colors duration-300 group ${getGuruCardClass(
+                    visibleGuru.length
+                  )}`}
+                >
+                  <div className="w-24 h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500/50 overflow-hidden group-hover:scale-105 group-hover:border-emerald-500 transition duration-300">
+                    <img
+                      src={getFullUrl(g.fotoUrl, '/avatar.png')}
+                      alt={g.nama}
+                      className="w-full h-full object-cover rounded-full"
+                      onError={(e) => {
+                        e.currentTarget.src = '/logo.png';
+                      }}
+                    />
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">
-                    {g.pendidikan || 'Pendidik Vokasi'}
+                  <div>
+                    <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-snug">
+                      {g.nama}
+                    </h3>
+                    <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1 line-clamp-1">
+                      {g.mataPelajaran}
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">
+                      {g.pendidikan || 'Pendidik Vokasi'}
+                    </div>
                   </div>
-                </div>
-                {g.nip && (
-                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <span className="text-[9px] font-mono text-slate-400">NIP: {g.nip}</span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                  {g.nip && (
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                      <span className="text-[9px] font-mono text-slate-400">NIP: {g.nip}</span>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
 
         {/* Tombol Selengkapnya / Minimize jika data Guru banyak */}
         {guruList.length > INITIAL_GURU_LIMIT && (
           <div className="text-center pt-4">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => setShowAllGuru(!showAllGuru)}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:border-emerald-500 shadow-xs hover:shadow-md transition duration-200 cursor-pointer group"
             >
@@ -769,17 +963,23 @@ export default function HomePage() {
                 className={`w-4 h-4 transition-transform duration-300 ${showAllGuru ? 'rotate-180' : ''
                   }`}
               />
-            </button>
+            </motion.button>
           </div>
         )}
-      </section>
+      </motion.section>
 
       {/* ========================================================
                 6. PROGRAM KEAHLIAN (8 JURUSAN DENGAN LOGO JURUSAN)
             ======================================================== */}
-      <section id="jurusan" className="py-20 bg-slate-100/70 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800">
+      <motion.section
+        id="jurusan"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="py-20 bg-slate-100/70 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-2">
+          <motion.div variants={fadeInUp} className="text-center max-w-2xl mx-auto space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
               <Award className="w-3.5 h-3.5" />
               <span>Kompetensi Keahlian</span>
@@ -790,19 +990,33 @@ export default function HomePage() {
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
               Pilihan kejuruan masa depan dengan kurikulum berbasis Dunia Usaha & Industri
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div
+            variants={staggerContainer}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
             {programs.map((p) => {
               const IconComponent = getProgramIcon(p.singkatan);
-              const logoPath = p.iconUrl || `/jurusan/${(p.singkatan || '').toLowerCase().replace(/[^a-z]/g, '')}.svg`;
+              const logoPath =
+                p.iconUrl || `/jurusan/${(p.singkatan || '').toLowerCase().replace(/[^a-z]/g, '')}.svg`;
               return (
-                <div
+                <motion.div
                   key={p.id}
-                  className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 shadow-xs hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col justify-between space-y-4 group"
+                  variants={cardVariant}
+                  whileHover={{
+                    y: -8,
+                    boxShadow: '0 20px 25px -5px rgba(4, 120, 87, 0.12), 0 8px 10px -6px rgba(4, 120, 87, 0.08)',
+                    transition: { duration: 0.25 },
+                  }}
+                  className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4 group transition-colors duration-300"
                 >
                   <div className="space-y-3">
-                    <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 flex items-center justify-center group-hover:scale-110 group-hover:border-emerald-500 shadow-xs transition duration-300">
+                    <motion.div
+                      whileHover={{ scale: 1.15, rotate: 3 }}
+                      transition={{ duration: 0.25 }}
+                      className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 flex items-center justify-center group-hover:border-emerald-500 shadow-xs transition-colors duration-300"
+                    >
                       {p.iconUrl && (p.iconUrl.startsWith('/') || p.iconUrl.startsWith('http')) ? (
                         <img
                           src={getFullUrl(logoPath, '/logo.png')}
@@ -815,7 +1029,7 @@ export default function HomePage() {
                       ) : (
                         <IconComponent className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                       )}
-                    </div>
+                    </motion.div>
                     <div>
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                         {p.singkatan}
@@ -830,54 +1044,64 @@ export default function HomePage() {
                   </div>
 
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <span className="text-[11px] font-mono text-slate-400">
-                      Kuota: <strong>{p.kuota}</strong> Kursi
-                    </span>
-                    <button
+                    <div>
+                      <span className="text-[11px] font-mono text-slate-400">
+                        Kuota: <strong>{p.kuota}</strong> Kursi
+                      </span>
+                      {p.fotoUrls && p.fotoUrls.length > 0 && (
+                        <div className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
+                          <ImageIcon className="w-3 h-3" />
+                          <span>{p.fotoUrls.length} Foto Dokumentasi</span>
+                        </div>
+                      )}
+                    </div>
+                    <motion.button
+                      whileHover={{ x: 3 }}
                       onClick={() => setSelectedProgram(p)}
                       className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <span>Rincian</span>
                       <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                    </motion.button>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ========================================================
-                7. MITRA DUNIA USAHA & INDUSTRI (MARQUEE ANIMASI BERGERAK KE KIRI)
+                7. MITRA DUNIA USAHA & INDUSTRI (MARQUEE ANIMASI)
             ======================================================== */}
       <section id="mitra" className="py-16 bg-slate-900 text-white overflow-hidden relative">
-        {/* CSS Scoped Marquee Keyframes Bergerak Otomatis dari Kanan ke Kiri */}
         <style
           dangerouslySetInnerHTML={{
             __html: `
-                        @keyframes muskaMarqueeScrollLeft {
-                            0% {
-                                transform: translate3d(0, 0, 0);
-                            }
-                            100% {
-                                transform: translate3d(-50%, 0, 0);
-                            }
-                        }
-                        .muska-marquee-row {
-                            display: flex !important;
-                            width: max-content !important;
-                            animation: muskaMarqueeScrollLeft 22s linear infinite !important;
-                            will-change: transform;
-                        }
-                        .muska-marquee-row:hover {
-                            animation-play-state: paused;
-                        }
-                    `,
+              @keyframes muskaMarqueeScrollLeft {
+                0% { transform: translate3d(0, 0, 0); }
+                100% { transform: translate3d(-50%, 0, 0); }
+              }
+              .muska-marquee-row {
+                display: flex !important;
+                width: max-content !important;
+                animation: muskaMarqueeScrollLeft 24s linear infinite !important;
+                will-change: transform;
+              }
+              .muska-marquee-row:hover {
+                animation-play-state: paused;
+              }
+            `,
           }}
         />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 text-center space-y-3 mb-8">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeInUp}
+          className="max-w-7xl mx-auto px-4 sm:px-8 text-center space-y-3 mb-8"
+        >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">
             <Building2 className="w-3.5 h-3.5" />
             <span>Kemitraan Industri & Link-and-Match</span>
@@ -885,18 +1109,18 @@ export default function HomePage() {
           <h2 className="text-xl sm:text-2xl font-extrabold text-white">
             Bekerja Sama dengan Puluhan Industri Nasional
           </h2>
-        </div>
+        </motion.div>
 
         {/* Marquee Track Container */}
         <div className="relative w-full overflow-hidden py-4">
           <div className="muska-marquee-row items-center gap-8">
-            {/* Duplicate for seamless infinite loop right to left */}
             {[...mitraList, ...mitraList, ...mitraList, ...mitraList].map((m, idx) => (
-              <div
+              <motion.div
                 key={idx}
-                className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 shrink-0 hover:bg-white/10 transition"
+                whileHover={{ scale: 1.06, backgroundColor: 'rgba(255, 255, 255, 0.12)' }}
+                className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 shrink-0 transition-colors cursor-pointer"
               >
-                <div className="w-12 h-12 flex items-center justify-center p-1 bg-white rounded-xl">
+                <div className="w-12 h-12 flex items-center justify-center p-1 bg-white rounded-xl shadow-xs">
                   <img
                     src={getFullUrl(m.logoUrl, '/logo.png')}
                     alt={m.namaPerusahaan}
@@ -914,7 +1138,7 @@ export default function HomePage() {
                     {m.bidangKerjasama || 'Mitra Resmi DUDI'}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -923,8 +1147,13 @@ export default function HomePage() {
       {/* ========================================================
                 8. KEUNGGULAN SEKOLAH (3 POIN IKONIK)
             ======================================================== */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="py-20 max-w-7xl mx-auto px-4 sm:px-8 space-y-12"
+      >
+        <motion.div variants={fadeInUp} className="text-center max-w-2xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
             <Zap className="w-3.5 h-3.5" />
             <span>Keunggulan Kompetitif</span>
@@ -932,53 +1161,86 @@ export default function HomePage() {
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             Mengapa Memilih SMK Muhammadiyah Sekampung?
           </h2>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xs hover:shadow-lg transition space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+        <motion.div
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ y: -10, transition: { duration: 0.25 } }}
+            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-8 shadow-xs hover:shadow-xl transition-colors duration-300 space-y-4 group"
+          >
+            <motion.div
+              whileHover={{ rotate: 8, scale: 1.1 }}
+              transition={{ duration: 0.25 }}
+              className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-colors duration-300"
+            >
               <Cpu className="w-7 h-7" />
-            </div>
+            </motion.div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
               1. Layanan Digital & AI Terintegrasi
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Pelayanan SPMB berbasis AI OCR verifikasi berkas otomatis, chatbot RAG 24/7, serta ujian seleksi mandiri berbasis CBT modern.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xs hover:shadow-lg transition space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ y: -10, transition: { duration: 0.25 } }}
+            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-3xl p-8 shadow-xs hover:shadow-xl transition-colors duration-300 space-y-4 group"
+          >
+            <motion.div
+              whileHover={{ rotate: 8, scale: 1.1 }}
+              transition={{ duration: 0.25 }}
+              className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center transition-colors duration-300"
+            >
               <Award className="w-7 h-7" />
-            </div>
+            </motion.div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
               2. Guru Profesional & Sertifikasi Industri
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Tenaga pendidik tersertifikasi asesor BNSP dan instruktur pelatihan industri, memastikan transfer kompetensi kerja riil.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-xs hover:shadow-lg transition space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ y: -10, transition: { duration: 0.25 } }}
+            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-teal-500 dark:hover:border-teal-500 rounded-3xl p-8 shadow-xs hover:shadow-xl transition-colors duration-300 space-y-4 group"
+          >
+            <motion.div
+              whileHover={{ rotate: 8, scale: 1.1 }}
+              transition={{ duration: 0.25 }}
+              className="w-14 h-14 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center transition-colors duration-300"
+            >
               <Building2 className="w-7 h-7" />
-            </div>
+            </motion.div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
               3. Bengkel & Sarana Praktik Lengkap
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Laboratorium komputer multimedia, bengkel injeksi resmi sepeda motor, studio DKV, serta mesin CNC berstandar APM nasional.
             </p>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
       {/* ========================================================
                 9. BERITA TERBARU (GRID 3 KOLOM)
             ======================================================== */}
-      <section id="berita" className="py-20 bg-slate-100/70 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800">
+      <motion.section
+        id="berita"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="py-20 bg-slate-100/70 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
                 <BookOpen className="w-3.5 h-3.5" />
@@ -988,19 +1250,34 @@ export default function HomePage() {
                 Kabar Terkini SMK Muhammadiyah Sekampung
               </h2>
             </div>
-          </div>
+            <Link
+              href="/berita"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:border-emerald-500 transition shadow-2xs group cursor-pointer"
+            >
+              <span>Lihat Semua Berita</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div
+            variants={staggerContainer}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
             {beritaList.map((b) => (
-              <div
+              <motion.div
                 key={b.id}
-                className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition flex flex-col justify-between group"
+                variants={cardVariant}
+                whileHover={{ y: -8, transition: { duration: 0.25 } }}
+                className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-colors duration-300 flex flex-col justify-between group"
               >
-                <div className="relative h-48 bg-slate-200 dark:bg-slate-900 overflow-hidden">
+                <Link
+                  href={`/berita/${b.slug || b.id}`}
+                  className="relative h-48 bg-slate-200 dark:bg-slate-900 overflow-hidden block"
+                >
                   <img
                     src={getFullUrl(b.thumbnail, '/banner-spmb.jpg')}
                     alt={b.judul}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
                     onError={(e) => {
                       e.currentTarget.src = '/banner-spmb.jpg';
                     }}
@@ -1008,53 +1285,71 @@ export default function HomePage() {
                   <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
                     {b.kategori}
                   </span>
-                </div>
+                </Link>
 
-                <div className="p-6 space-y-3 flex-1">
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>
-                      {new Date(b.tanggalPublish).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </span>
+                <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                      <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>
+                        {new Date(b.tanggalPublish).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                    <Link href={`/berita/${b.slug || b.id}`}>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        {b.judul}
+                      </h3>
+                    </Link>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                      {b.ringkasan || b.konten}
+                    </p>
                   </div>
-                  <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
-                    {b.judul}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
-                    {b.ringkasan || b.konten}
-                  </p>
-                </div>
 
-                <div className="p-5 pt-0">
-                  <button
-                    onClick={() => setSelectedBerita(b)}
-                    className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <span>Baca Selengkapnya</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                    <Link
+                      href={`/berita/${b.slug || b.id}`}
+                      className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <span>Baca Selengkapnya</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ========================================================
                 10. FOOTER & PETA GOOGLE MAPS
             ======================================================== */}
-      <footer id="kontak" className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-16 pb-8">
+      <motion.footer
+        id="kontak"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        variants={fadeInUp}
+        className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-16 pb-8"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Col 1: Brand & Semboyan */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-600 p-1 flex items-center justify-center shrink-0">
-                  <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" onError={(e) => { e.currentTarget.src = '/logo.svg'; }} />
+                  <img
+                    src="/logo.png"
+                    alt="Logo"
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.src = '/logo.svg';
+                    }}
+                  />
                 </div>
                 <span className="font-bold text-sm text-white uppercase tracking-wider">
                   SMK MUHAMMADIYAH SEKAMPUNG
@@ -1075,27 +1370,31 @@ export default function HomePage() {
               </h4>
               <ul className="space-y-2 text-xs text-slate-400">
                 <li>
-                  <Link href="/register" className="hover:text-emerald-400 transition">
+                  <Link href="/register" className="hover:text-emerald-400 transition-colors">
                     Pendaftaran SPMB Online
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-emerald-400 transition">
+                  <Link href="/login" className="hover:text-emerald-400 transition-colors">
                     Login Akun Siswa
                   </Link>
                 </li>
                 <li>
-                  <a href="#jurusan" className="hover:text-emerald-400 transition">
+                  <a href="#jurusan" className="hover:text-emerald-400 transition-colors">
                     Daftar 8 Program Keahlian
                   </a>
                 </li>
                 <li>
-                  <a href="#sambutan" className="hover:text-emerald-400 transition">
+                  <a href="#sambutan" className="hover:text-emerald-400 transition-colors">
                     Profil Pimpinan Sekolah
                   </a>
                 </li>
                 <li>
-                  <Link href="http://localhost:3002" target="_blank" className="hover:text-emerald-400 transition">
+                  <Link
+                    href="http://localhost:3002"
+                    target="_blank"
+                    className="hover:text-emerald-400 transition-colors"
+                  >
                     CMS Dashboard Administrator
                   </Link>
                 </li>
@@ -1146,104 +1445,287 @@ export default function HomePage() {
             © 2026 SMK Muhammadiyah Sekampung. Seluruh Hak Cipta Dilindungi Undang-Undang.
           </div>
         </div>
-      </footer>
+      </motion.footer>
 
       {/* FLOATING AI ASSISTANT CHATBOT */}
       <ChatbotRAG />
 
       {/* FLOATING SCROLL TO TOP BUTTON */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-24 right-6 z-40 p-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer flex items-center justify-center border border-white/20 animate-in fade-in slide-in-from-bottom-4"
-          title="Kembali ke Atas"
-        >
-          <ChevronRight className="w-5 h-5 -rotate-90" />
-        </button>
-      )}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            key="scroll-to-top"
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 20 }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={scrollToTop}
+            className="fixed bottom-24 right-6 z-40 p-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white shadow-xl cursor-pointer flex items-center justify-center border border-white/20"
+            title="Kembali ke Atas"
+          >
+            <ChevronRight className="w-5 h-5 -rotate-90" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* MODAL DETAIL PROGRAM KEAHLIAN */}
-      {selectedProgram && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex justify-between items-start gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2 flex items-center justify-center shrink-0">
-                  <img
-                    src={getFullUrl(selectedProgram.iconUrl || `/jurusan/${(selectedProgram.singkatan || '').toLowerCase().replace(/[^a-z]/g, '')}.svg`, '/logo.png')}
-                    alt={selectedProgram.singkatan}
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      e.currentTarget.src = '/logo.png';
-                    }}
-                  />
-                </div>
-                <div>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                    {selectedProgram.singkatan}
-                  </span>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
-                    {selectedProgram.nama}
-                  </h3>
-                </div>
-              </div>
-              <button onClick={() => setSelectedProgram(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
-              {selectedProgram.deskripsi}
-            </div>
-            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs flex justify-between items-center">
-              <span>Kapasitas Daya Tampung:</span>
-              <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-sm">{selectedProgram.kuota} Kursi</strong>
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <button onClick={() => setSelectedProgram(null)} className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold">
-                Tutup
-              </button>
-              <Link href="/register" className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider">
-                Daftar Jurusan Ini
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {selectedProgram && (
+          <motion.div
+            key="modal-program-backdrop"
+            variants={modalBackdropVariant}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={() => setSelectedProgram(null)}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4"
+          >
+            {(() => {
+              const programPhotos: string[] = Array.isArray(selectedProgram.fotoUrls)
+                ? selectedProgram.fotoUrls.filter(Boolean)
+                : [];
+              return (
+                <motion.div
+                  key="modal-program-content"
+                  variants={modalContentVariant}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-4"
+                >
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2 flex items-center justify-center shrink-0">
+                        <img
+                          src={getFullUrl(
+                            selectedProgram.iconUrl ||
+                            `/jurusan/${(selectedProgram.singkatan || '').toLowerCase().replace(/[^a-z]/g, '')}.svg`,
+                            '/logo.png'
+                          )}
+                          alt={selectedProgram.singkatan}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src = '/logo.png';
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                            {selectedProgram.singkatan}
+                          </span>
+                          {programPhotos.length > 0 && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                              <ImageIcon className="w-3 h-3" />
+                              {programPhotos.length} Foto
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                          {selectedProgram.nama}
+                        </h3>
+                      </div>
+                    </div>
+                    <motion.button
+                      whileTap={{ scale: 0.85 }}
+                      onClick={() => setSelectedProgram(null)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-1"
+                    >
+                      <X className="w-5 h-5" />
+                    </motion.button>
+                  </div>
+
+                  {/* Photo Gallery (Max 5 photos) */}
+                  {programPhotos.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="relative aspect-16/9 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                        <AnimatePresence mode="wait">
+                          <motion.img
+                            key={programPhotos[activePhotoIdx] || activePhotoIdx}
+                            src={getFullUrl(programPhotos[activePhotoIdx], '/logo.png')}
+                            alt={`${selectedProgram.nama} - Foto ${activePhotoIdx + 1}`}
+                            initial={{ opacity: 0, scale: 1.03 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/logo.png';
+                            }}
+                          />
+                        </AnimatePresence>
+
+                        {/* Photo Index Counter */}
+                        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold flex items-center gap-1.5 border border-white/20">
+                          <ImageIcon className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>{activePhotoIdx + 1} / {programPhotos.length}</span>
+                        </div>
+
+                        {/* Navigation arrows if multiple photos */}
+                        {programPhotos.length > 1 && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActivePhotoIdx((prev) => (prev > 0 ? prev - 1 : programPhotos.length - 1));
+                              }}
+                              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20"
+                              title="Foto Sebelumnya"
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActivePhotoIdx((prev) => (prev < programPhotos.length - 1 ? prev + 1 : 0));
+                              }}
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 backdrop-blur-md text-white flex items-center justify-center transition-all cursor-pointer border border-white/20"
+                              title="Foto Selanjutnya"
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Thumbnails row */}
+                      {programPhotos.length > 1 && (
+                        <div className="flex gap-2 overflow-x-auto pb-1 pt-0.5">
+                          {programPhotos.map((photo, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setActivePhotoIdx(idx)}
+                              className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
+                                activePhotoIdx === idx
+                                  ? 'border-emerald-500 ring-2 ring-emerald-500/30 scale-105'
+                                  : 'border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100'
+                              }`}
+                            >
+                              <img
+                                src={getFullUrl(photo, '/logo.png')}
+                                alt={`Thumbnail ${idx + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+                    {selectedProgram.deskripsi}
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Kapasitas Daya Tampung:</span>
+                    <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-sm">
+                      {selectedProgram.kuota} Kursi
+                    </strong>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-2">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSelectedProgram(null)}
+                      className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    >
+                      Tutup
+                    </motion.button>
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Link
+                        href="/register"
+                        className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider inline-block cursor-pointer"
+                      >
+                        Daftar Jurusan Ini
+                      </Link>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              );
+            })()}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* MODAL DETAIL BERITA */}
-      {selectedBerita && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div onClick={(e) => e.stopPropagation()} className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white">
-                  {selectedBerita.kategori}
-                </span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-2 leading-snug">
-                  {selectedBerita.judul}
-                </h3>
-                <div className="text-xs text-slate-400 mt-1">
-                  Dipublikasikan: {new Date(selectedBerita.tanggalPublish).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} • Oleh: {selectedBerita.penulis}
+      <AnimatePresence>
+        {selectedBerita && (
+          <motion.div
+            key="modal-berita-backdrop"
+            variants={modalBackdropVariant}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            onClick={() => setSelectedBerita(null)}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4"
+          >
+            <motion.div
+              key="modal-berita-content"
+              variants={modalContentVariant}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white">
+                    {selectedBerita.kategori}
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-2 leading-snug">
+                    {selectedBerita.judul}
+                  </h3>
+                  <div className="text-xs text-slate-400 mt-1">
+                    Dipublikasikan:{' '}
+                    {new Date(selectedBerita.tanggalPublish).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}{' '}
+                    • Oleh: {selectedBerita.penulis}
+                  </div>
                 </div>
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  onClick={() => setSelectedBerita(null)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-1"
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
               </div>
-              <button onClick={() => setSelectedBerita(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="h-56 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900">
-              <img src={getFullUrl(selectedBerita.thumbnail, '/banner-spmb.jpg')} alt={selectedBerita.judul} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/banner-spmb.jpg'; }} />
-            </div>
-            <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
-              {selectedBerita.konten}
-            </div>
-            <div className="flex justify-end pt-2">
-              <button onClick={() => setSelectedBerita(null)} className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider">
-                Tutup Berita
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <div className="h-56 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900">
+                <img
+                  src={getFullUrl(selectedBerita.thumbnail, '/banner-spmb.jpg')}
+                  alt={selectedBerita.judul}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = '/banner-spmb.jpg';
+                  }}
+                />
+              </div>
+              <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+                {selectedBerita.konten}
+              </div>
+              <div className="flex justify-end pt-2">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setSelectedBerita(null)}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider cursor-pointer"
+                >
+                  Tutup Berita
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

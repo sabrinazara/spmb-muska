@@ -59,6 +59,16 @@ export class LandingPageController {
         return this.landingService.getPublicLandingData();
     }
 
+    @Get('berita')
+    async getPublicBerita() {
+        return this.landingService.getPublicBerita();
+    }
+
+    @Get('berita/:slugOrId')
+    async getPublicBeritaDetail(@Param('slugOrId') slugOrId: string) {
+        return this.landingService.getPublicBeritaBySlugOrId(slugOrId);
+    }
+
     // ==========================================
     // ADMIN ENDPOINTS (PROTECTED BY ADMINGUARD)
     // ==========================================

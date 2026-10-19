@@ -214,6 +214,7 @@ model ProgramKeahlian {
   singkatan String
   deskripsi String   @db.Text
   iconUrl   String?
+  fotoUrls  String[] @default([])
   kuota     Int      @default(72)
   urutan    Int      @default(0)
   createdAt DateTime @default(now())

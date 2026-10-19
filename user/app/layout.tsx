@@ -17,7 +17,7 @@ const dancingScript = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "SPMB SMK Muhammadiyah Sekampung",
+  title: "SMK Muhammadiyah Sekampung",
   description: "Sistem Informasi Penerimaan Peserta Didik Baru (PPDB) SMK Muhammadiyah Sekampung Berbasis AI RAG dan OCR",
 };
 

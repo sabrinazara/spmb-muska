@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
 import ImageUploader from '@/components/ImageUploader';
+import MultiImageUploader from '@/components/MultiImageUploader';
 
 type TabKey = 'slider' | 'profil' | 'wks' | 'guru' | 'berita' | 'mitra';
 
@@ -679,7 +680,7 @@ export default function WebsiteManagerPage() {
                                     </div>
                                     <button
                                         onClick={() => {
-                                            setFormData({ nama: '', singkatan: '', deskripsi: '', kuota: 72, iconUrl: '', urutan: programs.length + 1 });
+                                            setFormData({ nama: '', singkatan: '', deskripsi: '', kuota: 72, iconUrl: '', fotoUrls: [], urutan: programs.length + 1 });
                                             setModalType('program');
                                         }}
                                         className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
@@ -706,18 +707,23 @@ export default function WebsiteManagerPage() {
                                                 <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white mt-1 leading-snug">{p.nama}</h3>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-3 leading-relaxed">{p.deskripsi}</p>
                                             </div>
-                                            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                                                <span className="text-[11px] font-mono text-slate-400">Kuota: {p.kuota} Siswa</span>
+                                            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[11px] font-mono text-slate-400">
+                                                <span>Kuota: {p.kuota}</span>
+                                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                                                    {p.fotoUrls?.length || 0}/5 Foto
+                                                </span>
                                                 <div className="flex gap-1.5">
                                                     <button
-                                                        onClick={() => { setFormData(p); setModalType('program'); }}
+                                                        onClick={() => { setFormData({ ...p, fotoUrls: Array.isArray(p.fotoUrls) ? p.fotoUrls : [] }); setModalType('program'); }}
                                                         className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Edit Program"
                                                     >
                                                         <Edit2 className="w-3.5 h-3.5" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteItem(API_ENDPOINTS.WEBSITE.PROGRAM_BY_ID(p.id), 'Program berhasil dihapus')}
                                                         className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-rose-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Hapus Program"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
                                                     </button>
@@ -930,6 +936,13 @@ export default function WebsiteManagerPage() {
                                         aspectRatio="square"
                                         required
                                         helperText="Unggah logo/lambang resmi jurusan (SVG atau PNG transparan)"
+                                    />
+                                    <MultiImageUploader
+                                        label="Galeri Foto Kegiatan & Fasilitas Jurusan (Maksimal 5 Foto)"
+                                        value={formData.fotoUrls || []}
+                                        onChange={(urls) => setFormData({ ...formData, fotoUrls: urls })}
+                                        maxPhotos={5}
+                                        helperText="Unggah foto laboratorium, bengkel, atau kegiatan praktik siswa (maksimal 5 foto)"
                                     />
                                     <div>
                                         <label className="block font-bold mb-1">Deskripsi Jurusan *</label>
