@@ -523,9 +523,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                             <h1 className={`text-sm font-bold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
                                 {getPageTitle()}
                             </h1>
-                            <p className={`text-[11px] hidden sm:block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                                Sistem Verifikasi Digital SPMB Berbasis AI & OCR
-                            </p>
+                            {/* <p className={`text-[11px] hidden sm:block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                                Sistem 
+                            </p> */}
                         </div>
                     </div>
 

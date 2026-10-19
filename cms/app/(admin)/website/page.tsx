@@ -24,7 +24,7 @@ import {
     BookOpen,
     GraduationCap,
 } from 'lucide-react';
-import { API_BASE_URL, API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
+import { API_BASE_URL, API_ENDPOINTS, USER_URL, getAuthHeaders } from '@/lib/api';
 import ImageUploader from '@/components/ImageUploader';
 import MultiImageUploader from '@/components/MultiImageUploader';
 
@@ -597,16 +597,27 @@ export default function WebsiteManagerPage() {
                                         </div>
                                         <div className="p-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/30">
                                             <span className="text-[10px] font-medium text-slate-400">{b.penulis}</span>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-1.5">
+                                                <a
+                                                    href={`${USER_URL}/berita/${b.slug || b.id}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                    title="Preview Berita di Web"
+                                                >
+                                                    <ExternalLink className="w-3.5 h-3.5" />
+                                                </a>
                                                 <button
                                                     onClick={() => { setFormData(b); setModalType('berita'); }}
                                                     className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                    title="Edit Berita"
                                                 >
                                                     <Edit2 className="w-3.5 h-3.5" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteItem(API_ENDPOINTS.WEBSITE.BERITA_BY_ID(b.id), 'Berita berhasil dihapus')}
                                                     className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-rose-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                    title="Hapus Berita"
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                 </button>
@@ -713,6 +724,15 @@ export default function WebsiteManagerPage() {
                                                     {p.fotoUrls?.length || 0}/5 Foto
                                                 </span>
                                                 <div className="flex gap-1.5">
+                                                    <a
+                                                        href={`${USER_URL}/jurusan/${p.id}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Preview Halaman Jurusan di Web"
+                                                    >
+                                                        <ExternalLink className="w-3.5 h-3.5" />
+                                                    </a>
                                                     <button
                                                         onClick={() => { setFormData({ ...p, fotoUrls: Array.isArray(p.fotoUrls) ? p.fotoUrls : [] }); setModalType('program'); }}
                                                         className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"

@@ -258,22 +258,7 @@ export default function HomePage() {
   const programs = data?.programKeahlian || [];
   const mitraList = data?.mitraIndustri || [];
   const rawBerita = data?.berita || [];
-  const beritaList = rawBerita.some((b: any) => b.slug === 'maklumat-pelayanan-publik')
-    ? rawBerita
-    : [
-        {
-          id: 'maklumat-pelayanan-publik',
-          judul: 'Maklumat Pelayanan Publik SMK Muhammadiyah Sekampung',
-          slug: 'maklumat-pelayanan-publik',
-          ringkasan: 'Komitmen keterbukaan informasi publik dan standar integritas pelayanan pendidikan prima bagi seluruh warga sekolah.',
-          konten: 'Dengan ini, kami seluruh pimpinan, dewan guru, dan tenaga kependidikan SMK Muhammadiyah Sekampung menyatakan sanggup menyelenggarakan pelayanan pendidikan dan administrasi sekolah sesuai dengan standar pelayanan yang telah ditetapkan.\n\nKami berkomitmen:\n1. Memberikan pelayanan yang ramah, cepat, tepat, transparan, dan berkeadilan tanpa diskriminasi kepada seluruh peserta didik, wali murid, dan masyarakat luas.\n2. Meniadakan segala bentuk pungutan liar, gratifikasi, serta praktik percaloan dalam seluruh proses administrasi maupun SPMB.\n3. Menyediakan sarana pengaduan masyarakat yang responsif dan dapat dipertanggungjawabkan.\n4. Senantiasa melakukan perbaikan berkesinambungan demi terwujudnya Zona Integritas dan pelayanan prima berstandar unggul.\n\nApabila kami tidak menepati janji maklumat ini, kami siap menerima evaluasi dan sanksi sesuai dengan peraturan perundang-undangan yang berlaku.',
-          thumbnail: '/banner-spmb.jpg',
-          kategori: 'Zona Integritas',
-          tanggalPublish: '2026-07-20T08:00:00.000Z',
-          penulis: 'Administrator SPMB MUSKA',
-        },
-        ...rawBerita,
-      ];
+  const beritaList = rawBerita;
 
   // Limits & Pagination for WKS and Dewan Guru
   const INITIAL_WKS_LIMIT = 4;
@@ -1009,60 +994,114 @@ export default function HomePage() {
                     boxShadow: '0 20px 25px -5px rgba(4, 120, 87, 0.12), 0 8px 10px -6px rgba(4, 120, 87, 0.08)',
                     transition: { duration: 0.25 },
                   }}
-                  className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 shadow-xs flex flex-col justify-between space-y-4 group transition-colors duration-300"
+                  className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-5 shadow-xs flex flex-col justify-between space-y-4 group transition-colors duration-300"
                 >
                   <div className="space-y-3">
-                    <motion.div
-                      whileHover={{ scale: 1.15, rotate: 3 }}
-                      transition={{ duration: 0.25 }}
-                      className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 flex items-center justify-center group-hover:border-emerald-500 shadow-xs transition-colors duration-300"
-                    >
-                      {p.iconUrl && (p.iconUrl.startsWith('/') || p.iconUrl.startsWith('http')) ? (
+                    {/* Tampilan Foto Dokumentasi Unggulan (jika diisi di CMS) */}
+                    {p.fotoUrls && p.fotoUrls.length > 0 ? (
+                      <div
+                        onClick={() => setSelectedProgram(p)}
+                        className="relative aspect-16/10 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer group/photo"
+                        title="Klik untuk membuka Galeri Foto Jurusan"
+                      >
                         <img
-                          src={getFullUrl(logoPath, '/logo.png')}
-                          alt={p.singkatan}
-                          className="w-full h-full object-contain"
+                          src={getFullUrl(p.fotoUrls[0])}
+                          alt={p.nama}
+                          className="w-full h-full object-cover group-hover/photo:scale-105 transition-transform duration-500"
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.src = '/banner-spmb.jpg';
                           }}
                         />
-                      ) : (
-                        <IconComponent className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
-                      )}
-                    </motion.div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover/photo:opacity-40 transition-opacity" />
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/60 backdrop-blur-md text-white border border-white/20 flex items-center gap-1 shadow-xs">
+                          <ImageIcon className="w-3 h-3 text-emerald-400" />
+                          <span>{p.fotoUrls.length} Foto</span>
+                        </div>
+                        <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500 text-white shadow-xs">
+                            {p.singkatan}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <motion.div
+                          whileHover={{ scale: 1.15, rotate: 3 }}
+                          transition={{ duration: 0.25 }}
+                          className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-2.5 flex items-center justify-center group-hover:border-emerald-500 shadow-xs transition-colors duration-300"
+                        >
+                          {p.iconUrl && (p.iconUrl.startsWith('/') || p.iconUrl.startsWith('http')) ? (
+                            <img
+                              src={getFullUrl(logoPath, '/logo.png')}
+                              alt={p.singkatan}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <IconComponent className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+                          )}
+                        </motion.div>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          {p.singkatan}
+                        </span>
+                      </div>
+                    )}
+
                     <div>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                        {p.singkatan}
-                      </span>
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white mt-2 leading-snug">
+                      {p.fotoUrls && p.fotoUrls.length > 0 && (
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1 flex items-center justify-center shrink-0">
+                            <img
+                              src={getFullUrl(logoPath, '/logo.png')}
+                              alt={p.singkatan}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                e.currentTarget.src = '/logo.png';
+                              }}
+                            />
+                          </div>
+                          <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                            {p.singkatan}
+                          </span>
+                        </div>
+                      )}
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
                         {p.nama}
                       </h3>
                     </div>
+
                     <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-3 leading-relaxed">
                       {p.deskripsi}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <div>
-                      <span className="text-[11px] font-mono text-slate-400">
-                        Kuota: <strong>{p.kuota}</strong> Kursi
-                      </span>
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-mono text-slate-400">
+                      Kuota: <strong>{p.kuota}</strong>
+                    </span>
+
+                    <div className="flex items-center gap-2">
                       {p.fotoUrls && p.fotoUrls.length > 0 && (
-                        <div className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
-                          <ImageIcon className="w-3 h-3" />
-                          <span>{p.fotoUrls.length} Foto Dokumentasi</span>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProgram(p)}
+                          className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
+                          title="Buka galeri foto di popup"
+                        >
+                          <ImageIcon className="w-3.5 h-3.5" />
+                          <span>Galeri ({p.fotoUrls.length})</span>
+                        </button>
                       )}
+                      <Link
+                        href={`/jurusan/${p.id}`}
+                        className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 hover:underline flex items-center gap-1 group/btn"
+                      >
+                        <span>Profil</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+                      </Link>
                     </div>
-                    <motion.button
-                      whileHover={{ x: 3 }}
-                      onClick={() => setSelectedProgram(p)}
-                      className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>Rincian</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </motion.button>
                   </div>
                 </motion.div>
               );

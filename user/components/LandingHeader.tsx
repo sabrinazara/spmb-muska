@@ -198,7 +198,9 @@ export default function LandingHeader({ activeMenu = 'beranda', isHome = false }
             <motion.a
               whileHover={{ y: -2 }}
               href={`${prefix}#jurusan`}
-              className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+              className={`hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors ${
+                activeMenu === 'jurusan' ? 'text-emerald-600 dark:text-emerald-400 font-extrabold underline underline-offset-4 decoration-2' : ''
+              }`}
             >
               Program Keahlian
             </motion.a>

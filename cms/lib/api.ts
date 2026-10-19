@@ -10,6 +10,9 @@ export const API_BASE_URL =
 export const AI_BASE_URL =
     process.env.NEXT_PUBLIC_AI_URL || 'http://localhost:8000';
 
+export const USER_URL =
+    process.env.NEXT_PUBLIC_USER_URL || 'http://localhost:3000';
+
 export const API_ENDPOINTS = {
     AUTH: {
         LOGIN: `${API_BASE_URL}/auth/login`,

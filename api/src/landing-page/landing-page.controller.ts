@@ -69,6 +69,16 @@ export class LandingPageController {
         return this.landingService.getPublicBeritaBySlugOrId(slugOrId);
     }
 
+    @Get('jurusan')
+    async getPublicJurusan() {
+        return this.landingService.getPublicPrograms();
+    }
+
+    @Get('jurusan/:idOrSlug')
+    async getPublicJurusanDetail(@Param('idOrSlug') idOrSlug: string) {
+        return this.landingService.getPublicProgramByIdOrSlug(idOrSlug);
+    }
+
     // ==========================================
     // ADMIN ENDPOINTS (PROTECTED BY ADMINGUARD)
     // ==========================================

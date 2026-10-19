@@ -4,14 +4,14 @@
 
 @theme inline {
   --font-sans: var(--font-poppins), sans-serif;
-  --font-dancing: var(--font-dancing-script), cursive;
+  --font-dancing: 'Dancing Script', 'Brush Script MT', 'Caveat', cursive;
   --color-primary: #047857;
   --color-primary-hover: #065f46;
   --color-secondary: #d97706;
 }
 
 .font-dancing {
-  font-family: var(--font-dancing-script), cursive;
+  font-family: 'Dancing Script', 'Brush Script MT', 'Caveat', cursive;
 }
 
 

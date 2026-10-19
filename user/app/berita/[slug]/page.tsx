@@ -97,10 +97,6 @@ export default function BeritaDetailPage({ params }: PageProps) {
             currentArticle =
               allBerita.find((b) => b.slug === slug || b.id === slug) || null;
           }
-          // Jika masih belum ketemu dan ada berita lain, ambil berita pertama sebagai fallback aman
-          if (!currentArticle && allBerita.length > 0) {
-            currentArticle = allBerita[0];
-          }
 
           // Filter recent berita (selain yang sedang dibaca)
           const others = allBerita.filter(

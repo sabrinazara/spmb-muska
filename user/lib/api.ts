@@ -30,11 +30,15 @@ export const API_ENDPOINTS = {
         PENGUMUMAN: `${API_BASE_URL}/pendaftaran/pengumuman`,
     },
 
-    // Landing Page Publik & Berita
+    // Landing Page Publik, Berita & Program Keahlian (Jurusan)
     LANDING_PAGE: `${API_BASE_URL}/landing-page`,
     BERITA: {
         LIST: `${API_BASE_URL}/landing-page/berita`,
         DETAIL: (slugOrId: string) => `${API_BASE_URL}/landing-page/berita/${slugOrId}`,
+    },
+    JURUSAN: {
+        LIST: `${API_BASE_URL}/landing-page/jurusan`,
+        DETAIL: (idOrSlug: string) => `${API_BASE_URL}/landing-page/jurusan/${idOrSlug}`,
     },
 
     // Upload & Verifikasi Dokumen

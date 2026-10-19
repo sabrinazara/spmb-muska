@@ -343,37 +343,8 @@ export class LandingPageService {
                         tanggalPublish: new Date(Date.now() - 86400000 * 7),
                         penulis: 'WKS 3 Humas & Hubin',
                     },
-                    {
-                        judul: 'Maklumat Pelayanan Publik SMK Muhammadiyah Sekampung',
-                        slug: 'maklumat-pelayanan-publik',
-                        ringkasan: 'Komitmen keterbukaan informasi publik dan standar integritas pelayanan pendidikan prima bagi seluruh warga sekolah.',
-                        konten: 'Dengan ini, kami seluruh pimpinan, dewan guru, dan tenaga kependidikan SMK Muhammadiyah Sekampung menyatakan sanggup menyelenggarakan pelayanan pendidikan dan administrasi sekolah sesuai dengan standar pelayanan yang telah ditetapkan.\n\nKami berkomitmen:\n1. Memberikan pelayanan yang ramah, cepat, tepat, transparan, dan berkeadilan tanpa diskriminasi.\n2. Meniadakan segala bentuk pungutan liar, gratifikasi, serta praktik percaloan dalam seluruh proses administrasi maupun SPMB.\n3. Menyediakan sarana pengaduan masyarakat yang responsif dan dapat dipertanggungjawabkan.\n4. Senantiasa melakukan perbaikan berkesinambungan demi terwujudnya Zona Integritas dan pelayanan prima.\n\nApabila kami tidak menepati janji maklumat ini, kami siap menerima evaluasi dan sanksi sesuai peraturan yang berlaku.',
-                        thumbnail: '/banner-spmb.jpg',
-                        kategori: 'Zona Integritas',
-                        tanggalPublish: new Date(Date.now() - 86400000 * 2),
-                        penulis: 'Administrator SPMB MUSKA',
-                    },
                 ],
             });
-        } else {
-            // Pastikan artikel maklumat pelayanan publik tersedia jika belum ada
-            const maklumat = await this.prisma.berita.findFirst({
-                where: { slug: 'maklumat-pelayanan-publik' },
-            });
-            if (!maklumat) {
-                await this.prisma.berita.create({
-                    data: {
-                        judul: 'Maklumat Pelayanan Publik SMK Muhammadiyah Sekampung',
-                        slug: 'maklumat-pelayanan-publik',
-                        ringkasan: 'Komitmen keterbukaan informasi publik dan standar integritas pelayanan pendidikan prima bagi seluruh warga sekolah.',
-                        konten: 'Dengan ini, kami seluruh pimpinan, dewan guru, dan tenaga kependidikan SMK Muhammadiyah Sekampung menyatakan sanggup menyelenggarakan pelayanan pendidikan dan administrasi sekolah sesuai dengan standar pelayanan yang telah ditetapkan.\n\nKami berkomitmen:\n1. Memberikan pelayanan yang ramah, cepat, tepat, transparan, dan berkeadilan tanpa diskriminasi.\n2. Meniadakan segala bentuk pungutan liar, gratifikasi, serta praktik percaloan dalam seluruh proses administrasi maupun SPMB.\n3. Menyediakan sarana pengaduan masyarakat yang responsif dan dapat dipertanggungjawabkan.\n4. Senantiasa melakukan perbaikan berkesinambungan demi terwujudnya Zona Integritas dan pelayanan prima.\n\nApabila kami tidak menepati janji maklumat ini, kami siap menerima evaluasi dan sanksi sesuai peraturan yang berlaku.',
-                        thumbnail: '/banner-spmb.jpg',
-                        kategori: 'Zona Integritas',
-                        tanggalPublish: new Date(Date.now() - 86400000 * 2),
-                        penulis: 'Administrator SPMB MUSKA',
-                    },
-                });
-            }
         }
     }
 
@@ -398,6 +369,37 @@ export class LandingPageService {
             throw new NotFoundException(`Berita dengan slug atau id "${slugOrId}" tidak ditemukan`);
         }
         return berita;
+    }
+
+    async getPublicPrograms() {
+        await this.ensureInitialSeed();
+        return this.prisma.programKeahlian.findMany({
+            orderBy: { urutan: 'asc' },
+        });
+    }
+
+    async getPublicProgramByIdOrSlug(idOrSlug: string) {
+        await this.ensureInitialSeed();
+        // Coba cari langsung by ID
+        let program = await this.prisma.programKeahlian.findUnique({
+            where: { id: idOrSlug },
+        }).catch(() => null);
+
+        // Jika tidak ketemu by UUID, cari by singkatan atau slug nama
+        if (!program) {
+            const all = await this.prisma.programKeahlian.findMany();
+            const cleanTarget = idOrSlug.toLowerCase().replace(/[^a-z0-9]/g, '');
+            program = all.find((p) => {
+                const cleanSingkatan = p.singkatan.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const cleanNama = p.nama.toLowerCase().replace(/[^a-z0-9]/g, '');
+                return p.id === idOrSlug || cleanSingkatan === cleanTarget || cleanNama === cleanTarget;
+            }) || null;
+        }
+
+        if (!program) {
+            throw new NotFoundException(`Program Keahlian "${idOrSlug}" tidak ditemukan`);
+        }
+        return program;
     }
 
     // ==========================================

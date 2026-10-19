@@ -149,7 +149,7 @@ export default function AdminAnalyticsDashboard() {
                         Ringkasan Operasional Penerimaan Siswa Baru
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Pemantauan pendaftaran, verifikasi berkas AI OCR, dan seleksi calon siswa baru
+                        Pemantauan pendaftaran calon siswa baru
                     </p>
                 </div>
 
