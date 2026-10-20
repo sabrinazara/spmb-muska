@@ -151,10 +151,27 @@ function DetailPendaftarContent({ id }: { id: string }) {
         setLoading(true);
         setErrorMsg(null);
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                router.push('/login');
+                return;
+            }
+
             const res = await fetch(API_ENDPOINTS.ADMIN.DETAIL_PENDAFTAR(id), {
                 headers: getAuthHeaders(),
             });
-            if (!res.ok) throw new Error('Data pendaftar tidak ditemukan');
+
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user');
+                router.push('/login?expired=1');
+                return;
+            }
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => null);
+                throw new Error(errData?.message || 'Data pendaftar tidak ditemukan');
+            }
             const result: DetailPendaftar = await res.json();
             setData(result);
             setStatusVerifikasi(result.status || 'PENDING');
@@ -247,6 +264,31 @@ function DetailPendaftarContent({ id }: { id: string }) {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="h-80 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
                     <div className="h-80 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+                </div>
+            </div>
+        );
+    }
+
+    if (errorMsg) {
+        return (
+            <div className="p-8 text-center bg-white dark:bg-slate-950 border border-rose-200 dark:border-rose-900/50 rounded-2xl space-y-4 font-sans max-w-lg mx-auto my-12 shadow-sm">
+                <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto">
+                    <AlertCircle className="w-6 h-6" />
+                </div>
+                <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Gagal Memuat Detail Pendaftar</h3>
+                    <p className="text-xs text-rose-600 dark:text-rose-400 mt-1">{errorMsg}</p>
+                </div>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                    <button
+                        onClick={() => fetchDetail()}
+                        className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
+                    >
+                        Coba Lagi
+                    </button>
+                    <Link href="/pendaftar" className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition">
+                        &larr; Kembali ke Daftar Pendaftar
+                    </Link>
                 </div>
             </div>
         );

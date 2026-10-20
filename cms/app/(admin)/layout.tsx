@@ -129,6 +129,32 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                 return;
             }
         }
+        // Verifikasi kevalidan token aktif ke backend
+        fetch(API_ENDPOINTS.AUTH.ME, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user');
+                router.push('/login?expired=1');
+            } else if (res.ok) {
+                res.json().then(data => {
+                    if (data.role !== 'ADMIN') {
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('user');
+                        router.push('/login?forbidden=1');
+                    } else {
+                        setAdminUser(data);
+                    }
+                }).catch(() => { });
+            }
+        }).catch(() => {
+            // Biarkan jika server offline sementara
+        });
+
         setIsCheckingAuth(false);
     }, [router]);
 
@@ -212,19 +238,19 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             title: 'Penerimaan Siswa',
             items: [
                 {
-                    name: 'Data Pendaftar & Arsip',
+                    name: 'Data Pendaftar',
                     href: '/pendaftar',
                     exact: false,
                     icon: Users,
                 },
                 {
-                    name: 'Kuota Jurusan & Seleksi',
+                    name: 'Kuota',
                     href: '/pengaturan-kuota',
                     exact: false,
                     icon: Zap,
                 },
                 {
-                    name: 'Pengaturan & Jadwal CBT',
+                    name: 'Pengaturan',
                     href: '/settings',
                     exact: false,
                     icon: Sliders,
@@ -236,31 +262,31 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             title: 'Master Sistem',
             items: [
                 {
-                    name: 'Manajemen Administrator',
+                    name: 'Administrator',
                     href: '/admin-users',
                     exact: false,
                     icon: UserCog,
                 },
                 {
-                    name: 'AI Knowledge Base',
+                    name: 'RAG',
                     href: '/knowledge-base',
                     exact: false,
                     icon: BookOpen,
                 },
                 {
-                    name: 'Audit Trail Aktivitas',
+                    name: 'Audit Trail',
                     href: '/audit-log',
                     exact: false,
                     icon: ShieldCheck,
                 },
                 {
-                    name: 'Backup & Restore Database',
+                    name: 'Backup & Restore ',
                     href: '/database-manager',
                     exact: false,
                     icon: HardDrive,
                 },
                 {
-                    name: 'Manajemen Website & Landing',
+                    name: 'Manajemen CMS',
                     href: '/website',
                     exact: false,
                     icon: Globe,
@@ -270,9 +296,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     ];
 
     const getPageTitle = () => {
-        if (pathname === '/') return 'Dashboard Analytics';
+        if (pathname === '/') return 'Dashboard';
         if (pathname.startsWith('/pendaftar/')) return 'Detail & Validasi Berkas Pendaftar';
-        if (pathname === '/pendaftar') return 'Manajemen Data Pendaftar';
+        if (pathname === '/pendaftar') return 'Kelola Data Pendaftar';
         if (pathname === '/pengaturan-kuota') return 'Manajemen Kuota Jurusan & Seleksi Ranking';
         if (pathname === '/admin-users') return 'Manajemen Administrator & Akun Panitia';
         if (pathname === '/settings') return 'Pengaturan SPMB & Jadwal Kelulusan';
@@ -363,7 +389,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                             <Link
                                 href="/"
                                 onClick={() => setSidebarOpen(false)}
-                                title={isCollapsed ? 'Dashboard Analytics' : undefined}
+                                title={isCollapsed ? 'Dashboard' : undefined}
                                 className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${isCollapsed
                                     ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2.5'
                                     : 'px-3 py-2.5'
@@ -375,7 +401,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                                     }`}
                             >
                                 <LayoutDashboard className="w-4 h-4 shrink-0" />
-                                <span className={`truncate ${isCollapsed ? 'lg:hidden block' : 'block'}`}>Dashboard Analytics</span>
+                                <span className={`truncate ${isCollapsed ? 'lg:hidden block' : 'block'}`}>Dashboard</span>
                             </Link>
                         </div>
 

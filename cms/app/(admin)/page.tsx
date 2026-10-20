@@ -67,6 +67,12 @@ export default function AdminAnalyticsDashboard() {
             const res = await fetch(API_ENDPOINTS.ADMIN.STATS, {
                 headers: getAuthHeaders(),
             });
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user');
+                window.location.href = '/login?expired=1';
+                return;
+            }
             if (!res.ok) {
                 throw new Error('Gagal memuat statistik sistem');
             }

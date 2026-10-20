@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
     Users,
     Search,
@@ -15,6 +16,7 @@ import {
     Clock,
     RefreshCw,
     GraduationCap,
+    AlertCircle,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
 
@@ -36,8 +38,10 @@ interface PendaftarItem {
 }
 
 export default function PendaftarManagementPage() {
+    const router = useRouter();
     const [pendaftarList, setPendaftarList] = useState<PendaftarItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -51,7 +55,14 @@ export default function PendaftarManagementPage() {
 
     const fetchPendaftar = async (targetPage = page) => {
         setLoading(true);
+        setError(null);
         try {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                router.push('/login');
+                return;
+            }
+
             const query = new URLSearchParams();
             if (search.trim()) query.set('search', search.trim());
             if (jurusan !== 'ALL') query.set('jurusan', jurusan);
@@ -65,14 +76,26 @@ export default function PendaftarManagementPage() {
                 headers: getAuthHeaders(),
             });
 
-            if (!res.ok) throw new Error('Gagal memuat data pendaftar');
+            if (res.status === 401 || res.status === 403) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user');
+                router.push('/login?expired=1');
+                return;
+            }
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => null);
+                throw new Error(errData?.message || 'Gagal memuat data pendaftar');
+            }
+
             const data = await res.json();
             setPendaftarList(data.items || []);
             setTotal(data.pagination?.total || 0);
             setTotalPages(data.pagination?.totalPages || 1);
             setPage(targetPage);
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error fetching pendaftar:', err);
+            setError(err?.message || 'Gagal memuat data pendaftar. Pastikan koneksi backend stabil.');
         } finally {
             setLoading(false);
         }
@@ -244,6 +267,27 @@ export default function PendaftarManagementPage() {
                                     <td colSpan={8} className="py-12 text-center">
                                         <div className="inline-block w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-2"></div>
                                         <p className="text-slate-400 text-xs">Memuat data pendaftar...</p>
+                                    </td>
+                                </tr>
+                            ) : error ? (
+                                <tr>
+                                    <td colSpan={8} className="py-12 text-center">
+                                        <div className="max-w-md mx-auto space-y-3 px-4">
+                                            <div className="w-10 h-10 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto">
+                                                <AlertCircle className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white">Gagal Memuat Data Pendaftar</p>
+                                                <p className="text-xs text-rose-500 mt-1">{error}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => fetchPendaftar(page)}
+                                                className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-sm"
+                                            >
+                                                <RefreshCw className="w-3.5 h-3.5" />
+                                                <span>Muat Ulang / Coba Lagi</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ) : pendaftarList.length > 0 ? (

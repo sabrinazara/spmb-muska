@@ -164,17 +164,17 @@ export default function DashboardLayout({
             title: 'Tahapan Pendaftaran',
             items: [
                 {
-                    label: 'Lengkapi Data Biodata',
+                    label: 'Data Diri',
                     href: '/dashboard/lengkapi-data',
                     icon: FileText,
                 },
                 {
-                    label: 'Upload Dokumen & OCR',
+                    label: 'Upload Dokumen',
                     href: '/dashboard/upload',
                     icon: UploadCloud,
                 },
                 {
-                    label: 'Status Verifikasi Panitia',
+                    label: 'Status Verifikasi',
                     href: '/dashboard/status',
                     icon: CheckCircle2,
                 },
@@ -253,7 +253,7 @@ export default function DashboardLayout({
                                     }`}>
                                     SMK Muhammadiyah
                                 </div>
-                                <div className={`text-[10px] font-extrabold tracking-wider uppercase ${isDark ? 'text-emerald-400' : 'text-emerald-600'
+                                <div className={`text-[13px] font-extrabold tracking-wider truncate  ${isDark ? 'text-white' : 'text-slate-900'
                                     }`}>
                                     Sekampung
                                 </div>

@@ -265,7 +265,7 @@ export default function UploadDokumenPage() {
                 {/* Banner 1: Pendaftaran Gratis */}
                 <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-2xs">
                     <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                        <ShieldCheck className="w-5 h-5 text-amber-300" />
+                        <ShieldCheck className="w-5 h-5 text-white" />
                     </div>
                     <div>
                         <div className="text-xs font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
@@ -296,11 +296,10 @@ export default function UploadDokumenPage() {
             {/* Alert Message */}
             {alert && (
                 <div
-                    className={`p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${
-                        alert.type === 'success'
+                    className={`p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${alert.type === 'success'
                             ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
                             : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
-                    }`}
+                        }`}
                 >
                     <div className="flex items-center gap-2.5">
                         <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${alert.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}`}>
@@ -693,12 +692,12 @@ export default function UploadDokumenPage() {
                                                 {doc.jenisDokumen === 'KK'
                                                     ? 'Kartu Keluarga (KK)'
                                                     : doc.jenisDokumen === 'KIA_KARTU_PELAJAR'
-                                                    ? 'Kartu Pelajar / KIA'
-                                                    : doc.jenisDokumen === 'SKL_IJAZAH'
-                                                    ? 'SKL / Ijazah SMP'
-                                                    : doc.jenisDokumen === 'PAS_FOTO'
-                                                    ? 'Pas Foto 3x4'
-                                                    : doc.jenisDokumen}
+                                                        ? 'Kartu Pelajar / KIA'
+                                                        : doc.jenisDokumen === 'SKL_IJAZAH'
+                                                            ? 'SKL / Ijazah SMP'
+                                                            : doc.jenisDokumen === 'PAS_FOTO'
+                                                                ? 'Pas Foto 3x4'
+                                                                : doc.jenisDokumen}
                                             </td>
                                             <td className="py-3.5 text-xs text-slate-500 dark:text-slate-400">
                                                 {new Date(doc.createdAt).toLocaleDateString('id-ID', {

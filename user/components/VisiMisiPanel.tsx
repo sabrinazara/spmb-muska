@@ -40,13 +40,9 @@ export default function VisiMisiPanel({ className = '', compact = false }: VisiM
                             src="/logo.png"
                             alt="Logo SMK Muhammadiyah Sekampung"
                             className="w-full h-full object-contain"
-                        />
+                        />  
                     </div>
                     <div>
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-400/15 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">
-                            {/* <Sparkles className="w-3 h-3 text-amber-300" /> */}
-                            <span>Pusat Keunggulan Vokasi</span>
-                        </div>
                         <h2 className="text-sm sm:text-base font-black tracking-tight text-white leading-tight">
                             SMK MUHAMMADIYAH SEKAMPUNG
                         </h2>
@@ -95,7 +91,7 @@ export default function VisiMisiPanel({ className = '', compact = false }: VisiM
             <div className="relative z-10 mt-4 pt-3.5 border-t border-white/10">
                 <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-amber-500/15 border border-emerald-500/30">
                     <Award className="w-5 h-5 text-amber-300 shrink-0" />
-                    <div>   
+                    <div>
                         <div className="font-dancing text-base sm:text-lg font-bold text-amber-200 tracking-wide">
                             &ldquo;Sukses · Jaya · Bermanfaat · Inspiratif&rdquo;
                         </div>

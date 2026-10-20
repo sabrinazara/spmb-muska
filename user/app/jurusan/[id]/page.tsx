@@ -237,19 +237,19 @@ export default function JurusanDetailPage({ params }: PageProps) {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
+                  {/* <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                     {program?.singkatan || 'SMK PK'}
-                  </span>
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                  </span> */}
+                  {/* <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                     <Users className="w-3.5 h-3.5" />
                     <span>Daya Tampung: {program?.kuota || 72} Siswa</span>
-                  </span>
-                  {photos.length > 0 && (
+                  </span> */}
+                  {/* {photos.length > 0 && (
                     <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20 flex items-center gap-1">
                       <ImageIcon className="w-3.5 h-3.5" />
                       <span>{photos.length} Foto Dokumentasi</span>
                     </span>
-                  )}
+                  )} */}
                 </div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
                   {program ? program.nama : 'Memuat Profil Jurusan...'}
@@ -315,7 +315,7 @@ export default function JurusanDetailPage({ params }: PageProps) {
                       </div>
                       <div>
                         <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                          Dokumentasi Kegiatan & Lab {program.singkatan}
+                          Dokumentasi Kegiatan {program.singkatan}
                         </h2>
                         <p className="text-xs text-slate-400">
                           {photos.length > 0
@@ -324,11 +324,11 @@ export default function JurusanDetailPage({ params }: PageProps) {
                         </p>
                       </div>
                     </div>
-                    {photos.length > 0 && (
+                    {/* {photos.length > 0 && (
                       <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
                         Foto {activePhotoIdx + 1} dari {photos.length}
                       </span>
-                    )}
+                    )} */}
                   </div>
 
                   {photos.length > 0 ? (
@@ -382,11 +382,10 @@ export default function JurusanDetailPage({ params }: PageProps) {
                               key={idx}
                               type="button"
                               onClick={() => setActivePhotoIdx(idx)}
-                              className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
-                                activePhotoIdx === idx
-                                  ? 'border-emerald-500 ring-2 ring-emerald-500/40 scale-105 shadow-md'
-                                  : 'border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100'
-                              }`}
+                              className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${activePhotoIdx === idx
+                                ? 'border-emerald-500 ring-2 ring-emerald-500/40 scale-105 shadow-md'
+                                : 'border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100'
+                                }`}
                             >
                               <img
                                 src={getFullUrl(foto)}
@@ -484,14 +483,14 @@ export default function JurusanDetailPage({ params }: PageProps) {
                 {/* 4. BANNER AJAKAN PENDAFTARAN */}
                 <div className="rounded-3xl bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white p-6 sm:p-8 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 border border-emerald-600/30">
                   <div className="space-y-2 text-center sm:text-left">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-white/20 backdrop-blur-md">
+                    {/* <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-white/20 backdrop-blur-md">
                       Penerimaan Siswa Baru
-                    </span>
+                    </span> */}
                     <h3 className="text-xl sm:text-2xl font-black tracking-tight">
                       Siap Bergabung dengan {program.singkatan}?
                     </h3>
                     <p className="text-xs sm:text-sm text-emerald-100/90 max-w-lg leading-relaxed">
-                      Kuota terbatas {program.kuota} kursi. Manfaatkan kemudahan pendaftaran online dengan verifikasi instan berbasis AI.
+                      Kuota terbatas {program.kuota} kursi. Manfaatkan kemudahan pendaftaran online dari sistem kami.
                     </p>
                   </div>
                   <Link
@@ -556,52 +555,6 @@ export default function JurusanDetailPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* 2. ALUR PENDAFTARAN SPMB */}
-                <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-4 shadow-xs">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>Alur Pendaftaran</span>
-                  </h3>
-                  <div className="space-y-3 text-xs">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">
-                        1
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-900 dark:text-white">Registrasi Akun Siswa</div>
-                        <div className="text-slate-500 mt-0.5">Daftar dengan NISN & password baru</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">
-                        2
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-900 dark:text-white">Pilih Jurusan & Biodata</div>
-                        <div className="text-slate-500 mt-0.5">Pilih kompetensi keahlian favorit Anda</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">
-                        3
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-900 dark:text-white">Upload Dokumen Cerdas</div>
-                        <div className="text-slate-500 mt-0.5">Otomasi verifikasi ijazah & KK berbasis OCR</div>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 text-[11px]">
-                        4
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-900 dark:text-white">Pengumuman & Kelulusan</div>
-                        <div className="text-slate-500 mt-0.5">Cetak kartu ujian & bukti verifikasi resmi</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 {/* 3. BANTUAN & KONSULTASI JURUSAN */}
                 <div className="p-6 rounded-3xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 space-y-3">
                   <div className="flex items-center gap-2">
@@ -618,7 +571,7 @@ export default function JurusanDetailPage({ params }: PageProps) {
                     className="inline-flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
                   >
                     <Phone className="w-3.5 h-3.5" />
-                    <span>Hubungi Hotline SPMB (+62)</span>
+                    <span>Hubungi admin SPMB (+62)813 7765 3555</span>
                   </a>
                 </div>
               </div>

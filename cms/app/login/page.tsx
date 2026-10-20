@@ -83,6 +83,15 @@ export default function AdminLoginPage() {
             setIsDark(true);
             document.documentElement.classList.add('dark');
         }
+
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('expired') === '1') {
+                setErrorMsg('Sesi login Anda telah berakhir demi keamanan. Silakan masuk kembali.');
+            } else if (params.get('forbidden') === '1') {
+                setErrorMsg('Akses ditolak: Akun Anda tidak memiliki hak akses Administrator Panitia SPMB.');
+            }
+        }
     }, []);
 
     const toggleTheme = () => {

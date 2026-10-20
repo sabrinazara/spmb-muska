@@ -234,12 +234,12 @@ export default function JurusanListPage() {
                         <span className="text-[11px] font-mono text-slate-400">
                           Kuota: <strong>{p.kuota}</strong> Kursi
                         </span>
-                        {photos.length > 0 && (
+                        {/* {photos.length > 0 && (
                           <div className="flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
                             <ImageIcon className="w-3 h-3" />
                             <span>{photos.length} Foto Dokumentasi</span>
                           </div>
-                        )}
+                        )} */}
                       </div>
 
                       <Link
