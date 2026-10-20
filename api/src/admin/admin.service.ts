@@ -125,25 +125,61 @@ export class AdminService {
         const skip = (page - 1) * limit;
 
         const where: any = {};
+        const andConditions: any[] = [];
 
         if (params.search && params.search.trim() !== '') {
             const query = params.search.trim();
-            where.OR = [
-                { namaLengkap: { contains: query, mode: 'insensitive' } },
-                { nisn: { contains: query, mode: 'insensitive' } },
-                { nik: { contains: query, mode: 'insensitive' } },
-                { sekolahAsal: { contains: query, mode: 'insensitive' } },
-                { nomorPendaftaran: { contains: query, mode: 'insensitive' } },
-                { user: { email: { contains: query, mode: 'insensitive' } } },
-            ];
+            andConditions.push({
+                OR: [
+                    { namaLengkap: { contains: query, mode: 'insensitive' } },
+                    { nisn: { contains: query, mode: 'insensitive' } },
+                    { nik: { contains: query, mode: 'insensitive' } },
+                    { sekolahAsal: { contains: query, mode: 'insensitive' } },
+                    { nomorPendaftaran: { contains: query, mode: 'insensitive' } },
+                    { user: { email: { contains: query, mode: 'insensitive' } } },
+                ]
+            });
         }
 
         if (params.jurusan && params.jurusan !== 'ALL') {
-            where.jurusan = { contains: params.jurusan, mode: 'insensitive' };
+            const listJurusan = [
+                { nama: 'Teknik Jaringan Komputer dan Telekomunikasi', keywords: ['Jaringan', 'TKJ', 'Telekomunikasi'] },
+                { nama: 'Teknik Otomotif', keywords: ['Otomotif', 'Sepeda Motor', 'TBSM', 'TSM'] },
+                { nama: 'Desain Komunikasi Visual', keywords: ['Desain', 'DKV'] },
+                { nama: 'Bisnis Digital dan Kreatif', keywords: ['Bisnis Digital', 'BDK'] },
+                { nama: 'Kulineri', keywords: ['Kuliner', 'Kulineri', 'Boga'] },
+                { nama: 'Kecantikan dan Tata Rias', keywords: ['Kecantikan', 'Rias'] },
+                { nama: 'Teknik Pemesinan', keywords: ['Pemesinan', 'CNC'] },
+                { nama: 'Teknik Pengelasan', keywords: ['Pengelasan', 'Welding', 'Las'] },
+            ];
+
+            const matched = listJurusan.find(
+                (j) =>
+                    j.nama.toLowerCase().includes(params.jurusan!.toLowerCase()) ||
+                    params.jurusan!.toLowerCase().includes(j.nama.toLowerCase())
+            );
+
+            if (matched) {
+                andConditions.push({
+                    OR: matched.keywords.map((kw) => ({
+                        jurusan: { contains: kw, mode: 'insensitive' as const },
+                    }))
+                });
+            } else {
+                where.jurusan = { contains: params.jurusan, mode: 'insensitive' };
+            }
+        }
+
+        if (andConditions.length > 0) {
+            where.AND = andConditions;
         }
 
         if (params.status && params.status !== 'ALL') {
-            where.status = params.status;
+            const validStatus = ['PENDING', 'VALID', 'INVALID'];
+            const upper = params.status.toUpperCase();
+            if (validStatus.includes(upper)) {
+                where.status = upper;
+            }
         }
 
         if (params.statusPembayaran && params.statusPembayaran !== 'ALL') {

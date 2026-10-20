@@ -603,7 +603,7 @@ export default function HomePage() {
                             href={sliders[currentSlide].linkUrl || '/register'}
                             className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-xl hover:shadow-2xl transition flex items-center gap-2 cursor-pointer"
                           >
-                            <span>{sliders[currentSlide].ctaText || 'Daftar Sekarang Online'}</span>
+                            <span>{sliders[currentSlide].ctaText || 'Daftar SPMB'}</span>
                             <ArrowRight className="w-4 h-4" />
                           </Link>
                         </motion.div>
@@ -612,7 +612,7 @@ export default function HomePage() {
                             href="#sambutan"
                             className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs uppercase tracking-wider backdrop-blur-md transition cursor-pointer inline-block"
                           >
-                            Pelajari Profil
+                            Profil
                           </a>
                         </motion.div>
                       </motion.div>
@@ -1014,13 +1014,13 @@ export default function HomePage() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover/photo:opacity-40 transition-opacity" />
                         <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/60 backdrop-blur-md text-white border border-white/20 flex items-center gap-1 shadow-xs">
-                          <ImageIcon className="w-3 h-3 text-emerald-400" />
-                          <span>{p.fotoUrls.length} Foto</span>
+                          {/* <ImageIcon className="w-3 h-3 text-emerald-400" />
+                          <span>{p.fotoUrls.length} Foto</span> */}
                         </div>
                         <div className="absolute bottom-2 left-2 flex items-center gap-1.5">
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500 text-white shadow-xs">
+                          {/* <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500 text-white shadow-xs">
                             {p.singkatan}
-                          </span>
+                          </span> */}
                         </div>
                       </div>
                     ) : (
@@ -1078,12 +1078,12 @@ export default function HomePage() {
                   </div>
 
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-                    <span className="text-[11px] font-mono text-slate-400">
+                    {/* <span className="text-[11px] font-mono text-slate-400">
                       Kuota: <strong>{p.kuota}</strong>
-                    </span>
+                    </span> */}
 
                     <div className="flex items-center gap-2">
-                      {p.fotoUrls && p.fotoUrls.length > 0 && (
+                      {/* {p.fotoUrls && p.fotoUrls.length > 0 && (
                         <button
                           type="button"
                           onClick={() => setSelectedProgram(p)}
@@ -1093,12 +1093,12 @@ export default function HomePage() {
                           <ImageIcon className="w-3.5 h-3.5" />
                           <span>Galeri ({p.fotoUrls.length})</span>
                         </button>
-                      )}
+                      )} */}
                       <Link
                         href={`/jurusan/${p.id}`}
                         className="text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 hover:underline flex items-center gap-1 group/btn"
                       >
-                        <span>Profil</span>
+                        <span>Selengkapnya</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
@@ -1143,7 +1143,7 @@ export default function HomePage() {
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider">
             <Building2 className="w-3.5 h-3.5" />
-            <span>Kemitraan Industri & Link-and-Match</span>
+            <span>Kemitraan Industri</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-white">
             Bekerja Sama dengan Puluhan Industri Nasional
@@ -1195,7 +1195,7 @@ export default function HomePage() {
         <motion.div variants={fadeInUp} className="text-center max-w-2xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
             <Zap className="w-3.5 h-3.5" />
-            <span>Keunggulan Kompetitif</span>
+            <span>Keunggulan</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             Mengapa Memilih SMK Muhammadiyah Sekampung?
@@ -1639,11 +1639,10 @@ export default function HomePage() {
                               key={idx}
                               type="button"
                               onClick={() => setActivePhotoIdx(idx)}
-                              className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
-                                activePhotoIdx === idx
-                                  ? 'border-emerald-500 ring-2 ring-emerald-500/30 scale-105'
-                                  : 'border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100'
-                              }`}
+                              className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${activePhotoIdx === idx
+                                ? 'border-emerald-500 ring-2 ring-emerald-500/30 scale-105'
+                                : 'border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-100'
+                                }`}
                             >
                               <img
                                 src={getFullUrl(photo, '/logo.png')}

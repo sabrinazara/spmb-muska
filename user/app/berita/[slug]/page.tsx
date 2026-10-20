@@ -228,10 +228,10 @@ export default function BeritaDetailPage({ params }: PageProps) {
                       <span>{berita.kategori}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                  {/* <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
                     <Eye className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>Dilihat Ratusan Pembaca</span>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Konten Artikel Utama (News Content Data) */}
@@ -377,7 +377,7 @@ export default function BeritaDetailPage({ params }: PageProps) {
                 </div>
 
                 {/* WIDGET 2: PENGUMUMAN & PENDAFTARAN SPMB (ACCENT BORDER EMAS/HIJAU) */}
-                <div className="bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 border border-emerald-800/60 rounded-3xl p-6 text-white shadow-md space-y-4">
+                {/* <div className="bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 border border-emerald-800/60 rounded-3xl p-6 text-white shadow-md space-y-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold uppercase tracking-wider">
                     <Sparkles className="w-3 h-3 text-amber-400 fill-current" />
                     <span>SPMB TA 2026/2027</span>
@@ -407,7 +407,7 @@ export default function BeritaDetailPage({ params }: PageProps) {
                       <span>Login Akun Siswa</span>
                     </Link>
                   </div>
-                </div>
+                </div> */}
 
                 {/* WIDGET 3: HOTLINE & LAYANAN PENGADUAN */}
                 <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-xs space-y-3">

@@ -10,7 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET || 'rahasia-spmb-muska-2026', // Idealnya taruh di .env
-      signOptions: { expiresIn: '1d' }, // Token berlaku 1 hari
+      signOptions: { expiresIn: '7d' }, // Token berlaku 7 hari agar sesi panitia tidak cepat kedaluwarsa
     }),
   ],
   providers: [AuthService],
