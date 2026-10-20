@@ -19,6 +19,7 @@ import { API_ENDPOINTS } from '@/lib/api';
 import ChatbotRAG from '@/components/ChatbotRAG';
 import VisiMisiPanel from '@/components/VisiMisiPanel';
 import JurusanMarquee from '@/components/JurusanMarquee';
+import RegistrationClosedModal from '@/components/RegistrationClosedModal';
 
 function AnimatedBlitBackground({ isDark }: { isDark: boolean }) {
     return (
@@ -74,6 +75,8 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [isDark, setIsDark] = useState(false);
+    const [isClosed, setIsClosed] = useState(false);
+    const [tahunAjaran, setTahunAjaran] = useState('2026/2027');
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('user_theme');
@@ -84,6 +87,19 @@ export default function LoginPage() {
             setIsDark(false);
             document.documentElement.classList.remove('dark');
         }
+
+        // Cek status buka/tutup pendaftaran SPMB dari server
+        fetch(API_ENDPOINTS.PENDAFTARAN.PENGUMUMAN)
+            .then((res) => res.json())
+            .then((status) => {
+                if (status?.bukaPendaftaran === false) {
+                    setIsClosed(true);
+                }
+                if (status?.tahunAjaran) {
+                    setTahunAjaran(status.tahunAjaran);
+                }
+            })
+            .catch((err) => console.error('Gagal memuat status pendaftaran:', err));
     }, []);
 
     const toggleTheme = () => {
@@ -100,6 +116,9 @@ export default function LoginPage() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isClosed) {
+            return;
+        }
         setLoading(true);
         setErrorMsg('');
 
@@ -317,6 +336,16 @@ export default function LoginPage() {
 
             {/* Floating RAG Chatbot */}
             <ChatbotRAG />
+
+            {/* Modal Notifikasi Jika Pendaftaran/Login Ditutup Admin */}
+            <RegistrationClosedModal
+                isOpen={isClosed}
+                onClose={() => router.push('/')}
+                tahunAjaran={tahunAjaran}
+                forceRedirectHome={true}
+                customTitle="Akses Masuk Siswa Ditutup Sementara"
+                customDescription="Mohon maaf, layanan login dan akses akun pendaftar SPMB SMK Muhammadiyah Sekampung saat ini sedang ditutup sementara oleh pihak panitia. Silakan kembali ke halaman beranda."
+            />
         </div>
     );
 }

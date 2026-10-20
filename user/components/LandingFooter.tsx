@@ -32,11 +32,11 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
           {/* Col 1: Brand & Semboyan */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 p-1 flex items-center justify-center shrink-0 shadow-md">
+              <div className="w-12 h-12 flex items-center justify-center shrink-0">
                 <img
                   src="/logo.png"
                   alt="Logo SMK Muhammadiyah Sekampung"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain filter drop-shadow-sm"
                   onError={(e) => {
                     e.currentTarget.src = '/logo.svg';
                   }}

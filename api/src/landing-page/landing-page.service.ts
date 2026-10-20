@@ -13,7 +13,7 @@ export class LandingPageService {
         // Cek dan inisialisasi data bawaan sekolah jika belum ada
         await this.ensureInitialSeed();
 
-        const [sliders, profil, wks, guru, programKeahlian, mitraIndustri, berita] = await Promise.all([
+        const [sliders, profil, wks, guru, programKeahlian, mitraIndustri, berita, systemSettings] = await Promise.all([
             this.prisma.heroSlider.findMany({
                 where: { isActive: true },
                 orderBy: { urutan: 'asc' },
@@ -36,7 +36,20 @@ export class LandingPageService {
                 orderBy: { tanggalPublish: 'desc' },
                 take: 6,
             }),
+            this.prisma.systemSetting.findMany(),
         ]);
+
+        const settingsMap: Record<string, string> = {};
+        systemSettings.forEach((s) => {
+            settingsMap[s.key] = s.value;
+        });
+
+        const settings = {
+            tahunAjaran: settingsMap['tahunAjaran'] || '2026/2027',
+            bukaPendaftaran: settingsMap['bukaPendaftaran'] !== 'false',
+            pengumumanDibuka: settingsMap['pengumumanDibuka'] === 'true',
+            tanggalPengumuman: settingsMap['tanggalPengumuman'] || '2026-06-01T10:00:00',
+        };
 
         return {
             sliders,
@@ -46,6 +59,7 @@ export class LandingPageService {
             programKeahlian,
             mitraIndustri,
             berita,
+            settings,
         };
     }
 

@@ -337,14 +337,14 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                             className={`flex items-center gap-3 group min-w-0 ${isCollapsed ? 'lg:justify-center' : ''}`}
                             title="CMS MUSKA"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-emerald-700/80 p-1 flex items-center justify-center shrink-0 shadow-sm border border-emerald-600/30 overflow-hidden">
+                            <div className="w-11 h-11 flex items-center justify-center shrink-0">
                                 <img
                                     src="/logo.png"
                                     onError={(e) => {
                                         e.currentTarget.src = '/logo.svg';
                                     }}
                                     alt="Logo SMK Muhammadiyah Sekampung"
-                                    className="w-full h-full object-contain"
+                                    className="w-full h-full object-contain filter drop-shadow-sm"
                                 />
                             </div>
                             <div className={`min-w-0 transition-all duration-200 ${isCollapsed ? 'lg:hidden block' : 'block'}`}>
@@ -671,6 +671,8 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     );
 }
 
+import { ToastProvider } from '@/components/ToastProvider';
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     return (
         <Suspense
@@ -680,7 +682,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
             }
         >
-            <AdminLayoutInner>{children}</AdminLayoutInner>
+            <ToastProvider>
+                <AdminLayoutInner>{children}</AdminLayoutInner>
+            </ToastProvider>
         </Suspense>
     );
 }
+

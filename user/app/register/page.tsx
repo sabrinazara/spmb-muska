@@ -23,6 +23,7 @@ import { API_ENDPOINTS } from '@/lib/api';
 import ChatbotRAG from '@/components/ChatbotRAG';
 import VisiMisiPanel from '@/components/VisiMisiPanel';
 import JurusanMarquee from '@/components/JurusanMarquee';
+import RegistrationClosedModal from '@/components/RegistrationClosedModal';
 
 function AnimatedBlitBackground({ isDark }: { isDark: boolean }) {
     return (
@@ -85,6 +86,8 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [isDark, setIsDark] = useState(false);
+    const [isClosed, setIsClosed] = useState(false);
+    const [tahunAjaran, setTahunAjaran] = useState('2026/2027');
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('user_theme');
@@ -95,6 +98,19 @@ export default function RegisterPage() {
             setIsDark(false);
             document.documentElement.classList.remove('dark');
         }
+
+        // Cek status buka/tutup pendaftaran SPMB dari server
+        fetch(API_ENDPOINTS.PENDAFTARAN.PENGUMUMAN)
+            .then((res) => res.json())
+            .then((status) => {
+                if (status?.bukaPendaftaran === false) {
+                    setIsClosed(true);
+                }
+                if (status?.tahunAjaran) {
+                    setTahunAjaran(status.tahunAjaran);
+                }
+            })
+            .catch((err) => console.error('Gagal memuat status pendaftaran:', err));
     }, []);
 
     const toggleTheme = () => {
@@ -115,6 +131,9 @@ export default function RegisterPage() {
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isClosed) {
+            return;
+        }
         setLoading(true);
         setMessage(null);
 
@@ -438,6 +457,16 @@ export default function RegisterPage() {
 
             {/* Floating RAG Chatbot */}
             <ChatbotRAG />
+
+            {/* Modal Notifikasi Jika Pendaftaran Ditutup Admin */}
+            <RegistrationClosedModal
+                isOpen={isClosed}
+                onClose={() => router.push('/')}
+                tahunAjaran={tahunAjaran}
+                forceRedirectHome={true}
+                customTitle="Pendaftaran Siswa Baru Ditutup"
+                customDescription="Mohon maaf, saat ini akses pendaftaran akun baru SPMB SMK Muhammadiyah Sekampung sedang tidak dibuka atau telah berakhir oleh pihak panitia. Silakan kembali ke halaman beranda."
+            />
         </div>
     );
 }

@@ -32,6 +32,7 @@ const QUICK_QUESTIONS = [
 
 export default function ChatbotRAG() {
     const [isOpen, setIsOpen] = useState(false);
+    const [showHint, setShowHint] = useState(true);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
@@ -105,43 +106,66 @@ export default function ChatbotRAG() {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 font-sans">
-            {/* MINIMALIST COMPACT FLOATING LAUNCHER */}
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 font-sans">
+            {/* MINIMALIST FLOATING LAUNCHER WITH DISMISSIBLE "Tanya disini!" HINT */}
             {!isOpen && (
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-950 hover:bg-slate-900 text-white shadow-xl hover:shadow-2xl border border-emerald-500/30 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer group"
-                    aria-label="Buka Chat Asisten AI SPMB"
-                >
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 group-hover:bg-emerald-500 transition-colors">
-                        <Bot className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="text-xs font-semibold tracking-wide text-slate-100 group-hover:text-white">
-                        Tanya Asisten AI
-                    </span>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                </button>
+                <div className="flex items-center gap-2 animate-in fade-in duration-200">
+                    {/* HINT BADGE "Tanya disini!" DENGAN TOMBOL CLOSE */}
+                    {showHint && (
+                        <div
+                            onClick={() => setIsOpen(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-xs font-bold shadow-xl border border-emerald-500/40 hover:border-emerald-500 transition-all cursor-pointer animate-in fade-in slide-in-from-right-3 duration-300 group select-none"
+                            title="Klik untuk membuka chat"
+                        >
+                            {/* <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 animate-pulse" /> */}
+                            <span className="group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                Tanya disini!
+                            </span>
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowHint(false);
+                                }}
+                                title="Tutup tulisan ini"
+                                className="p-0.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ml-0.5"
+                                aria-label="Tutup tulisan tanya disini"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* LAUNCHER BUTTON */}
+                    <button
+                        onClick={() => setIsOpen(true)}
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-full bg-slate-950 dark:bg-slate-900 hover:bg-slate-900 dark:hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl border border-emerald-500/40 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer group"
+                        aria-label="Buka Chat Asisten AI SPMB"
+                        title="Buka Chat Asisten AI SPMB"
+                    >
+                        <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 group-hover:bg-emerald-500 transition-colors shadow-xs">
+                            <Bot className="w-3.5 h-3.5" />
+                        </div>
+                    </button>
+                </div>
             )}
 
-            {/* EXPANDED MINIMALIST & PROFESSIONAL CHAT CARD */}
+            {/* EXPANDED MINIMALIST & SLEEK CHAT CARD */}
             {isOpen && (
-                <div className="w-[92vw] sm:w-[380px] h-[520px] max-h-[82vh] bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-[calc(100vw-32px)] sm:w-[360px] max-w-[360px] h-[480px] max-h-[80vh] bg-white dark:bg-slate-950 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     {/* MINIMALIST HEADER */}
                     <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 shrink-0">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-xl bg-emerald-600/90 flex items-center justify-center text-white shrink-0">
+                            <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
                                 <Bot className="w-4 h-4" />
                             </div>
                             <div>
                                 <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                                    <span>Asisten SPMB MUSKA</span>
-                                    <span className="text-[10px] font-medium text-emerald-400 bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-800/60">
-                                        AI
-                                    </span>
+                                    <span>MUSKA AI</span>
                                 </div>
                                 <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
-                                    <span>Siap Menjawab 24 Jam</span>
+                                    {/* <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span> */}
+                                    <span>Mau nanya apa?</span>
                                 </div>
                             </div>
                         </div>
@@ -180,18 +204,17 @@ export default function ChatbotRAG() {
                     </div>
 
                     {/* MESSAGE HISTORY */}
-                    <div className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-slate-50/40 dark:bg-slate-950/40">
+                    <div className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-slate-50/40 dark:bg-slate-950/40 scrollbar-thin">
                         {messages.map((msg) => (
                             <div
                                 key={msg.id}
                                 className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                             >
                                 <div
-                                    className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed shadow-2xs whitespace-pre-wrap ${
-                                        msg.sender === 'user'
-                                            ? 'bg-emerald-600 text-white rounded-br-2xs'
+                                    className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed shadow-2xs whitespace-pre-wrap ${msg.sender === 'user'
+                                            ? 'bg-emerald-600 text-white rounded-br-2xs font-medium'
                                             : 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 rounded-bl-2xs'
-                                    }`}
+                                        }`}
                                 >
                                     {msg.text}
                                 </div>

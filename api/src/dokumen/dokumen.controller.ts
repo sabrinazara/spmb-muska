@@ -18,8 +18,11 @@ export class DokumenController {
 
     @Post('scan-preview')
     @UseInterceptors(FileInterceptor('file'))
-    async scanPreview(@UploadedFile() file: Express.Multer.File) {
-        return this.dokumenService.scanPreview(file);
+    async scanPreview(
+        @UploadedFile() file: Express.Multer.File,
+        @Body('studentNik') studentNik?: string,
+    ) {
+        return this.dokumenService.scanPreview(file, studentNik);
     }
 
     @Post('upload')
@@ -32,6 +35,7 @@ export class DokumenController {
         @Body('confirmedNik') confirmedNik?: string,
         @Body('confirmedText') confirmedText?: string,
         @Body('confirmedParsedData') confirmedParsedData?: string,
+        @Body('parsedData') parsedData?: string,
     ) {
         const idToUse = bodyPendaftaranId || req.user.sub;
         return this.dokumenService.prosesUploadDokumen(
@@ -40,7 +44,7 @@ export class DokumenController {
             jenisDokumen || 'KTP',
             confirmedNik,
             confirmedText,
-            confirmedParsedData,
+            confirmedParsedData || parsedData,
         );
     }
 }

@@ -182,7 +182,7 @@ export default function GisMapPicker({ latitude, longitude, onChange }: GisMapPi
                 <div>
                     <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
                         <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Titik Koordinat Rumah (Peta GIS)</span>
+                        <span>Titik Koordinat Rumah</span>
                     </label>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                         Klik pada peta atau geser pin merah-hijau untuk menandai lokasi tempat tinggal Anda

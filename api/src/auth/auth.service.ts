@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -20,6 +20,12 @@ export class AuthService {
         jurusan?: string;
         jurusanPilihan?: string;
     }) {
+        // Cek apakah pendaftaran sedang dibuka oleh admin
+        const settingBuka = await this.prisma.systemSetting.findUnique({ where: { key: 'bukaPendaftaran' } });
+        if (settingBuka && settingBuka.value === 'false') {
+            throw new BadRequestException('Pendaftaran SPMB saat ini sedang ditutup sementara oleh pihak panitia.');
+        }
+
         const email = data.email?.trim().toLowerCase();
         const nama = (data.nama || data.namaLengkap || '').trim();
         const password = data.password;
@@ -113,6 +119,14 @@ export class AuthService {
         const isPasswordValid = await bcrypt.compare(pass, user.password);
         if (!isPasswordValid) {
             throw new UnauthorizedException('Kredensial tidak valid');
+        }
+
+        // Cek status pendaftaran jika login sebagai siswa / pendaftar
+        if (user.role === 'USER') {
+            const settingBuka = await this.prisma.systemSetting.findUnique({ where: { key: 'bukaPendaftaran' } });
+            if (settingBuka && settingBuka.value === 'false') {
+                throw new BadRequestException('Akses masuk akun siswa SPMB sedang ditutup sementara oleh pihak panitia.');
+            }
         }
 
         // Buat JWT Token

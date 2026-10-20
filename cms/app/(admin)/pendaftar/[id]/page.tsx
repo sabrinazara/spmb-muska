@@ -24,6 +24,7 @@ import {
     Sparkles,
 } from 'lucide-react';
 import { API_ENDPOINTS, API_BASE_URL, getAuthHeaders } from '@/lib/api';
+import { cmsToast } from '@/components/ToastProvider';
 
 const GisMapViewer = dynamic(() => import('@/components/GisMapViewer'), {
     ssr: false,
@@ -209,10 +210,12 @@ function DetailPendaftarContent({ id }: { id: string }) {
             if (!res.ok) throw new Error(resData.message || 'Gagal memverifikasi dokumen');
 
             setActionMsg({ type: 'success', text: `Status berkas berhasil diubah menjadi ${targetStatus}` });
+            cmsToast.change(`Status verifikasi berkas berhasil diubah menjadi ${targetStatus}.`, 'Perubahan Status Berkas');
             setStatusVerifikasi(targetStatus);
             fetchDetail();
         } catch (err: any) {
             setActionMsg({ type: 'error', text: err.message || 'Terjadi kesalahan sistem' });
+            cmsToast.error(err.message || 'Terjadi kesalahan sistem saat verifikasi berkas.', 'Gagal Verifikasi');
         } finally {
             setSavingVerifikasi(false);
         }
@@ -241,9 +244,11 @@ function DetailPendaftarContent({ id }: { id: string }) {
             if (!res.ok) throw new Error(resData.message || 'Gagal menyimpan nilai & ruang ujian');
 
             setActionMsg({ type: 'success', text: 'Ruang ujian, jadwal, nilai, dan status kelulusan berhasil diperbarui.' });
+            cmsToast.update('Ruang ujian, jadwal, nilai CBT, dan status kelulusan siswa berhasil disimpan.', 'Pembaruan Data Ujian');
             fetchDetail();
         } catch (err: any) {
             setActionMsg({ type: 'error', text: err.message || 'Gagal menyimpan nilai' });
+            cmsToast.error(err.message || 'Gagal menyimpan data nilai dan kelulusan.', 'Gagal Menyimpan');
         } finally {
             setSavingNilai(false);
         }

@@ -15,6 +15,7 @@ import {
     Sparkles,
 } from 'lucide-react';
 import { API_ENDPOINTS, API_BASE_URL, getAuthHeaders, getAuthToken } from '@/lib/api';
+import { cmsToast, useToast } from '@/components/ToastProvider';
 
 interface KBItem {
     id: string;
@@ -27,6 +28,7 @@ interface KBItem {
 }
 
 export default function KnowledgeBaseManagementPage() {
+    const { confirmAction } = useToast();
     const [items, setItems] = useState<KBItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
@@ -98,35 +100,47 @@ export default function KnowledgeBaseManagementPage() {
             if (!res.ok) throw new Error(data.message || 'Gagal mengunggah dokumen');
 
             setAlert({ type: 'success', text: 'Dokumen berhasil diunggah dan disinkronkan ke Vector Store AI RAG' });
+            cmsToast.update(`Dokumen "${judul.trim()}" berhasil diunggah dan diindeks ke AI Vector Store.`, 'Pembaruan Dokumen AI');
             setJudul('');
             setDeskripsi('');
             setSelectedFile(null);
             fetchKB();
         } catch (err: any) {
             setAlert({ type: 'error', text: err.message || 'Terjadi kesalahan sistem' });
+            cmsToast.error(err.message || 'Gagal mengunggah dokumen.', 'Gagal Unggah');
         } finally {
             setUploading(false);
         }
     };
 
     const handleDelete = async (id: string, judulDoc: string) => {
-        if (!confirm(`Hapus dokumen "${judulDoc}" dari basis pengetahuan RAG?`)) return;
-
-        try {
-            const res = await fetch(`${API_ENDPOINTS.ADMIN.KNOWLEDGE_BASE}/${id}`, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setAlert({ type: 'success', text: 'Dokumen berhasil dihapus' });
-                fetchKB();
-            } else {
-                setAlert({ type: 'error', text: data.message || 'Gagal menghapus dokumen' });
-            }
-        } catch {
-            setAlert({ type: 'error', text: 'Gagal menghubungi server' });
-        }
+        confirmAction({
+            title: 'Hapus Dokumen Knowledge Base',
+            message: `Apakah Anda yakin ingin menghapus dokumen "${judulDoc}"? Dokumen ini akan dihilangkan dari basis data AI RAG.`,
+            type: 'danger',
+            confirmLabel: 'Ya, Hapus Dokumen',
+            cancelLabel: 'Batal',
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(`${API_ENDPOINTS.ADMIN.KNOWLEDGE_BASE}/${id}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders(),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        setAlert({ type: 'success', text: 'Dokumen berhasil dihapus' });
+                        cmsToast.delete(`Dokumen "${judulDoc}" berhasil dihapus dari sistem.`, 'Penghapusan Data Berhasil');
+                        fetchKB();
+                    } else {
+                        setAlert({ type: 'error', text: data.message || 'Gagal menghapus dokumen' });
+                        cmsToast.error(data.message || 'Gagal menghapus dokumen.', 'Gagal Menghapus');
+                    }
+                } catch {
+                    setAlert({ type: 'error', text: 'Gagal menghubungi server' });
+                    cmsToast.error('Gagal menghubungi server.', 'Kesalahan Server');
+                }
+            },
+        });
     };
 
     const getFullUrl = (url: string) => {

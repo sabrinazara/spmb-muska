@@ -13,6 +13,7 @@ import {
     X,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
+import { cmsToast, useToast } from '@/components/ToastProvider';
 
 interface AuditLogItem {
     id: string;
@@ -25,6 +26,7 @@ interface AuditLogItem {
 }
 
 export default function AuditTrailPage() {
+    const { confirmAction } = useToast();
     const [logs, setLogs] = useState<AuditLogItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionMsg, setActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -51,41 +53,63 @@ export default function AuditTrailPage() {
     }, []);
 
     const handleDeleteLog = async (id: string) => {
-        if (!confirm('Apakah Anda yakin ingin menghapus catatan audit ini?')) return;
-        try {
-            const res = await fetch(`${API_ENDPOINTS.ADMIN.AUDIT_LOGS}/${id}`, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-            });
-            const result = await res.json();
-            if (res.ok) {
-                setActionMsg({ type: 'success', text: result.message || 'Catatan audit berhasil dihapus.' });
-                fetchLogs();
-            } else {
-                setActionMsg({ type: 'error', text: result.message || 'Gagal menghapus catatan audit.' });
-            }
-        } catch {
-            setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
-        }
+        confirmAction({
+            title: 'Hapus Catatan Audit',
+            message: 'Apakah Anda yakin ingin menghapus catatan riwayat aktivitas audit ini?',
+            type: 'danger',
+            confirmLabel: 'Ya, Hapus',
+            cancelLabel: 'Batal',
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(`${API_ENDPOINTS.ADMIN.AUDIT_LOGS}/${id}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders(),
+                    });
+                    const result = await res.json();
+                    if (res.ok) {
+                        setActionMsg({ type: 'success', text: result.message || 'Catatan audit berhasil dihapus.' });
+                        cmsToast.delete('Catatan audit berhasil dihapus.', 'Penghapusan Log Berhasil');
+                        fetchLogs();
+                    } else {
+                        setActionMsg({ type: 'error', text: result.message || 'Gagal menghapus catatan audit.' });
+                        cmsToast.error(result.message || 'Gagal menghapus catatan audit.', 'Gagal Menghapus');
+                    }
+                } catch {
+                    setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
+                    cmsToast.error('Gagal menghubungi server backend.', 'Kesalahan Server');
+                }
+            },
+        });
     };
 
     const handleClearAllLogs = async () => {
-        if (!confirm('PERINGATAN: Apakah Anda yakin ingin membersihkan SELURUH riwayat audit log? Tindakan ini tidak dapat dikembalikan.')) return;
-        try {
-            const res = await fetch(API_ENDPOINTS.ADMIN.AUDIT_LOGS, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-            });
-            const result = await res.json();
-            if (res.ok) {
-                setActionMsg({ type: 'success', text: result.message || 'Seluruh riwayat audit log berhasil dibersihkan.' });
-                fetchLogs();
-            } else {
-                setActionMsg({ type: 'error', text: result.message || 'Gagal membersihkan audit log.' });
-            }
-        } catch {
-            setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
-        }
+        confirmAction({
+            title: 'Bersihkan Seluruh Riwayat Audit Trail',
+            message: 'PERINGATAN: Apakah Anda yakin ingin membersihkan SELURUH riwayat aktivitas audit log? Tindakan ini permanen dan tidak dapat dikembalikan.',
+            type: 'danger',
+            confirmLabel: 'Ya, Bersihkan Seluruh Log',
+            cancelLabel: 'Batal',
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(API_ENDPOINTS.ADMIN.AUDIT_LOGS, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders(),
+                    });
+                    const result = await res.json();
+                    if (res.ok) {
+                        setActionMsg({ type: 'success', text: result.message || 'Seluruh riwayat audit log berhasil dibersihkan.' });
+                        cmsToast.delete('Seluruh riwayat audit trail berhasil dibersihkan.', 'Pembersihan Riwayat Selesai');
+                        fetchLogs();
+                    } else {
+                        setActionMsg({ type: 'error', text: result.message || 'Gagal membersihkan audit log.' });
+                        cmsToast.error(result.message || 'Gagal membersihkan audit log.', 'Gagal Membersihkan');
+                    }
+                } catch {
+                    setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
+                    cmsToast.error('Gagal menghubungi server backend.', 'Kesalahan Server');
+                }
+            },
+        });
     };
 
     const getActionBadge = (aksi: string) => {

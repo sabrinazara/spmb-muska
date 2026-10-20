@@ -32,9 +32,12 @@ import {
   Quote,
   GraduationCap,
   Image as ImageIcon,
+  Home,
 } from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
 import ChatbotRAG from '@/components/ChatbotRAG';
+import RegistrationClosedModal from '@/components/RegistrationClosedModal';
+import LandingHeader from '@/components/LandingHeader';
 
 interface LandingData {
   sliders: any[];
@@ -44,6 +47,12 @@ interface LandingData {
   programKeahlian: any[];
   mitraIndustri: any[];
   berita: any[];
+  settings?: {
+    tahunAjaran?: string;
+    bukaPendaftaran?: boolean;
+    pengumumanDibuka?: boolean;
+    tanggalPengumuman?: string;
+  };
 }
 
 // ========================================================
@@ -122,6 +131,15 @@ const modalContentVariant: Variants = {
 export default function HomePage() {
   const [data, setData] = useState<LandingData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isClosedModalOpen, setIsClosedModalOpen] = useState(false);
+
+  // Helper untuk membuka popup jika pendaftaran sedang ditutup oleh admin
+  const handleAuthClick = (e: React.MouseEvent, targetUrl?: string) => {
+    if (data?.settings && data.settings.bukaPendaftaran === false) {
+      e.preventDefault();
+      setIsClosedModalOpen(true);
+    }
+  };
 
   // Format display URL: if starts with /uploads/, prepend NEXT_PUBLIC_API_URL
   const getFullUrl = (url: string | null | undefined, fallback: string = '/logo.png') => {
@@ -152,55 +170,20 @@ export default function HomePage() {
     setActivePhotoIdx(0);
   }, [selectedProgram]);
 
-  // Scroll to Top state
+  // Scroll state (Back-to-Top button)
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   // WKS & Dewan Guru Expand / Minimize State (Tombol Selengkapnya)
   const [showAllWks, setShowAllWks] = useState(false);
   const [showAllGuru, setShowAllGuru] = useState(false);
 
-  // Typewriter State for Header Brand Title
-  const [typedBrand, setTypedBrand] = useState('');
-  const fullBrandText = 'SMK MUHAMMADIYAH SEKAMPUNG';
-  const [isDeletingBrand, setIsDeletingBrand] = useState(false);
-  const [brandSpeed, setBrandSpeed] = useState(110);
-
-  // Typewriter Effect Loop
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (!isDeletingBrand && typedBrand.length < fullBrandText.length) {
-      timer = setTimeout(() => {
-        setTypedBrand(fullBrandText.slice(0, typedBrand.length + 1));
-      }, brandSpeed);
-    } else if (!isDeletingBrand && typedBrand.length === fullBrandText.length) {
-      timer = setTimeout(() => {
-        setIsDeletingBrand(true);
-        setBrandSpeed(50);
-      }, 2200);
-    } else if (isDeletingBrand && typedBrand.length > 0) {
-      timer = setTimeout(() => {
-        setTypedBrand(fullBrandText.slice(0, typedBrand.length - 1));
-      }, brandSpeed);
-    } else if (isDeletingBrand && typedBrand.length === 0) {
-      timer = setTimeout(() => {
-        setIsDeletingBrand(false);
-        setBrandSpeed(110);
-      }, 500);
-    }
-
-    return () => clearTimeout(timer);
-  }, [typedBrand, isDeletingBrand, brandSpeed]);
-
   // Track Window Scroll for Back-To-Top Button
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 350) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
+      const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      setShowScrollTop(scrollY > 350);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -224,6 +207,10 @@ export default function HomePage() {
       .then((res) => res.json())
       .then((result) => {
         setData(result);
+        // Jika status pendaftaran ditutup oleh admin, tampilkan popup pemberitahuan otomatis saat refresh/buka
+        if (result?.settings && result.settings.bukaPendaftaran === false) {
+          setIsClosedModalOpen(true);
+        }
       })
       .catch((err) => console.error('Gagal mengambil data landing page:', err))
       .finally(() => setLoading(false));
@@ -314,227 +301,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
       {/* ========================================================
-                1. TOP INFO BAR
+                FIXED FLOATING HEADER
             ======================================================== */}
-      <div className="bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 py-1.5 px-4 sm:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          {/* Left: Contact Info */}
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
-            <div className="flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>JL. RAYA SEKAMPUNG, Kec. Sekampung, Kab. Lampung Timur, Prov. Lampung.</span>
-            </div>
-            <a
-              href="mailto:smkmuhsekampung@gmail.com"
-              className="hidden md:flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>smkmuhsekampung@gmail.com</span>
-            </a>
-            <a
-              href="tel:081377653555"
-              className="hidden lg:flex items-center gap-1.5 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>081377653555</span>
-            </a>
-          </div>
-
-          {/* Right: Quick Links & Theme Toggle */}
-          <div className="flex items-center gap-3">
-            <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-              NPSN: 10814962 • Akreditasi A
-            </span>
-            <div className="h-3 w-px bg-slate-300 dark:bg-slate-700" />
-            <motion.button
-              whileTap={{ scale: 0.85, rotate: 180 }}
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-              onClick={toggleTheme}
-              className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition cursor-pointer"
-              title={isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
-            >
-              {isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5" />}
-            </motion.button>
-          </div>
-        </div>
-      </div>
-
-      {/* ========================================================
-                2. MAIN NAVBAR (STICKY)
-            ======================================================== */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between gap-4">
-          {/* Brand Logo & Name With Typewriter Effect */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <motion.div
-              whileHover={{ scale: 1.08, rotate: [0, -3, 3, 0] }}
-              transition={{ duration: 0.3 }}
-              className="w-12 h-12 rounded-2xl bg-emerald-700 p-1.5 flex items-center justify-center shrink-0 shadow-md"
-            >
-              <img
-                src="/logo.png"
-                onError={(e) => {
-                  e.currentTarget.src = '/logo.svg';
-                }}
-                alt="Logo SMK Muhammadiyah Sekampung"
-                className="w-full h-full object-contain"
-              />
-            </motion.div>
-            <div>
-              <div className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 dark:text-white uppercase leading-tight min-h-[22px] flex items-center">
-                <span>{typedBrand || ' '}</span>
-                <span className="inline-block w-0.5 h-4 sm:h-5 bg-amber-500 ml-1 animate-pulse" />
-              </div>
-              <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 tracking-wide">
-                Pusat Keunggulan Vokasi
-              </div>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-5 text-xs font-bold text-slate-700 dark:text-slate-300">
-            <motion.a whileHover={{ y: -2 }} href="#beranda" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Beranda
-            </motion.a>
-            <motion.a whileHover={{ y: -2 }} href="#sambutan" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Sambutan
-            </motion.a>
-            <motion.a whileHover={{ y: -2 }} href="#wks" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Pimpinan
-            </motion.a>
-            <motion.a whileHover={{ y: -2 }} href="#guru" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Dewan Guru
-            </motion.a>
-            <motion.a whileHover={{ y: -2 }} href="#jurusan" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Program Keahlian
-            </motion.a>
-            <motion.a whileHover={{ y: -2 }} href="#mitra" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Mitra DUDI
-            </motion.a>
-            <Link href="/berita" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Berita
-            </Link>
-            <motion.a whileHover={{ y: -2 }} href="#kontak" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              Kontak
-            </motion.a>
-          </nav>
-
-          {/* CTA Buttons */}
-          <div className="hidden sm:flex items-center gap-3">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/login"
-                className="px-4 py-2 rounded-xl border border-emerald-600/30 hover:border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold text-xs transition inline-block"
-              >
-                Masuk
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/register"
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>Daftar</span>
-              </Link>
-            </motion.div>
-          </div>
-
-          {/* Mobile Menu Hamburger */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-            aria-label="Toggle Navigation Menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </motion.button>
-        </div>
-
-        {/* Mobile Drawer with AnimatePresence */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="lg:hidden bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 space-y-3 text-xs font-semibold"
-            >
-              <a
-                href="#beranda"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Beranda
-              </a>
-              <a
-                href="#sambutan"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Sambutan Kepala Sekolah
-              </a>
-              <a
-                href="#wks"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Pimpinan Wakil Kepala Sekolah
-              </a>
-              <a
-                href="#guru"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Dewan Guru & Tenaga Pendidik
-              </a>
-              <a
-                href="#jurusan"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Program Keahlian (8 Jurusan)
-              </a>
-              <a
-                href="#mitra"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Mitra Industri & DUDI
-              </a>
-              <Link
-                href="/berita"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Berita & Pengumuman
-              </Link>
-              <a
-                href="#kontak"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 text-slate-700 dark:text-slate-300 hover:text-emerald-600"
-              >
-                Kontak & Lokasi
-              </a>
-              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex gap-2">
-                <Link
-                  href="/login"
-                  className="flex-1 py-2.5 text-center rounded-xl border border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold"
-                >
-                  Masuk Akun
-                </Link>
-                <Link
-                  href="/register"
-                  className="flex-1 py-2.5 text-center rounded-xl bg-emerald-700 text-white font-bold"
-                >
-                  Daftar SPMB
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
+      <LandingHeader
+        activeMenu="beranda"
+        isHome={true}
+        bukaPendaftaran={data?.settings?.bukaPendaftaran}
+        tahunAjaran={data?.settings?.tahunAjaran || '2026/2027'}
+      />
 
       {/* ========================================================
                 3. HERO SECTION (SLIDER CAROUSEL DENGAN FRAMER MOTION)
@@ -575,7 +349,7 @@ export default function HomePage() {
                     >
                       <motion.div variants={fadeInUp}>
                         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-600/30 border border-emerald-400/40 text-emerald-300 text-xs font-extrabold uppercase tracking-widest backdrop-blur-xs shadow-lg">
-                          <span>{sliders[currentSlide].badgeText || 'Penerimaan Siswa Baru TA 2026/2027'}</span>
+                          <span>{sliders[currentSlide].badgeText || `Penerimaan Siswa Baru TA ${data?.settings?.tahunAjaran || '2026/2027'}`}</span>
                         </div>
                       </motion.div>
 
@@ -601,6 +375,12 @@ export default function HomePage() {
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                           <Link
                             href={sliders[currentSlide].linkUrl || '/register'}
+                            onClick={(e) => {
+                              const target = sliders[currentSlide].linkUrl || '/register';
+                              if (target.includes('register') || target.includes('login') || target.startsWith('/')) {
+                                handleAuthClick(e, target);
+                              }
+                            }}
                             className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-xl hover:shadow-2xl transition flex items-center gap-2 cursor-pointer"
                           >
                             <span>{sliders[currentSlide].ctaText || 'Daftar SPMB'}</span>
@@ -1380,11 +1160,11 @@ export default function HomePage() {
             {/* Col 1: Brand & Semboyan */}
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 p-1 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 flex items-center justify-center shrink-0">
                   <img
                     src="/logo.png"
                     alt="Logo"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain filter drop-shadow-sm"
                     onError={(e) => {
                       e.currentTarget.src = '/logo.svg';
                     }}
@@ -1409,12 +1189,20 @@ export default function HomePage() {
               </h4>
               <ul className="space-y-2 text-xs text-slate-400">
                 <li>
-                  <Link href="/register" className="hover:text-emerald-400 transition-colors">
+                  <Link
+                    href="/register"
+                    onClick={(e) => handleAuthClick(e, '/register')}
+                    className="hover:text-emerald-400 transition-colors"
+                  >
                     Pendaftaran SPMB Online
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-emerald-400 transition-colors">
+                  <Link
+                    href="/login"
+                    onClick={(e) => handleAuthClick(e, '/login')}
+                    className="hover:text-emerald-400 transition-colors"
+                  >
                     Login Akun Siswa
                   </Link>
                 </li>
@@ -1500,7 +1288,7 @@ export default function HomePage() {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.9 }}
             onClick={scrollToTop}
-            className="fixed bottom-24 right-6 z-40 p-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white shadow-xl cursor-pointer flex items-center justify-center border border-white/20"
+            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 p-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white shadow-xl cursor-pointer flex items-center justify-center border border-white/20"
             title="Kembali ke Atas"
           >
             <ChevronRight className="w-5 h-5 -rotate-90" />
@@ -1764,6 +1552,14 @@ export default function HomePage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Modal Notifikasi Pendaftaran Ditutup Sementara */}
+      <RegistrationClosedModal
+        isOpen={isClosedModalOpen}
+        onClose={() => setIsClosedModalOpen(false)}
+        tahunAjaran={data?.settings?.tahunAjaran || '2026/2027'}
+        forceRedirectHome={false}
+      />
     </div>
   );
 }

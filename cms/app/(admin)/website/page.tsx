@@ -27,10 +27,12 @@ import {
 import { API_BASE_URL, API_ENDPOINTS, USER_URL, getAuthHeaders } from '@/lib/api';
 import ImageUploader from '@/components/ImageUploader';
 import MultiImageUploader from '@/components/MultiImageUploader';
+import { cmsToast, useToast } from '@/components/ToastProvider';
 
 type TabKey = 'slider' | 'profil' | 'wks' | 'guru' | 'berita' | 'mitra';
 
 export default function WebsiteManagerPage() {
+    const { confirmAction } = useToast();
     const [activeTab, setActiveTab] = useState<TabKey>('slider');
     const [loading, setLoading] = useState(true);
     const [alertMsg, setAlertMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -96,33 +98,47 @@ export default function WebsiteManagerPage() {
             });
             if (res.ok) {
                 setAlertMsg({ type: 'success', text: 'Profil sekolah dan sambutan kepala sekolah berhasil diperbarui!' });
+                cmsToast.update('Profil sekolah dan sambutan kepala sekolah berhasil disimpan ke landing page.', 'Pembaruan Profil Sekolah');
             } else {
                 setAlertMsg({ type: 'error', text: 'Gagal memperbarui profil sekolah' });
+                cmsToast.error('Gagal memperbarui profil sekolah.', 'Gagal Menyimpan');
             }
         } catch {
             setAlertMsg({ type: 'error', text: 'Terjadi kesalahan jaringan' });
+            cmsToast.error('Terjadi kesalahan jaringan saat menyimpan profil.', 'Kesalahan Jaringan');
         } finally {
             setSaving(false);
         }
     };
 
-    // Generic Delete
+    // Generic Delete with Animated Confirm and Toast
     const handleDeleteItem = async (url: string, successMsg: string) => {
-        if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
-        try {
-            const res = await fetch(url, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-            });
-            if (res.ok) {
-                setAlertMsg({ type: 'success', text: successMsg });
-                loadAllData();
-            } else {
-                setAlertMsg({ type: 'error', text: 'Gagal menghapus data' });
-            }
-        } catch {
-            setAlertMsg({ type: 'error', text: 'Terjadi kesalahan jaringan' });
-        }
+        confirmAction({
+            title: 'Hapus Konten Website',
+            message: 'Apakah Anda yakin ingin menghapus data konten ini? Tindakan ini tidak dapat dibatalkan.',
+            type: 'danger',
+            confirmLabel: 'Ya, Hapus Data',
+            cancelLabel: 'Batal',
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(url, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders(),
+                    });
+                    if (res.ok) {
+                        setAlertMsg({ type: 'success', text: successMsg });
+                        cmsToast.delete(successMsg || 'Data konten berhasil dihapus dari landing page.', 'Penghapusan Data Berhasil');
+                        loadAllData();
+                    } else {
+                        setAlertMsg({ type: 'error', text: 'Gagal menghapus data' });
+                        cmsToast.error('Gagal menghapus data dari server.', 'Gagal Menghapus');
+                    }
+                } catch {
+                    setAlertMsg({ type: 'error', text: 'Terjadi kesalahan jaringan' });
+                    cmsToast.error('Terjadi kesalahan jaringan.', 'Kesalahan Jaringan');
+                }
+            },
+        });
     };
 
     // Generic Submit for Slider, WKS, Berita, Mitra, Program
@@ -155,15 +171,23 @@ export default function WebsiteManagerPage() {
                 body: JSON.stringify(formData),
             });
             if (res.ok) {
+                const isEdit = !!formData.id;
                 setAlertMsg({ type: 'success', text: 'Data berhasil disimpan!' });
+                if (isEdit) {
+                    cmsToast.change('Data konten website berhasil diperbarui.', 'Perubahan Data Disimpan');
+                } else {
+                    cmsToast.update('Data konten baru berhasil ditambahkan ke landing page.', 'Pembaruan Data Berhasil');
+                }
                 setModalType(null);
                 loadAllData();
             } else {
                 const err = await res.json();
                 setAlertMsg({ type: 'error', text: err.message || 'Gagal menyimpan data' });
+                cmsToast.error(err.message || 'Gagal menyimpan data.', 'Gagal Menyimpan');
             }
         } catch {
             setAlertMsg({ type: 'error', text: 'Terjadi kesalahan jaringan' });
+            cmsToast.error('Terjadi kesalahan jaringan.', 'Kesalahan Jaringan');
         } finally {
             setSaving(false);
         }

@@ -96,21 +96,9 @@ export default function UploadDokumenPage() {
         }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const selected = e.target.files[0];
-            setFile(selected);
-            setPreviewUrl(URL.createObjectURL(selected));
-            setOcrScanned(false);
-            setExtractedText('');
-            setConfirmedNik('');
-            setParsedFields({});
-            setAlert(null);
-        }
-    };
-
-    const handleRunOcr = async () => {
-        if (!file) {
+    const executeOcrScan = async (targetFile?: File | null) => {
+        const fileToScan = targetFile || file;
+        if (!fileToScan) {
             setAlert({ type: 'error', text: 'Pilih file gambar dokumen terlebih dahulu.' });
             return;
         }
@@ -120,7 +108,10 @@ export default function UploadDokumenPage() {
 
         const token = localStorage.getItem('access_token');
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', fileToScan);
+        if (studentNik) {
+            formData.append('studentNik', studentNik);
+        }
 
         try {
             const res = await fetch(API_ENDPOINTS.DOKUMEN.SCAN_PREVIEW, {
@@ -135,12 +126,28 @@ export default function UploadDokumenPage() {
 
             if (res.ok) {
                 const rawText = result.text || '';
-                const detectedNik = result.detectedNik || studentNik || '';
-                const parsed: ParsedOcrData = result.parsed || {};
+                const rawParsed = result.parsed || result.parsedData || {};
+                const detectedNik = result.detectedNik || rawParsed.nik || studentNik || '';
+
+                const normalizedFields: ParsedOcrData = {
+                    nik: detectedNik,
+                    nama: rawParsed.nama && rawParsed.nama !== '-' ? rawParsed.nama : '',
+                    tempat_tanggal_lahir: rawParsed.tempat_tanggal_lahir && rawParsed.tempat_tanggal_lahir !== '-'
+                        ? rawParsed.tempat_tanggal_lahir
+                        : [rawParsed.tempat_lahir, rawParsed.tanggal_lahir].filter((v: any) => v && v !== '-').join(', '),
+                    jenis_kelamin: rawParsed.jenis_kelamin && rawParsed.jenis_kelamin !== '-' ? rawParsed.jenis_kelamin : '',
+                    alamat: rawParsed.alamat && rawParsed.alamat !== '-' ? rawParsed.alamat : '',
+                    rt_rw: rawParsed.rt_rw && rawParsed.rt_rw !== '-' ? rawParsed.rt_rw : '',
+                    kel_desa: rawParsed.kel_desa && rawParsed.kel_desa !== '-' ? rawParsed.kel_desa : '',
+                    kecamatan: rawParsed.kecamatan && rawParsed.kecamatan !== '-' ? rawParsed.kecamatan : '',
+                    agama: rawParsed.agama && rawParsed.agama !== '-' ? rawParsed.agama : '',
+                    pekerjaan: rawParsed.pekerjaan && rawParsed.pekerjaan !== '-' ? rawParsed.pekerjaan : 'PELAJAR / MAHASISWA',
+                    no_kk: rawParsed.no_kk && rawParsed.no_kk !== '-' ? rawParsed.no_kk : (rawParsed.nomor_kk && rawParsed.nomor_kk !== '-' ? rawParsed.nomor_kk : ''),
+                };
 
                 setExtractedText(rawText);
                 setConfirmedNik(detectedNik);
-                setParsedFields(parsed);
+                setParsedFields(normalizedFields);
                 setOcrScanned(true);
 
                 setAlert({
@@ -161,6 +168,26 @@ export default function UploadDokumenPage() {
         } finally {
             setScanningOcr(false);
         }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const selected = e.target.files[0];
+            setFile(selected);
+            setPreviewUrl(URL.createObjectURL(selected));
+            setOcrScanned(false);
+            setExtractedText('');
+            setConfirmedNik('');
+            setParsedFields({});
+            setAlert(null);
+
+            // Jalankan ekstraksi AI OCR otomatis segera saat user mengunggah berkas
+            executeOcrScan(selected);
+        }
+    };
+
+    const handleRunOcr = async () => {
+        await executeOcrScan(file);
     };
 
     const handleParsedFieldChange = (key: keyof ParsedOcrData, value: string) => {
@@ -189,6 +216,7 @@ export default function UploadDokumenPage() {
         formData.append('jenisDokumen', jenisDokumen);
         formData.append('confirmedNik', confirmedNik);
         formData.append('confirmedText', extractedText);
+        formData.append('confirmedParsedData', JSON.stringify(parsedFields));
         formData.append('parsedData', JSON.stringify(parsedFields));
 
         try {
@@ -377,8 +405,7 @@ export default function UploadDokumenPage() {
                                         Ukuran: {((file?.size || 0) / 1024).toFixed(1)} KB • Tipe: {file?.type}
                                     </div>
                                     <div className="mt-2 text-xs text-emerald-800 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-md inline-flex items-center gap-1.5">
-                                        <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                                        <span>Siap dipindai dengan teknologi Python OpenCV & Tesseract OCR</span>
+                                        <span>Berhasil Upload</span>
                                     </div>
                                 </div>
                             </div>
@@ -396,8 +423,7 @@ export default function UploadDokumenPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <Sparkles className="w-4 h-4 text-amber-300" />
-                                        <span>Jalankan Ekstraksi AI OCR Lengkap</span>
+                                        <span>Jalankan Ekstraksi</span>
                                     </>
                                 )}
                             </button>

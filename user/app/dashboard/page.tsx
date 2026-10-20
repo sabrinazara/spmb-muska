@@ -56,9 +56,20 @@ interface PendaftaranData {
 
 export default function DashboardBeranda() {
     const [pendaftaran, setPendaftaran] = useState<PendaftaranData | null>(null);
+    const [tahunAjaran, setTahunAjaran] = useState<string>('2026/2027');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Fetch active tahunAjaran from public system setting
+        fetch(API_ENDPOINTS.PENDAFTARAN.PENGUMUMAN)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.tahunAjaran) {
+                    setTahunAjaran(data.tahunAjaran);
+                }
+            })
+            .catch(() => {});
+
         const token = localStorage.getItem('access_token');
         if (!token) return;
 
@@ -123,7 +134,7 @@ export default function DashboardBeranda() {
             <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
                 <div className="relative z-10 max-w-2xl">
                     <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-xs rounded-full text-xs font-semibold tracking-wide text-amber-200 mb-3">
-                        Tahun Ajaran 2026/2027
+                        Tahun Ajaran {tahunAjaran}
                     </span>
                     <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                         Selamat Datang, {pendaftaran?.namaLengkap || pendaftaran?.user?.nama || 'Calon Siswa'}!

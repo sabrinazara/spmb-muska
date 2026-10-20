@@ -33,7 +33,7 @@ export class DokumenService {
         return normMatch ? normMatch[0] : null;
     }
 
-    async scanPreview(file: Express.Multer.File) {
+    async scanPreview(file: Express.Multer.File, studentNik?: string) {
         if (!file) {
             throw new BadRequestException('Berkas gambar tidak ditemukan');
         }
@@ -41,19 +41,32 @@ export class DokumenService {
         let teksEkstraksi = '';
         let ocrResult: any = null;
         try {
-            ocrResult = await this.aiIntegrationService.scanDocument(file);
+            ocrResult = await this.aiIntegrationService.scanDocument(file, studentNik);
             teksEkstraksi = ocrResult?.text || '';
         } catch (error) {
             console.warn('Layanan OCR Python offline atau gagal:', (error as any)?.message);
         }
 
-        const detectedNik = ocrResult?.detectedNik || ocrResult?.parsed_data?.nik || this.extractPotentialNik(teksEkstraksi);
+        const rawParsed = ocrResult?.parsed_data || {};
+        const detectedNik = ocrResult?.detectedNik || rawParsed?.nik || this.extractPotentialNik(teksEkstraksi) || studentNik || null;
+
+        // Ensure tempat_tanggal_lahir is built if tempat_lahir / tanggal_lahir exist
+        const parsed = {
+            ...rawParsed,
+            nik: detectedNik && detectedNik !== '-' ? detectedNik : (studentNik || ''),
+            tempat_tanggal_lahir: rawParsed.tempat_tanggal_lahir && rawParsed.tempat_tanggal_lahir !== '-'
+                ? rawParsed.tempat_tanggal_lahir
+                : [rawParsed.tempat_lahir, rawParsed.tanggal_lahir].filter((v) => v && v !== '-').join(', '),
+            no_kk: rawParsed.no_kk && rawParsed.no_kk !== '-' ? rawParsed.no_kk : (rawParsed.nomor_kk && rawParsed.nomor_kk !== '-' ? rawParsed.nomor_kk : ''),
+            pekerjaan: rawParsed.pekerjaan && rawParsed.pekerjaan !== '-' ? rawParsed.pekerjaan : 'PELAJAR / MAHASISWA',
+        };
 
         return {
             filename: file.originalname,
             text: teksEkstraksi,
-            detectedNik: detectedNik !== '-' ? detectedNik : null,
-            parsedData: ocrResult?.parsed_data || null,
+            detectedNik: detectedNik && detectedNik !== '-' ? detectedNik : null,
+            parsed: parsed,
+            parsedData: parsed,
             confidence: ocrResult?.confidence || 'MEDIUM',
         };
     }
@@ -120,7 +133,10 @@ export class DokumenService {
             ''
         ).replace(/[\s\W_]+/g, '');
 
-        if (jenisDokumen.toUpperCase() === 'KTP' || jenisDokumen.toUpperCase() === 'KK') {
+        const docUpper = jenisDokumen.toUpperCase();
+        const isIdentityDoc = docUpper.includes('KTP') || docUpper.includes('KK') || docUpper.includes('PELAJAR') || docUpper.includes('KIA');
+
+        if (isIdentityDoc) {
             let teksBersihOCR = teksEkstraksi.replace(/[\s\W_]+/g, '').toUpperCase();
             teksBersihOCR = teksBersihOCR
                 .replace(/O/g, '0')
@@ -133,7 +149,9 @@ export class DokumenService {
                 .replace(/A/g, '4');
 
             const isNikCocok = (nikToCompare && nikToCompare === nikPendaftar) || teksBersihOCR.includes(nikPendaftar);
-            statusValidasi = isNikCocok ? 'VALID' : 'INVALID';
+            // Untuk Kartu Pelajar / KIA, jika teks terbaca dan ada nama siswa atau NIK cocok
+            const isKartuPelajarValid = docUpper.includes('PELAJAR') && (teksEkstraksi.length > 20 || isNikCocok);
+            statusValidasi = (isNikCocok || isKartuPelajarValid) ? 'VALID' : 'INVALID';
         } else {
             // Untuk Ijazah / SKL / Akta jika terisi teks kita anggap PENDING/VALID
             statusValidasi = teksEkstraksi.length > 10 ? 'VALID' : 'PENDING';
@@ -177,8 +195,8 @@ export class DokumenService {
             });
         }
 
-        // Jika dokumen ini VALID dan jenisnya KTP/KK, otomatis perbarui status Pendaftaran menjadi VALID jika disetujui
-        if (statusValidasi === 'VALID' && (jenisDokumen.toUpperCase() === 'KTP' || jenisDokumen.toUpperCase() === 'KK')) {
+        // Jika dokumen ini VALID dan jenisnya identitas (KTP/KK/Kartu Pelajar), otomatis perbarui status Pendaftaran
+        if (statusValidasi === 'VALID' && isIdentityDoc) {
             await this.prisma.pendaftaran.update({
                 where: { id: pendaftaran.id },
                 data: {

@@ -17,6 +17,7 @@ import {
     X,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
+import { cmsToast, useToast } from '@/components/ToastProvider';
 
 interface AdminAccount {
     id: string;
@@ -27,6 +28,7 @@ interface AdminAccount {
 }
 
 export default function AdminUsersPage() {
+    const { confirmAction } = useToast();
     const [admins, setAdmins] = useState<AdminAccount[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionMsg, setActionMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -101,6 +103,7 @@ export default function AdminUsersPage() {
 
             if (res.ok) {
                 setActionMsg({ type: 'success', text: result.message || 'Administrator baru berhasil ditambahkan.' });
+                cmsToast.update(`Akun administrator "${nama.trim()}" berhasil dibuat.`, 'Administrator Ditambahkan');
                 setNama('');
                 setEmail('');
                 setPassword('');
@@ -108,9 +111,11 @@ export default function AdminUsersPage() {
                 fetchAdmins();
             } else {
                 setActionMsg({ type: 'error', text: result.message || 'Gagal menambahkan administrator.' });
+                cmsToast.error(result.message || 'Gagal menambahkan administrator.', 'Gagal Menambah Admin');
             }
         } catch {
             setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
+            cmsToast.error('Gagal menghubungi server backend.', 'Kesalahan Server');
         } finally {
             setSubmittingAdd(false);
         }
@@ -155,38 +160,51 @@ export default function AdminUsersPage() {
 
             if (res.ok) {
                 setActionMsg({ type: 'success', text: result.message || 'Data administrator berhasil diperbarui.' });
+                cmsToast.change(`Data administrator "${editNama.trim()}" berhasil diperbarui.`, 'Pembaruan Data Berhasil');
                 setIsEditModalOpen(false);
                 setEditingAdmin(null);
                 fetchAdmins();
             } else {
                 setActionMsg({ type: 'error', text: result.message || 'Gagal memperbarui data administrator.' });
+                cmsToast.error(result.message || 'Gagal memperbarui data administrator.', 'Gagal Memperbarui');
             }
         } catch {
             setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
+            cmsToast.error('Gagal menghubungi server backend.', 'Kesalahan Server');
         } finally {
             setSubmittingEdit(false);
         }
     };
 
     const handleDeleteAdmin = async (id: string, adminNama: string) => {
-        if (!confirm(`Apakah Anda yakin ingin menghapus akun administrator "${adminNama}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+        confirmAction({
+            title: 'Hapus Akun Administrator',
+            message: `Apakah Anda yakin ingin menghapus akun administrator "${adminNama}"? Tindakan ini permanen dan data yang dihapus tidak dapat dipulihkan.`,
+            type: 'danger',
+            confirmLabel: 'Ya, Hapus Akun',
+            cancelLabel: 'Batal',
+            onConfirm: async () => {
+                try {
+                    const res = await fetch(`${API_ENDPOINTS.ADMIN.USERS}/${id}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders(),
+                    });
+                    const result = await res.json();
 
-        try {
-            const res = await fetch(`${API_ENDPOINTS.ADMIN.USERS}/${id}`, {
-                method: 'DELETE',
-                headers: getAuthHeaders(),
-            });
-            const result = await res.json();
-
-            if (res.ok) {
-                setActionMsg({ type: 'success', text: result.message || 'Administrator berhasil dihapus.' });
-                fetchAdmins();
-            } else {
-                setActionMsg({ type: 'error', text: result.message || 'Gagal menghapus administrator.' });
-            }
-        } catch {
-            setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
-        }
+                    if (res.ok) {
+                        setActionMsg({ type: 'success', text: result.message || 'Administrator berhasil dihapus.' });
+                        cmsToast.delete(`Akun administrator "${adminNama}" berhasil dihapus dari sistem.`, 'Penghapusan Data Berhasil');
+                        fetchAdmins();
+                    } else {
+                        setActionMsg({ type: 'error', text: result.message || 'Gagal menghapus administrator.' });
+                        cmsToast.error(result.message || 'Gagal menghapus administrator.', 'Gagal Menghapus');
+                    }
+                } catch {
+                    setActionMsg({ type: 'error', text: 'Gagal menghubungi server backend.' });
+                    cmsToast.error('Gagal menghubungi server backend.', 'Kesalahan Server');
+                }
+            },
+        });
     };
 
     // SKELETON LOADING

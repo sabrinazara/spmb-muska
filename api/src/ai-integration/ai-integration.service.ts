@@ -9,12 +9,15 @@ export class AiIntegrationService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async scanDocument(file: Express.Multer.File): Promise<any> {
+  async scanDocument(file: Express.Multer.File, studentNik?: string): Promise<any> {
     const formData = new FormData();
     formData.append('file', file.buffer, {
       filename: file.originalname,
       contentType: file.mimetype,
     });
+    if (studentNik) {
+      formData.append('account_nik', studentNik);
+    }
 
     const response = await firstValueFrom(
       this.httpService.post('http://localhost:8000/ocr/scan', formData, {

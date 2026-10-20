@@ -238,14 +238,14 @@ export default function DashboardLayout({
                             className={`flex items-center gap-3 group min-w-0 ${isCollapsed ? 'lg:justify-center' : ''}`}
                             title="SMK Muhammadiyah Sekampung"
                         >
-                            <div className="w-9 h-9 shrink-0 rounded-xl bg-emerald-700/80 p-1 flex items-center justify-center border border-emerald-600/40 overflow-hidden shadow-xs">
+                            <div className="w-11 h-11 shrink-0 flex items-center justify-center">
                                 <img
                                     src="/logo.png"
                                     onError={(e) => {
                                         e.currentTarget.src = '/logo.svg';
                                     }}
                                     alt="Logo SMK Muhammadiyah Sekampung"
-                                    className="w-full h-full object-contain"
+                                    className="w-full h-full object-contain filter drop-shadow-sm"
                                 />
                             </div>
                             <div className={`min-w-0 transition-all duration-200 ${isCollapsed ? 'lg:hidden block' : 'block'}`}>

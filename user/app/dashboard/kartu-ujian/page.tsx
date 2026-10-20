@@ -39,12 +39,22 @@ interface PendaftaranInfo {
 
 export default function KartuUjianPage() {
     const [pendaftaran, setPendaftaran] = useState<PendaftaranInfo | null>(null);
+    const [tahunAjaran, setTahunAjaran] = useState<string>('2026/2027');
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [paperMode, setPaperMode] = useState(false); // Toggle to view physical white paper format
 
     useEffect(() => {
+        fetch(API_ENDPOINTS.PENDAFTARAN.PENGUMUMAN)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.tahunAjaran) {
+                    setTahunAjaran(data.tahunAjaran);
+                }
+            })
+            .catch(() => {});
+
         const token = localStorage.getItem('access_token');
         if (!token) return;
 
@@ -351,7 +361,7 @@ export default function KartuUjianPage() {
                         {/* Title Badge & Verification Ribbon */}
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
                             <span className="inline-block px-4 py-1.5 bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded-lg shadow-2xs">
-                                KARTU TANDA PESERTA UJIAN SELEKSI SPMB TA 2026/2027
+                                KARTU TANDA PESERTA UJIAN SELEKSI SPMB TA {tahunAjaran}
                             </span>
 
                             <span

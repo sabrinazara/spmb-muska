@@ -250,7 +250,10 @@ export class PendaftaranService {
 
         const nomorPendaftaran = pendaftaran.nomorPendaftaran || `MUSKA-2026-${Math.floor(10000 + Math.random() * 90000)}`;
         const nama = pendaftaran.namaLengkap || pendaftaran.user?.nama || 'Calon Siswa';
-        const qrText = `SPMB MUSKA 2026 | No: ${nomorPendaftaran} | NISN: ${pendaftaran.nisn} | Nama: ${nama} | Status: RESMI TERVERIFIKASI`;
+        const settings = await this.getPengumumanStatus();
+        const tahunAjaran = settings.tahunAjaran || '2026/2027';
+
+        const qrText = `SPMB MUSKA ${tahunAjaran} | No: ${nomorPendaftaran} | NISN: ${pendaftaran.nisn} | Nama: ${nama} | Status: RESMI TERVERIFIKASI`;
         const qrDataUrl = await QRCode.toDataURL(qrText, { margin: 1, width: 120 });
         const qrBuffer = Buffer.from(qrDataUrl.split(',')[1], 'base64');
 
@@ -314,7 +317,7 @@ export class PendaftaranService {
             doc.fillColor('#ffffff')
                 .fontSize(10.5)
                 .font('Helvetica-Bold')
-                .text('KARTU TANDA PESERTA UJIAN SELEKSI SPMB TA 2026/2027', 35, 114, { align: 'center', width: 525 });
+                .text(`KARTU TANDA PESERTA UJIAN SELEKSI SPMB TA ${tahunAjaran}`, 35, 114, { align: 'center', width: 525 });
 
             // === 4. BADGE STATUS VALIDASI RESMI ===
             doc.roundedRect(35, 138, 525, 26, 4).fillAndStroke('#ecfdf5', '#10b981');
@@ -437,9 +440,11 @@ export class PendaftaranService {
             throw new NotFoundException('Data pendaftaran tidak ditemukan');
         }
 
-        const nomorPendaftaran = pendaftaran.nomorPendaftaran || `MUSKA-2026-${Math.floor(10000 + Math.random() * 90000)}`;
+        const nomorPendaftaran = pendaftaran.nomorPendaftaran || `MUSKA-${Math.floor(10000 + Math.random() * 90000)}`;
         const nama = pendaftaran.namaLengkap || pendaftaran.user.nama || 'Calon Siswa';
-        const qrText = `SPMB MUSKA 2026 | FORMULIR PENDAFTARAN | No: ${nomorPendaftaran} | NISN: ${pendaftaran.nisn} | Nama: ${nama}`;
+        const settings = await this.getPengumumanStatus();
+        const tahunAjaran = settings.tahunAjaran || '2026/2027';
+        const qrText = `SPMB MUSKA ${tahunAjaran} | FORMULIR PENDAFTARAN | No: ${nomorPendaftaran} | NISN: ${pendaftaran.nisn} | Nama: ${nama}`;
         const qrDataUrl = await QRCode.toDataURL(qrText, { margin: 1, width: 120 });
         const qrBuffer = Buffer.from(qrDataUrl.split(',')[1], 'base64');
 
@@ -487,7 +492,7 @@ export class PendaftaranService {
             doc.fillColor('#ffffff')
                 .fontSize(10.5)
                 .font('Helvetica-Bold')
-                .text('LEMBAR RINGKASAN FORMULIR PENDAFTARAN PESERTA DIDIK BARU', 36, doc.y - 16, { align: 'center' });
+                .text(`LEMBAR RINGKASAN FORMULIR PENDAFTARAN PESERTA DIDIK BARU TA ${tahunAjaran}`, 36, doc.y - 16, { align: 'center' });
 
             doc.moveDown(1.5);
 
@@ -509,6 +514,7 @@ export class PendaftaranService {
 
             renderSection('A. DATA PENDAFTARAN & JURUSAN', [
                 ['Nomor Pendaftaran', nomorPendaftaran],
+                ['Tahun Ajaran / Periode', tahunAjaran],
                 ['Pilihan Program Keahlian', pendaftaran.jurusan],
                 ['Status Verifikasi', pendaftaran.status === 'VALID' ? 'TERVERIFIKASI (LULUS BERKAS)' : pendaftaran.status],
                 ['Tanggal Registrasi', new Date(pendaftaran.createdAt).toLocaleDateString('id-ID', { dateStyle: 'full' })],

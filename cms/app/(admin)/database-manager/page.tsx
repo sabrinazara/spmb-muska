@@ -19,6 +19,7 @@ import {
     AlertTriangle,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
+import { cmsToast } from '@/components/ToastProvider';
 
 interface BackupMeta {
     aplikasi: string;
@@ -74,11 +75,13 @@ export default function DatabaseManagerPage() {
                 type: 'success',
                 text: 'Cadangan database berhasil diunduh dalam format .json lengkap!',
             });
+            cmsToast.update('Cadangan data (.json) berhasil dibuat dan diunduh ke komputer Anda.', 'Cadangan Database Berhasil');
         } catch (err: any) {
             setAlertMsg({
                 type: 'error',
                 text: err.message || 'Terjadi kesalahan saat mengunduh cadangan database.',
             });
+            cmsToast.error(err.message || 'Gagal mengekspor data cadangan.', 'Gagal Mengunduh');
         } finally {
             setDownloading(false);
         }
@@ -151,10 +154,12 @@ export default function DatabaseManagerPage() {
                 setPreviewMeta(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
 
+                const restoreSuccessMsg = `Pemulihan data berhasil! ${result.hasilRestore?.pendaftaranRestored || 0} pendaftar dan ${result.hasilRestore?.jurusanRestored || 0} jurusan berhasil dipulihkan.`;
                 setAlertMsg({
                     type: 'success',
-                    text: `Pemulihan data berhasil! ${result.hasilRestore?.pendaftaranRestored || 0} pendaftar dan ${result.hasilRestore?.jurusanRestored || 0} jurusan berhasil dipulihkan.`,
+                    text: restoreSuccessMsg,
                 });
+                cmsToast.update(restoreSuccessMsg, 'Pemulihan Database Selesai');
             } else {
                 throw new Error(result.message || 'Gagal memulihkan database.');
             }
@@ -163,6 +168,7 @@ export default function DatabaseManagerPage() {
                 type: 'error',
                 text: err.message || 'Terjadi kesalahan server saat pemulihan transaksi database.',
             });
+            cmsToast.error(err.message || 'Gagal memproses pemulihan database.', 'Gagal Pemulihan');
         } finally {
             setRestoring(false);
         }

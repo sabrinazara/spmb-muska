@@ -21,6 +21,7 @@ import {
     ArrowUpDown,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
+import { cmsToast } from '@/components/ToastProvider';
 
 interface JurusanKuota {
     id: string;
@@ -114,14 +115,17 @@ export default function PengaturanKuotaPage() {
 
             if (res.ok) {
                 setAlertMsg({ type: 'success', text: 'Kuota jurusan berhasil diperbarui!' });
+                cmsToast.change(`Kuota maksimal berhasil diubah menjadi ${editValue} kursi.`, 'Perubahan Kuota Disimpan');
                 setEditingId(null);
                 fetchKuota();
             } else {
                 const err = await res.json();
                 setAlertMsg({ type: 'error', text: err.message || 'Gagal menyimpan perubahan kuota.' });
+                cmsToast.error(err.message || 'Gagal menyimpan perubahan kuota.', 'Gagal Mengubah Kuota');
             }
         } catch {
             setAlertMsg({ type: 'error', text: 'Terjadi kesalahan jaringan.' });
+            cmsToast.error('Terjadi kesalahan jaringan saat menyimpan kuota.', 'Kesalahan Jaringan');
         } finally {
             setSavingId(null);
         }
@@ -139,17 +143,21 @@ export default function PengaturanKuotaPage() {
                 const result: SeleksiResult = await res.json();
                 setSeleksiResult(result);
                 setShowConfirmModal(false);
+                const ringkasanText = `Seleksi CBT selesai: ${result.ringkasan.totalLulus} siswa LULUS, ${result.ringkasan.totalCadangan} siswa CADANGAN.`;
                 setAlertMsg({
                     type: 'success',
-                    text: `Seleksi otomatis selesai: ${result.ringkasan.totalLulus} siswa LULUS, ${result.ringkasan.totalCadangan} siswa CADANGAN.`,
+                    text: ringkasanText,
                 });
+                cmsToast.update(ringkasanText, 'Pembaruan Seleksi Otomatis');
                 fetchKuota();
             } else {
                 const err = await res.json();
                 setAlertMsg({ type: 'error', text: err.message || 'Gagal menjalankan seleksi otomatis.' });
+                cmsToast.error(err.message || 'Gagal menjalankan seleksi otomatis.', 'Gagal Seleksi');
             }
         } catch {
             setAlertMsg({ type: 'error', text: 'Gagal memproses seleksi otomatis di server.' });
+            cmsToast.error('Gagal memproses seleksi otomatis di server.', 'Gagal Memproses');
         } finally {
             setRunningSeleksi(false);
         }
@@ -168,8 +176,7 @@ export default function PengaturanKuotaPage() {
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="max-w-2xl">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-3">
-                            <Zap className="w-3.5 h-3.5" />
-                            <span>Sistem Seleksi Otomatis & Kuota Terpusat</span>
+                            <span>Sistem Seleksi Otomatis / Manual</span>
                         </div>
                         <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
                             Manajemen Kuota Jurusan & Seleksi Ranking
@@ -184,7 +191,6 @@ export default function PengaturanKuotaPage() {
                             onClick={() => setShowConfirmModal(true)}
                             className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 cursor-pointer transform active:scale-95"
                         >
-                            <Zap className="w-4 h-4 fill-current" />
                             <span>Jalankan Seleksi Otomatis</span>
                         </button>
                     </div>
@@ -194,11 +200,10 @@ export default function PengaturanKuotaPage() {
             {/* ALERT MESSAGE */}
             {alertMsg && (
                 <div
-                    className={`p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${
-                        alertMsg.type === 'success'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
-                            : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
-                    }`}
+                    className={`p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${alertMsg.type === 'success'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
+                        : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
+                        }`}
                 >
                     <div className="flex items-center gap-2.5">
                         {alertMsg.type === 'success' ? (
@@ -421,13 +426,12 @@ export default function PengaturanKuotaPage() {
                                                     </div>
                                                     <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-900 overflow-hidden">
                                                         <div
-                                                            className={`h-full rounded-full transition-all duration-500 ${
-                                                                j.persentaseKeterisian >= 100
-                                                                    ? 'bg-rose-500'
-                                                                    : j.persentaseKeterisian >= 75
+                                                            className={`h-full rounded-full transition-all duration-500 ${j.persentaseKeterisian >= 100
+                                                                ? 'bg-rose-500'
+                                                                : j.persentaseKeterisian >= 75
                                                                     ? 'bg-amber-500'
                                                                     : 'bg-emerald-500'
-                                                            }`}
+                                                                }`}
                                                             style={{ width: `${Math.min(100, j.persentaseKeterisian)}%` }}
                                                         />
                                                     </div>

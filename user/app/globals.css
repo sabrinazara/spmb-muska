@@ -302,3 +302,119 @@ body {
   width: 400%;
   height: 400%;
 }
+
+/* ========================================================
+   GLOBAL CUSTOM SCROLLBAR (PREMIUM EMERALD & RESPONSIVE ACROSS ALL PAGES)
+======================================================== */
+:root {
+  --scrollbar-track: #e2e8f0;
+  --scrollbar-thumb: #059669;
+  --scrollbar-thumb-hover: #047857;
+  --scrollbar-thumb-active: #064e3b;
+}
+
+.dark, html.dark {
+  --scrollbar-track: #0f172a;
+  --scrollbar-thumb: #10b981;
+  --scrollbar-thumb-hover: #34d399;
+  --scrollbar-thumb-active: #6ee7b7;
+}
+
+/* ========================================================
+   SINGLE ROOT SCROLLBAR ONLY (HTML)
+   Prevents double scrollbars by ensuring body never scrolls
+   ======================================================== */
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: 100%;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+body {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  max-width: 100%;
+  scrollbar-width: none !important;
+}
+
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* WebKit & Chromium Custom Scrollbar for HTML root */
+html::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 9999px;
+}
+
+html::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease-in-out;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+html::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
+}
+
+html::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Slim scrollbar utility for sidebars, dropdowns, and tables */
+.scrollbar-thin,
+.custom-scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.scrollbar-thin::-webkit-scrollbar,
+.custom-scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track,
+.custom-scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb,
+.custom-scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Hide scrollbar utility while maintaining scroll functionality */
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
