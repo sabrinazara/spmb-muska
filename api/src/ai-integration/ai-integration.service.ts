@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { client, handle_file } from '@gradio/client';
 import FormData from 'form-data';
 import { firstValueFrom } from 'rxjs';
 
@@ -9,29 +10,103 @@ export class AiIntegrationService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  async scanDocument(file: Express.Multer.File, studentNik?: string): Promise<any> {
-    const formData = new FormData();
-    formData.append('file', file.buffer, {
-      filename: file.originalname,
-      contentType: file.mimetype,
-    });
-    if (studentNik) {
-      formData.append('account_nik', studentNik);
+  /**
+   * Menginisialisasi koneksi client ke Hugging Face Space Private menggunakan token otentikasi
+   */
+  private async getGradioClient() {
+    const spaceUrl = process.env.HF_SPACE_URL || 'https://faiz140405-spmb-ai-engine.hf.space';
+    const hfToken = (process.env.HF_TOKEN || '').trim();
+
+    const options: any = {};
+    if (hfToken) {
+      options.hf_token = hfToken;
+      options.token = hfToken;
     }
 
-    const response = await firstValueFrom(
-      this.httpService.post('http://localhost:8000/ocr/scan', formData, {
-        headers: formData.getHeaders(),
-      }),
-    );
+    return await client(spaceUrl, options);
+  }
 
-    return response.data;
+  async scanDocument(file: Express.Multer.File, studentNik?: string): Promise<any> {
+    // 1. Coba hubungi Hugging Face Private Space via @gradio/client
+    try {
+      this.logger.log(`Menghubungkan ke Hugging Face Space OCR (${process.env.HF_SPACE_URL || 'default'})...`);
+      const app = await this.getGradioClient();
+
+      const filePayload = file.buffer
+        ? handle_file(file.buffer)
+        : handle_file(file.path);
+
+      const result: any = await app.predict('/ocr', [filePayload]);
+      const ocrData = result?.data?.[0];
+
+      if (ocrData) {
+        if (!ocrData.detectedNik && studentNik) {
+          ocrData.detectedNik = studentNik;
+          if (ocrData.parsed_data) {
+            ocrData.parsed_data.nik = studentNik;
+          }
+        }
+        return ocrData;
+      }
+    } catch (hfErr: any) {
+      this.logger.warn(`Hugging Face Space OCR tidak merespon (${hfErr?.message || hfErr}). Menggunakan fallback.`);
+    }
+
+    // 2. Fallback: Microservice Python lokal di port 8000
+    try {
+      const formData = new FormData();
+      formData.append('file', file.buffer, {
+        filename: file.originalname,
+        contentType: file.mimetype,
+      });
+      if (studentNik) {
+        formData.append('account_nik', studentNik);
+      }
+
+      const response = await firstValueFrom(
+        this.httpService.post('http://localhost:8000/ocr/scan', formData, {
+          headers: formData.getHeaders(),
+          timeout: 4000,
+        }),
+      );
+
+      return response.data;
+    } catch (localErr: any) {
+      this.logger.warn(`Local Python OCR offline: ${localErr?.message}`);
+      return {
+        text: '',
+        parsed_data: { nik: studentNik || '' },
+        detectedNik: studentNik || null,
+        confidence: 'LOW',
+      };
+    }
   }
 
   async chat(question: string): Promise<{ question: string; answer: string; source: string }> {
     const cleanQuestion = (question || '').trim();
 
-    // 1. Coba hubungi microservice Python RAG di port 8000
+    // 1. Coba hubungi Hugging Face Private Space via @gradio/client
+    try {
+      const app = await this.getGradioClient();
+      const result: any = await app.predict('/rag', [cleanQuestion]);
+      const rawAnswer = result?.data?.[0];
+
+      const answer = typeof rawAnswer === 'string'
+        ? rawAnswer
+        : (rawAnswer?.answer || JSON.stringify(rawAnswer));
+
+      if (answer) {
+        return {
+          question: cleanQuestion,
+          answer,
+          source: 'Hugging Face Space (Gradio RAG)',
+        };
+      }
+    } catch (hfErr: any) {
+      this.logger.warn(`Hugging Face Space RAG tidak merespon (${hfErr?.message || hfErr}). Menggunakan fallback.`);
+    }
+
+    // 2. Coba hubungi microservice Python RAG lokal di port 8000
     try {
       const response = await firstValueFrom(
         this.httpService.post(
@@ -45,11 +120,11 @@ export class AiIntegrationService {
         return {
           question: cleanQuestion,
           answer: response.data.answer,
-          source: 'Python RAG AI Engine',
+          source: 'Python RAG AI Engine (Lokal)',
         };
       }
     } catch (err: any) {
-      this.logger.warn(`Python AI service tidak merespon (${err.message}). Menggunakan basis data cerdas internal.`);
+      this.logger.warn(`Python AI service lokal tidak merespon (${err.message}). Menggunakan basis data cerdas internal.`);
     }
 
     // 2. Intelligent Fallback Knowledge Base SMK Muhammadiyah Sekampung

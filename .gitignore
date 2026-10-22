@@ -15,3 +15,5 @@ out/
 # IDE / System files
 .vscode/
 .DS_Store
+__pycache__/
+*.pyc
