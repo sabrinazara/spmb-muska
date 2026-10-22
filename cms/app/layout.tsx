@@ -17,7 +17,7 @@ const dancingScript = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "CMS Panel - SMK Muhammadiyah 1 Wonosobo",
+  title: "CMS Panel - SMK Muhammadiyah Sekampung",
   description: "Panel Pengelolaan dan Verifikasi Berkas Calon Siswa Baru",
 };
 

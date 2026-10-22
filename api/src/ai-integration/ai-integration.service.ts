@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { client, handle_file } from '@gradio/client';
 import FormData from 'form-data';
@@ -26,30 +26,60 @@ export class AiIntegrationService {
     return await client(spaceUrl, options);
   }
 
-  async scanDocument(file: Express.Multer.File, studentNik?: string): Promise<any> {
-    // 1. Coba hubungi Hugging Face Private Space via @gradio/client
+  /**
+   * Ekstraksi dokumen KTP menggunakan Gradio OCR di Hugging Face Private Space
+   * @param fileBuffer Buffer berkas dari multer
+   * @param mimeType Tipe MIME berkas (default: image/jpeg)
+   */
+  async extractKtp(fileBuffer: Buffer, mimeType: string = 'image/jpeg'): Promise<any> {
+    if (!fileBuffer || !Buffer.isBuffer(fileBuffer)) {
+      throw new HttpException(
+        'Buffer berkas KTP tidak valid atau kosong',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     try {
       this.logger.log(`Menghubungkan ke Hugging Face Space OCR (${process.env.HF_SPACE_URL || 'default'})...`);
       const app = await this.getGradioClient();
 
-      const filePayload = file.buffer
-        ? handle_file(file.buffer)
-        : handle_file(file.path);
+      const blob = new Blob([new Uint8Array(fileBuffer)], { type: mimeType });
+      const payload = handle_file(blob);
 
-      const result: any = await app.predict('/ocr', [filePayload]);
+      const result: any = await app.predict('/ocr', [payload]);
       const ocrData = result?.data?.[0];
 
-      if (ocrData) {
-        if (!ocrData.detectedNik && studentNik) {
-          ocrData.detectedNik = studentNik;
-          if (ocrData.parsed_data) {
-            ocrData.parsed_data.nik = studentNik;
+      if (!ocrData) {
+        throw new Error('Hasil ekstraksi data OCR kosong dari AI Engine');
+      }
+
+      return ocrData;
+    } catch (err: any) {
+      this.logger.error(`Gagal memproses OCR di Hugging Face: ${err.message}`, err.stack);
+      throw new HttpException(
+        `Layanan AI Engine OCR gagal merespons atau sedang sleeping: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async scanDocument(file: Express.Multer.File, studentNik?: string): Promise<any> {
+    // 1. Coba hubungi Hugging Face Private Space via extractKtp
+    try {
+      if (file.buffer) {
+        const ocrData = await this.extractKtp(file.buffer, file.mimetype);
+        if (ocrData) {
+          if (!ocrData.detectedNik && studentNik) {
+            ocrData.detectedNik = studentNik;
+            if (ocrData.parsed_data) {
+              ocrData.parsed_data.nik = studentNik;
+            }
           }
+          return ocrData;
         }
-        return ocrData;
       }
     } catch (hfErr: any) {
-      this.logger.warn(`Hugging Face Space OCR tidak merespon (${hfErr?.message || hfErr}). Menggunakan fallback.`);
+      this.logger.warn(`Hugging Face Space OCR tidak merespon (${hfErr?.message || hfErr}). Menggunakan fallback lokal.`);
     }
 
     // 2. Fallback: Microservice Python lokal di port 8000
