@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 import ChartJS, { ChartOptions } from 'chart.js/auto';
-import { RefreshCw, Layers, Check, Database, TrendingUp, Calendar } from 'lucide-react';
+import { RefreshCw, Layers, Database, Calendar } from 'lucide-react';
 
 interface JurusanStatItem {
     jurusan: string;
@@ -31,13 +31,13 @@ interface StackedAreaChartProps {
     onRefreshParent?: () => void;
 }
 
-// Konfigurasi warna khusus & kontras untuk setiap program keahlian (8 Jurusan Resmi SMK MUSKA)
+// Konfigurasi warna khusus untuk setiap program keahlian (8 Jurusan Resmi SMK MUSKA)
 const COLOR_CONFIG: Record<
     string,
     { border: string; bg: string; dot: string; label: string }
 > = {
     'TJKT': {
-        border: '#10b981', // Emerald
+        border: '#10b981', // Emerald Green
         bg: 'rgba(16, 185, 129, 0.55)',
         dot: 'bg-emerald-500',
         label: 'TJKT (Teknik Jaringan Komputer)',
@@ -61,13 +61,13 @@ const COLOR_CONFIG: Record<
         label: 'BDK (Bisnis Digital & Kreatif)',
     },
     'BOGA': {
-        border: '#f43f5e', // Rose
+        border: '#f43f5e', // Rose Coral
         bg: 'rgba(244, 63, 94, 0.55)',
         dot: 'bg-rose-500',
         label: 'BOGA (Kulineri & Tata Boga)',
     },
     'TATA RIAS': {
-        border: '#d946ef', // Fuchsia
+        border: '#d946ef', // Fuchsia Magenta
         bg: 'rgba(217, 70, 239, 0.55)',
         dot: 'bg-fuchsia-500',
         label: 'TATA RIAS (Kecantikan & Rias)',
@@ -127,7 +127,6 @@ export default function StackedAreaChart({
                     if (d.breakdown && d.breakdown[item.singkatan] !== undefined) {
                         return d.breakdown[item.singkatan];
                     }
-                    // Fallback jika belum ter-breakdown
                     return 0;
                 });
 
@@ -149,8 +148,8 @@ export default function StackedAreaChart({
                     fill: true,
                     tension: 0.4,
                     borderWidth: 2.5,
-                    pointRadius: 3.5,
-                    pointHoverRadius: 6.5,
+                    pointRadius: 4,
+                    pointHoverRadius: 7,
                     pointBackgroundColor: conf.border,
                     hidden: Boolean(hiddenDatasets[item.singkatan]),
                 };
@@ -158,11 +157,10 @@ export default function StackedAreaChart({
 
             return { labels, datasets };
         } else {
-            // Mode Bulanan (Real-Time dari Database)
-            // Mengambil data per bulan dari Januari s/d bulan sekarang (atau 12 bulan)
+            // Mode Bulanan (Real-Time 100% dari Database)
+            // Tampilkan bulan berjalan dari Januari hingga bulan sekarang (atau 12 bulan)
             const currentMonthIdx = new Date().getMonth(); // 0-indexed (9 = Oktober)
-            
-            // Batasi tampilan bulan dari Januari hingga bulan saat ini agar kurva padat & fokus pada data riil
+
             const activeMonths = monthlyJurusanTrends && monthlyJurusanTrends.length > 0
                 ? monthlyJurusanTrends.filter((m) => m.bulanIndex <= currentMonthIdx + 1)
                 : [
@@ -189,14 +187,13 @@ export default function StackedAreaChart({
                     if (countInMonth !== undefined) {
                         return countInMonth;
                     }
-                    // Jika data realtime berada di bulan saat ini
                     if (m.bulanIndex === currentMonthIdx + 1) {
                         return item.count || 0;
                     }
                     return 0;
                 });
 
-                // Jika mode kumulatif, hitung running sum
+                // Jika mode kumulatif, hitung running sum akumulasi
                 if (calcMode === 'cumulative') {
                     let sum = 0;
                     rawValues = rawValues.map((val) => {
@@ -212,7 +209,7 @@ export default function StackedAreaChart({
                     borderColor: conf.border,
                     backgroundColor: conf.bg,
                     fill: true,
-                    tension: 0.4, // Kurva halus (spline) sesuai referensi
+                    tension: 0.4, // Kurva halus sesuai referensi Chart.js
                     borderWidth: 2.5,
                     pointRadius: 4,
                     pointHoverRadius: 7,
@@ -242,7 +239,7 @@ export default function StackedAreaChart({
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-                duration: 1200,
+                duration: 1000,
                 easing: 'easeOutQuart',
             },
             interaction: {
@@ -255,7 +252,7 @@ export default function StackedAreaChart({
                     display: false,
                 },
                 legend: {
-                    display: false, // Dikelola via interactive pills di UI
+                    display: false, // Dikelola via interactive pills di UI bawah
                 },
                 tooltip: {
                     mode: 'index',
@@ -292,7 +289,7 @@ export default function StackedAreaChart({
                     },
                     title: {
                         display: true,
-                        text: viewMode === 'monthly' ? 'Bulan (Periode Riil Pendaftaran)' : '7 Hari Terakhir (Harian)',
+                        text: viewMode === 'monthly' ? 'Perbulan' : '7 Hari Terakhir',
                         color: textColor,
                         font: { size: 10, weight: 600 },
                     },
@@ -300,11 +297,13 @@ export default function StackedAreaChart({
                 y: {
                     stacked: true, // Stacked Area Chart
                     beginAtZero: true,
+                    suggestedMax: Math.max(totalPendaftarReal + 2, 8),
                     grid: {
                         color: gridColor,
                     },
                     ticks: {
                         color: textColor,
+                        stepSize: 1,
                         precision: 0,
                         font: {
                             family: 'ui-monospace, monospace',
@@ -314,7 +313,7 @@ export default function StackedAreaChart({
                     },
                     title: {
                         display: true,
-                        text: calcMode === 'cumulative' ? 'Total Pendaftar Kumulatif' : 'Jumlah Pendaftar (Akumulasi Stacked)',
+                        text: calcMode === 'cumulative' ? 'Total Pendaftar Kumulatif' : 'Jumlah Pendaftar Baru',
                         color: textColor,
                         font: { size: 10, weight: 600 },
                     },
@@ -329,6 +328,13 @@ export default function StackedAreaChart({
                 data: chartData,
                 options,
             });
+
+            // Pastikan resize triggered setelah render agar canvas mengisi lebar penuh
+            setTimeout(() => {
+                if (chartInstanceRef.current) {
+                    chartInstanceRef.current.resize();
+                }
+            }, 60);
         }
 
         return () => {
@@ -352,7 +358,7 @@ export default function StackedAreaChart({
 
         setTimeout(() => {
             setIsRefreshing(false);
-        }, 1200);
+        }, 1000);
     };
 
     // Toggle sembunyikan/tampilkan jurusan tertentu
@@ -379,7 +385,7 @@ export default function StackedAreaChart({
                                 </h3>
                             </div>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                Data Pendaftar Per-Jurusan
+                                Data pendaftar per jurusan
                             </p>
                         </div>
                     </div>
@@ -456,9 +462,9 @@ export default function StackedAreaChart({
                 </div>
             </div>
 
-            {/* Area Canvas Chart.js (Stacked Area) */}
-            <div className="relative w-full h-72 sm:h-80 md:h-96">
-                <canvas ref={canvasRef} />
+            {/* Area Canvas Chart.js (Stacked Area, Full Width & Responsive) */}
+            <div className="relative w-full h-80 sm:h-96">
+                <canvas ref={canvasRef} className="w-full h-full block" />
             </div>
 
             {/* Interactive Legend (Pembeda Warna Setiap Jurusan & Filter Klik) */}
@@ -466,7 +472,7 @@ export default function StackedAreaChart({
                 <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2 flex items-center justify-between">
                     <span>Pilihan Jurusan (Klik untuk sembunyikan/tampilkan):</span>
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                        <span>Data Riil Aktif: <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{totalPendaftarReal} siswa</strong></span>
+                            <span>Pendaftar: <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{totalPendaftarReal} siswa</strong></span>
                     </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
