@@ -38,44 +38,103 @@ export class AdminService {
             { nama: 'Teknik Pengelasan (Welding)', singkatan: 'LAS', keywords: ['Pengelasan', 'Welding', 'Las'] },
         ];
 
-        const jurusanStats = await Promise.all(
-            listJurusan.map(async (item) => {
-                const count = await this.prisma.pendaftaran.count({
-                    where: {
-                        OR: item.keywords.map((kw) => ({
-                            jurusan: { contains: kw, mode: 'insensitive' as const }
-                        }))
-                    }
-                });
-                return {
-                    jurusan: item.nama,
-                    singkatan: item.singkatan,
-                    count,
-                };
-            })
-        );
+        // Ambil seluruh data pendaftaran untuk kalkulasi real-time yang akurat
+        const allPendaftar = await this.prisma.pendaftaran.findMany({
+            select: {
+                id: true,
+                jurusan: true,
+                createdAt: true,
+            }
+        });
 
-        // Tren Pendaftaran 7 Hari Terakhir
-        const dailyTrends: { tanggal: string; label: string; count: number }[] = [];
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            const startOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
-            const endOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59);
+        const matchJurusan = (jurusanStr: string) => {
+            const jLower = (jurusanStr || '').toLowerCase();
+            for (const item of listJurusan) {
+                if (item.keywords.some((kw) => jLower.includes(kw.toLowerCase()))) {
+                    return item.singkatan;
+                }
+            }
+            return 'LAINNYA';
+        };
 
-            const count = await this.prisma.pendaftaran.count({
-                where: {
-                    createdAt: {
-                        gte: startOfDay,
-                        lte: endOfDay,
+        const jurusanStats = listJurusan.map((item) => {
+            const count = allPendaftar.filter((p) => {
+                const jLower = (p.jurusan || '').toLowerCase();
+                return item.keywords.some((kw) => jLower.includes(kw.toLowerCase()));
+            }).length;
+
+            return {
+                jurusan: item.nama,
+                singkatan: item.singkatan,
+                count,
+            };
+        });
+
+        // Tren Bulanan Real-Time (12 Bulan Tahun Berjalan)
+        const currentYear = new Date().getFullYear();
+        const monthNames = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        const monthlyJurusanTrends = monthNames.map((namaBulan, idx) => {
+            const breakdown: Record<string, number> = {};
+            listJurusan.forEach((j) => { breakdown[j.singkatan] = 0; });
+
+            allPendaftar.forEach((p) => {
+                const pDate = new Date(p.createdAt);
+                if (pDate.getFullYear() === currentYear && pDate.getMonth() === idx) {
+                    const singkatan = matchJurusan(p.jurusan);
+                    if (breakdown[singkatan] !== undefined) {
+                        breakdown[singkatan]++;
                     }
                 }
             });
 
+            const total = Object.values(breakdown).reduce((a, b) => a + b, 0);
+
+            return {
+                bulan: namaBulan,
+                bulanIndex: idx + 1,
+                total,
+                breakdown,
+            };
+        });
+
+        // Tren Pendaftaran 7 Hari Terakhir Real-Time dengan breakdown per jurusan
+        const dailyTrends: {
+            tanggal: string;
+            label: string;
+            count: number;
+            breakdown: Record<string, number>;
+        }[] = [];
+
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const label = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+
+            const breakdown: Record<string, number> = {};
+            listJurusan.forEach((j) => { breakdown[j.singkatan] = 0; });
+
+            allPendaftar.forEach((p) => {
+                const pDateStr = new Date(p.createdAt).toISOString().split('T')[0];
+                if (pDateStr === dateStr) {
+                    const singkatan = matchJurusan(p.jurusan);
+                    if (breakdown[singkatan] !== undefined) {
+                        breakdown[singkatan]++;
+                    }
+                }
+            });
+
+            const count = Object.values(breakdown).reduce((a, b) => a + b, 0);
+
             dailyTrends.push({
-                tanggal: startOfDay.toISOString().split('T')[0],
-                label: startOfDay.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+                tanggal: dateStr,
+                label,
                 count,
+                breakdown,
             });
         }
 
@@ -102,6 +161,7 @@ export class AdminService {
                 menungguUjian,
             },
             jurusanStats,
+            monthlyJurusanTrends,
             dailyTrends,
             pendaftarTerbaru,
         };

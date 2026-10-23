@@ -18,6 +18,7 @@ import {
     BarChart3,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
+import StackedAreaChart from '@/components/StackedAreaChart';
 
 interface StatsData {
     summary: {
@@ -37,10 +38,17 @@ interface StatsData {
         singkatan: string;
         count: number;
     }[];
+    monthlyJurusanTrends?: {
+        bulan: string;
+        bulanIndex: number;
+        total: number;
+        breakdown: Record<string, number>;
+    }[];
     dailyTrends: {
         tanggal: string;
         label: string;
         count: number;
+        breakdown?: Record<string, number>;
     }[];
     pendaftarTerbaru: {
         id: string;
@@ -271,43 +279,14 @@ export default function AdminAnalyticsDashboard() {
 
             {/* 2 Kolom Grafik & Statistik */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Bar Chart Jurusan */}
-                <div className="lg:col-span-2 p-6 rounded-2xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 shadow-xs space-y-4">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                        <div>
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                <BarChart3 className="w-4 h-4 text-emerald-500" />
-                                <span>Distribusi Pendaftar per Program Keahlian</span>
-                            </h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
-                                8 Pilihan Jurusan Unggulan SMK Muhammadiyah Sekampung
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-3 pt-2">
-                        {jurusanStats.map((item) => {
-                            const percent = Math.round((item.count / maxJurusanCount) * 100);
-                            return (
-                                <div key={item.singkatan} className="space-y-1">
-                                    <div className="flex items-center justify-between text-xs">
-                                        <span className="font-semibold text-slate-700 dark:text-slate-300">
-                                            {item.jurusan} ({item.singkatan})
-                                        </span>
-                                        <span className="font-mono font-bold text-slate-900 dark:text-white">
-                                            {item.count} siswa
-                                        </span>
-                                    </div>
-                                    <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-500"
-                                            style={{ width: `${percent}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                {/* Stacked Area Chart Jurusan (Chart.js Line Chart - Stacked Area) */}
+                <div className="lg:col-span-2 p-6 rounded-2xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 shadow-xs">
+                    <StackedAreaChart
+                        jurusanStats={jurusanStats}
+                        dailyTrends={dailyTrends}
+                        monthlyJurusanTrends={stats.monthlyJurusanTrends}
+                        onRefreshParent={fetchStats}
+                    />
                 </div>
 
                 {/* Trend Harian */}
