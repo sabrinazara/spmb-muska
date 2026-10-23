@@ -199,12 +199,12 @@ export default function DashboardLayout({
     ];
 
     const getPageTitle = () => {
-        if (pathname === '/dashboard') return 'Beranda Alur Pendaftaran';
-        if (pathname === '/dashboard/lengkapi-data') return 'Formulir Kelengkapan Data Siswa';
-        if (pathname === '/dashboard/upload') return 'Unggah Dokumen & Verifikasi OCR';
-        if (pathname === '/dashboard/status') return 'Status Validasi Pendaftaran';
-        if (pathname === '/dashboard/kartu-ujian') return 'Kartu Peserta Ujian CBT';
-        if (pathname === '/dashboard/kelulusan') return 'Pengumuman Hasil Seleksi';
+        if (pathname === '/dashboard') return 'Beranda';
+        if (pathname === '/dashboard/lengkapi-data') return 'Formulir Data Siswa';
+        if (pathname === '/dashboard/upload') return 'Unggah Dokumen';
+        if (pathname === '/dashboard/status') return 'Status Pendaftaran';
+        if (pathname === '/dashboard/kartu-ujian') return 'Kartu Peserta Ujian';
+        if (pathname === '/dashboard/kelulusan') return 'Pengumuman';
         return 'Portal Pendaftaran Siswa';
     };
 
@@ -295,8 +295,8 @@ export default function DashboardLayout({
                                 onClick={() => setSidebarOpen(false)}
                                 title={isCollapsed ? 'Beranda' : undefined}
                                 className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${isCollapsed
-                                        ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2.5'
-                                        : 'px-3 py-2.5'
+                                    ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2.5'
+                                    : 'px-3 py-2.5'
                                     } ${pathname === '/dashboard'
                                         ? 'bg-emerald-600 text-white shadow-xs font-bold'
                                         : isDark
@@ -352,8 +352,8 @@ export default function DashboardLayout({
                                                         onClick={() => setSidebarOpen(false)}
                                                         title={isCollapsed ? item.label : undefined}
                                                         className={`flex items-center gap-3 rounded-xl text-xs font-semibold transition-all ${isCollapsed
-                                                                ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2'
-                                                                : 'px-3 py-2'
+                                                            ? 'lg:justify-center lg:px-0 lg:w-11 lg:h-11 lg:mx-auto px-3 py-2'
+                                                            : 'px-3 py-2'
                                                             } ${isActive
                                                                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
                                                                 : isDark
@@ -383,8 +383,8 @@ export default function DashboardLayout({
                     <div className={isCollapsed ? 'lg:hidden block' : 'block'}>
                         <div className="flex items-center gap-2.5 mb-2.5">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${isDark
-                                    ? 'bg-emerald-900/60 border-emerald-700/40 text-emerald-400'
-                                    : 'bg-emerald-100 border-emerald-200 text-emerald-800'
+                                ? 'bg-emerald-900/60 border-emerald-700/40 text-emerald-400'
+                                : 'bg-emerald-100 border-emerald-200 text-emerald-800'
                                 }`}>
                                 <User className="w-4 h-4" />
                             </div>
@@ -400,8 +400,8 @@ export default function DashboardLayout({
                         <button
                             onClick={handleLogout}
                             className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition cursor-pointer border ${isDark
-                                    ? 'text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border-rose-500/20'
-                                    : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border-rose-200'
+                                ? 'text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border-rose-500/20'
+                                : 'text-rose-600 bg-rose-50 hover:bg-rose-100 border-rose-200'
                                 }`}
                         >
                             <LogOut className="w-3.5 h-3.5" />
@@ -413,8 +413,8 @@ export default function DashboardLayout({
                     <div className={`space-y-2 ${isCollapsed ? 'lg:flex lg:flex-col lg:items-center hidden' : 'hidden'}`}>
                         <div
                             className={`w-10 h-10 rounded-xl flex items-center justify-center border cursor-default ${isDark
-                                    ? 'bg-emerald-900/60 border-emerald-700/40 text-emerald-400'
-                                    : 'bg-emerald-100 border-emerald-200 text-emerald-800'
+                                ? 'bg-emerald-900/60 border-emerald-700/40 text-emerald-400'
+                                : 'bg-emerald-100 border-emerald-200 text-emerald-800'
                                 }`}
                             title={`${user?.nama || 'Calon Siswa'} (${user?.email || ''})`}
                         >
@@ -452,8 +452,8 @@ export default function DashboardLayout({
                         <button
                             onClick={toggleCollapse}
                             className={`hidden lg:flex p-2 rounded-xl transition cursor-pointer ${isDark
-                                    ? 'text-slate-400 hover:text-white hover:bg-slate-800'
-                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                                ? 'text-slate-400 hover:text-white hover:bg-slate-800'
+                                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                                 }`}
                             title={isCollapsed ? 'Perluas Sidebar' : 'Kecilkan Sidebar'}
                             aria-label="Toggle Minimize Sidebar"
@@ -474,8 +474,8 @@ export default function DashboardLayout({
                         {/* Live Clock Widget */}
                         {currentTime && (
                             <div className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-medium shadow-2xs ${isDark
-                                    ? 'bg-slate-950 text-emerald-400 border-slate-800'
-                                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                ? 'bg-slate-950 text-emerald-400 border-slate-800'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                 }`}>
                                 <Clock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                                 <span>{currentTime}</span>
@@ -486,8 +486,8 @@ export default function DashboardLayout({
                         <button
                             onClick={toggleTheme}
                             className={`p-2 rounded-xl transition cursor-pointer ${isDark
-                                    ? 'bg-slate-800 text-amber-300 hover:bg-slate-700 border border-slate-700'
-                                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
+                                ? 'bg-slate-800 text-amber-300 hover:bg-slate-700 border border-slate-700'
+                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
                                 }`}
                             title={isDark ? 'Beralih ke Light Mode' : 'Beralih ke Dark Mode'}
                             aria-label="Toggle Theme"

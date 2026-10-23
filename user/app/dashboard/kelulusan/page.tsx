@@ -245,7 +245,6 @@ export default function PengumumanKelulusanPage() {
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                                 <div className="space-y-2">
                                     <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wide bg-amber-400 text-slate-950 shadow-md">
-                                        <Sparkles className="w-3.5 h-3.5" />
                                         <span>DINYATAKAN LULUS SELEKSI</span>
                                     </div>
                                     <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">

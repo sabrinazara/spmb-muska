@@ -597,10 +597,10 @@ export default function DashboardBeranda() {
                     {/* Kontak Bantuan */}
                     <div className="bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs text-xs space-y-2">
                         <div className="font-bold text-slate-900 dark:text-white text-sm mb-1 flex items-center gap-1.5">
-                            <Building2 className="w-4 h-4 text-emerald-600" />
-                            <span>Sekretariat SPMB MUSKA</span>
+                            <Building2 className="w-10 h-10 text-emerald-600" />
+                            <span>Admin SPMB SMK Muhammadiyah Sekampung</span>
                         </div>
-                        <div className="text-slate-600 dark:text-slate-400">SMK Muhammadiyah Sekampung, Kab. Lampung Timur</div>
+                        <div className="text-slate-600 dark:text-slate-400">SMK Muhammadiyah Sekampung, Kab. Lampung Timur, Prov. Lampung</div>
                         <div className="text-slate-700 dark:text-slate-300 font-semibold">WA: 0812-3456-7890</div>
                         <div className="text-slate-400 dark:text-slate-500 text-[11px]">Senin - Sabtu: 08.00 - 15.00 WIB</div>
                     </div>

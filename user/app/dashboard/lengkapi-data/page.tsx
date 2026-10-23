@@ -315,10 +315,6 @@ export default function LengkapiDataPage() {
             {/* PAGE TITLE & PROGRESS BANNER */}
             <div className="bg-emerald-700 dark:bg-emerald-800 border border-emerald-600/30 dark:border-emerald-700/50 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden transition-colors duration-200">
                 <div className="relative z-10 max-w-2xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-3">
-                        {/* <Sparkles className="w-3.5 h-3.5" /> */}
-                        <span>Portal SPMB SMK Muhammadiyah Sekampung</span>
-                    </div>
                     <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
                         Formulir Kelengkapan Data Diri Calon Siswa
                     </h1>
@@ -332,8 +328,8 @@ export default function LengkapiDataPage() {
             {message && (
                 <div
                     className={`p-4 rounded-2xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${message.type === 'success'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
-                            : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
+                        : 'bg-rose-50 dark:bg-rose-950/60 text-rose-900 dark:text-rose-200 border-rose-200 dark:border-rose-800'
                         }`}
                 >
                     <div className="flex items-center gap-2.5">
@@ -369,18 +365,18 @@ export default function LengkapiDataPage() {
                                 key={step.id}
                                 onClick={() => setCurrentStep(step.id)}
                                 className={`flex flex-col text-left p-3 rounded-xl transition-all cursor-pointer relative ${isActive
-                                        ? 'bg-emerald-600 text-white shadow-md'
-                                        : isDone
-                                            ? 'bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100/60 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                                            : 'bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
+                                    ? 'bg-emerald-600 text-white shadow-md'
+                                    : isDone
+                                        ? 'bg-emerald-50/70 dark:bg-emerald-950/30 hover:bg-emerald-100/60 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                        : 'bg-slate-50 dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
                                     }`}
                             >
                                 <div className="flex items-center justify-between w-full mb-1.5">
                                     <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-1.5 py-0.5 rounded ${isActive
-                                            ? 'bg-amber-400 text-slate-950'
-                                            : isDone
-                                                ? 'bg-emerald-600 text-white'
-                                                : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                                        ? 'bg-amber-400 text-slate-950'
+                                        : isDone
+                                            ? 'bg-emerald-600 text-white'
+                                            : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                                         }`}>
                                         {isDone ? (
                                             <>
@@ -888,8 +884,8 @@ export default function LengkapiDataPage() {
                                             key={idx}
                                             onClick={() => setFormData(prev => ({ ...prev, jurusan: item }))}
                                             className={`flex items-start gap-3.5 p-4 rounded-xl border cursor-pointer transition-all ${isSelected
-                                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 text-emerald-950 dark:text-emerald-100 ring-2 ring-emerald-500/20 shadow-xs'
-                                                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-800 dark:text-slate-200'
+                                                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 text-emerald-950 dark:text-emerald-100 ring-2 ring-emerald-500/20 shadow-xs'
+                                                : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-800 dark:text-slate-200'
                                                 }`}
                                         >
                                             <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${isSelected ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
@@ -925,8 +921,8 @@ export default function LengkapiDataPage() {
                                                 key={size}
                                                 onClick={() => setFormData(prev => ({ ...prev, ukuranBaju: size }))}
                                                 className={`flex items-center gap-2.5 p-3 rounded-xl border cursor-pointer transition ${isSelected
-                                                        ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200 font-bold ring-2 ring-amber-400/20'
-                                                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300 text-xs sm:text-sm'
+                                                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200 font-bold ring-2 ring-amber-400/20'
+                                                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300 text-xs sm:text-sm'
                                                     }`}
                                             >
                                                 <div className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 border ${isSelected ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
@@ -995,8 +991,8 @@ export default function LengkapiDataPage() {
                                                 key={item}
                                                 onClick={() => setFormData(prev => ({ ...prev, intrakurikuler: item }))}
                                                 className={`flex items-center gap-3.5 p-4 rounded-xl border cursor-pointer transition ${isChecked
-                                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 text-emerald-950 dark:text-emerald-100 font-bold shadow-xs'
-                                                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300'
+                                                    ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-600 text-emerald-950 dark:text-emerald-100 font-bold shadow-xs'
+                                                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300'
                                                     }`}
                                             >
                                                 <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border ${isChecked ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
@@ -1027,8 +1023,8 @@ export default function LengkapiDataPage() {
                                                 key={item}
                                                 onClick={() => handleCheckboxChange(item)}
                                                 className={`flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition select-none ${isChecked
-                                                        ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200 font-bold shadow-xs'
-                                                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300'
+                                                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-950 dark:text-amber-200 font-bold shadow-xs'
+                                                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50 text-slate-700 dark:text-slate-300'
                                                     }`}
                                             >
                                                 <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 border transition-colors ${isChecked ? 'border-amber-500 bg-amber-500 text-white' : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
