@@ -107,47 +107,22 @@ export default function ChatbotRAG() {
 
     return (
         <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 font-sans">
-            {/* MINIMALIST FLOATING LAUNCHER WITH DISMISSIBLE "Tanya disini!" HINT */}
+            {/* FLOATING LAUNCHER: LOGO CHATBOT DENGAN TULISAN TANYA DI SINI */}
             {!isOpen && (
-                <div className="flex items-center gap-2 animate-in fade-in duration-200">
-                    {/* HINT BADGE "Tanya disini!" DENGAN TOMBOL CLOSE */}
-                    {showHint && (
-                        <div
-                            onClick={() => setIsOpen(true)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-xs font-bold shadow-xl border border-emerald-500/40 hover:border-emerald-500 transition-all cursor-pointer animate-in fade-in slide-in-from-right-3 duration-300 group select-none"
-                            title="Klik untuk membuka chat"
-                        >
-                            {/* <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 animate-pulse" /> */}
-                            <span className="group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                Tanya disini!
-                            </span>
-                            <button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowHint(false);
-                                }}
-                                title="Tutup tulisan ini"
-                                className="p-0.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ml-0.5"
-                                aria-label="Tutup tulisan tanya disini"
-                            >
-                                <X className="w-3 h-3" />
-                            </button>
-                        </div>
-                    )}
-
-                    {/* LAUNCHER BUTTON */}
-                    <button
-                        onClick={() => setIsOpen(true)}
-                        className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-full bg-slate-950 dark:bg-slate-900 hover:bg-slate-900 dark:hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl border border-emerald-500/40 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer group"
-                        aria-label="Buka Chat Asisten AI SPMB"
-                        title="Buka Chat Asisten AI SPMB"
-                    >
-                        <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 group-hover:bg-emerald-500 transition-colors shadow-xs">
-                            <Bot className="w-3.5 h-3.5" />
-                        </div>
-                    </button>
-                </div>
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-950 dark:bg-slate-900 hover:bg-slate-900 dark:hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl border border-emerald-500/50 hover:border-emerald-500 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer group"
+                    aria-label="Tanya di Sini - Asisten AI SPMB"
+                    title="Tanya di Sini - Asisten AI SPMB"
+                >
+                    <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 group-hover:bg-emerald-500 transition-colors shadow-xs">
+                        <Bot className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-100 group-hover:text-emerald-400 transition-colors whitespace-nowrap">
+                        Tanya di Sini
+                    </span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                </button>
             )}
 
             {/* EXPANDED MINIMALIST & SLEEK CHAT CARD */}

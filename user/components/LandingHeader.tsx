@@ -213,12 +213,12 @@ export default function LandingHeader({
             }`}
           >
             {/* Brand Logo & Name With Typewriter Effect */}
-            <Link href="/" className="flex items-center gap-2.5 sm:gap-3.5 group min-w-0 flex-1 lg:flex-initial lg:shrink-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3.5 group min-w-0 flex-1 lg:flex-initial lg:shrink-0">
               <motion.div
                 whileHover={{ scale: 1.06 }}
                 transition={{ duration: 0.2 }}
                 className={`flex items-center justify-center shrink-0 transition-all duration-300 ${
-                  isScrolled ? 'w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14' : 'w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16'
+                  isScrolled ? 'w-9 h-9 sm:w-12 sm:h-12 lg:w-14 lg:h-14' : 'w-10 h-10 sm:w-14 sm:h-14 lg:w-16 lg:h-16'
                 }`}
               >
                 <img
@@ -231,11 +231,11 @@ export default function LandingHeader({
                 />
               </motion.div>
               <div className="min-w-0 flex-1 lg:w-[290px] lg:shrink-0 lg:flex-initial overflow-hidden">
-                <div className="font-extrabold text-xs sm:text-base tracking-tight text-slate-900 dark:text-white uppercase leading-tight min-h-[20px] sm:min-h-[24px] flex items-center whitespace-nowrap overflow-hidden text-ellipsis">
+                <div className="font-extrabold text-[11px] sm:text-base tracking-tight text-slate-900 dark:text-white uppercase leading-tight min-h-[18px] sm:min-h-[24px] flex items-center whitespace-nowrap overflow-hidden text-ellipsis">
                   <span>{typedBrand || ' '}</span>
-                  <span className="inline-block w-0.5 h-3.5 sm:h-5 bg-amber-500 ml-1 animate-pulse shrink-0" />
+                  <span className="inline-block w-0.5 h-3 sm:h-5 bg-amber-500 ml-1 animate-pulse shrink-0" />
                 </div>
-                <div className="text-[10px] sm:text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 tracking-wide truncate">
+                <div className="text-[9px] sm:text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 tracking-wide truncate">
                   Pusat Keunggulan Vokasi
                 </div>
               </div>
@@ -335,11 +335,11 @@ export default function LandingHeader({
             </nav>
 
             {/* Right: Actions, CTA Button & Theme Toggle */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3">
               <Link
                 href="/login"
                 onClick={handleAuthClick}
-                className="hidden sm:inline-block px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/60 font-bold text-xs transition"
+                className="hidden sm:inline-block px-3.5 py-2 rounded-xl text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50/80 dark:hover:bg-emerald-950/60 font-extrabold text-xs transition"
               >
                 Masuk
               </Link>
@@ -349,7 +349,7 @@ export default function LandingHeader({
                 <Link
                   href="/register"
                   onClick={handleAuthClick}
-                  className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs tracking-wider shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-[11px] sm:text-xs tracking-wider shadow-md hover:shadow-lg transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
                 >
                   <span>Daftar SPMB</span>
                 </Link>

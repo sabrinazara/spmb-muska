@@ -340,29 +340,29 @@ export default function HomePage() {
                   </motion.div>
 
                   {/* Staggered Slide Content */}
-                  <div className="relative z-20 max-w-7xl mx-auto h-full px-6 sm:px-12 flex flex-col justify-center">
+                  <div className="relative z-20 max-w-7xl mx-auto h-full px-4 sm:px-12 flex flex-col justify-center">
                     <motion.div
                       variants={staggerContainer}
                       initial="hidden"
                       animate="visible"
-                      className="max-w-3xl space-y-4"
+                      className="max-w-3xl space-y-3 sm:space-y-4"
                     >
                       <motion.div variants={fadeInUp}>
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-600/30 border border-emerald-400/40 text-emerald-300 text-xs font-extrabold uppercase tracking-widest backdrop-blur-xs shadow-lg">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-emerald-600/30 border border-emerald-400/40 text-emerald-300 text-[11px] sm:text-xs font-extrabold uppercase tracking-widest backdrop-blur-xs shadow-lg">
                           <span>{sliders[currentSlide].badgeText || `Penerimaan Siswa Baru TA ${data?.settings?.tahunAjaran || '2026/2027'}`}</span>
                         </div>
                       </motion.div>
 
                       <motion.h1
                         variants={fadeInUp}
-                        className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-md"
+                        className="text-xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-md"
                       >
                         {sliders[currentSlide].title}
                       </motion.h1>
 
                       <motion.p
                         variants={fadeInUp}
-                        className="text-sm sm:text-base text-slate-200/90 leading-relaxed max-w-2xl"
+                        className="text-xs sm:text-base text-slate-200/90 leading-relaxed max-w-2xl line-clamp-3 sm:line-clamp-none"
                       >
                         {sliders[currentSlide].subtitle ||
                           'Bergabung bersama SMK Muhammadiyah Sekampung. Kampus vokasi berkarakter Islami, dilengkapi AI OCR dan teknologi modern.'}
@@ -370,7 +370,7 @@ export default function HomePage() {
 
                       <motion.div
                         variants={fadeInUp}
-                        className="pt-4 flex flex-wrap items-center gap-3"
+                        className="pt-2 sm:pt-4 flex flex-wrap items-center gap-2.5 sm:gap-3"
                       >
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                           <Link
@@ -381,16 +381,16 @@ export default function HomePage() {
                                 handleAuthClick(e, target);
                               }
                             }}
-                            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-xl hover:shadow-2xl transition flex items-center gap-2 cursor-pointer"
+                            className="px-5 sm:px-6 py-2.5 sm:py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-[11px] sm:text-xs uppercase tracking-wider shadow-xl hover:shadow-2xl transition flex items-center gap-2 cursor-pointer"
                           >
                             <span>{sliders[currentSlide].ctaText || 'Daftar SPMB'}</span>
-                            <ArrowRight className="w-4 h-4" />
+                            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </Link>
                         </motion.div>
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                           <a
                             href="#sambutan"
-                            className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs uppercase tracking-wider backdrop-blur-md transition cursor-pointer inline-block"
+                            className="px-5 sm:px-6 py-2.5 sm:py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider backdrop-blur-md transition cursor-pointer inline-block"
                           >
                             Profil
                           </a>
@@ -411,19 +411,19 @@ export default function HomePage() {
                   onClick={() =>
                     setCurrentSlide((prev) => (prev === 0 ? sliders.length - 1 : prev - 1))
                   }
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
                   aria-label="Previous Slide"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.1, backgroundColor: 'rgba(5, 150, 105, 0.85)' }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setCurrentSlide((prev) => (prev + 1) % sliders.length)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
                   aria-label="Next Slide"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.button>
 
                 {/* Dot Indicators */}
@@ -465,32 +465,22 @@ export default function HomePage() {
           {/* Left: Photo & Frame (5 Cols) */}
           <motion.div variants={fadeInLeft} className="lg:col-span-5 flex justify-center">
             <motion.div
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ y: -4 }}
               transition={{ duration: 0.3 }}
-              className="relative group max-w-md w-full"
+              className="relative max-w-md w-full"
             >
-              {/* Layer 1: Ambient outer blur rotating glow */}
-              <div className="absolute -inset-4 rounded-[36px] overflow-hidden blur-2xl opacity-35 group-hover:opacity-90 transition-opacity duration-700 pointer-events-none">
-                <div className="muska-rotating-glow-canvas muska-rotating-glow-bg" />
-              </div>
-
-              {/* Layer 2: Orbital neon border outline rotating */}
-              <div className="absolute -inset-1 rounded-[30px] overflow-hidden opacity-40 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none p-[2px]">
-                <div className="muska-rotating-glow-canvas muska-rotating-glow-bg" />
-              </div>
-
-              {/* Main Card Frame */}
-              <div className="relative z-10 bg-white dark:bg-slate-900 rounded-3xl p-4 border border-slate-200/90 dark:border-slate-800 shadow-2xl overflow-hidden backdrop-blur-sm">
+              {/* Main Card Frame - Clean, Normal & Professional */}
+              <div className="relative z-10 bg-white dark:bg-slate-900 rounded-3xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-slate-950/60 overflow-hidden">
                 <div className="aspect-4/5 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
                   <img
                     src={getFullUrl(profil.fotoKepsek, '/kepsek.jpg')}
                     alt={profil.namaKepsek || 'Kepala Sekolah'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    className="w-full h-full object-cover transition duration-500"
                     onError={(e) => {
                       e.currentTarget.src = '/logo.png';
                     }}
                   />
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-5 text-white">
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950/90 via-slate-950/60 to-transparent p-5 text-white">
                     <div className="text-xs uppercase font-extrabold text-amber-400 tracking-wider">
                       Kepala Sekolah
                     </div>
@@ -519,20 +509,20 @@ export default function HomePage() {
                 'Selamat datang di portal resmi SMK Muhammadiyah Sekampung. Kami senantiasa berkomitmen menghadirkan pendidikan vokasi berkualitas unggul yang mengintegrasikan kompetensi keahlian industri dengan penanaman nilai-nilai luhur Al-Islam dan Kemuhammadiyahan.'}
             </div>
 
-            {/* Motto Banner */}
+            {/* Motto Banner (Non-Gradient, Bersih & Profesional) */}
             <motion.div
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.2 }}
-              className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-teal-50/60 to-amber-50/50 dark:from-emerald-950/40 dark:via-slate-900/50 dark:to-amber-950/20 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center gap-3.5 shadow-2xs"
+              className="p-4 sm:p-5 rounded-2xl bg-emerald-50/80 dark:bg-slate-900 border border-emerald-200 dark:border-slate-800 flex items-center gap-3.5 shadow-xs"
             >
-              <div className="w-11 h-11 rounded-2xl bg-emerald-600/10 dark:bg-emerald-400/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-600/10 dark:bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
                 <Award className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
               </div>
               <div className="min-w-0">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                   Moto
                 </div>
-                <div className="font-dancing text-xl sm:text-2xl font-bold text-emerald-900 dark:text-emerald-200 tracking-wide leading-tight mt-0.5">
+                <div className="font-dancing text-xl sm:text-2xl font-bold text-emerald-800 dark:text-emerald-300 tracking-wide leading-tight mt-0.5">
                   &ldquo;{profil.motto || 'Sukses · Jaya · Bermanfaat · Inspiratif'}&rdquo;
                 </div>
               </div>
@@ -904,11 +894,13 @@ export default function HomePage() {
               .muska-marquee-row {
                 display: flex !important;
                 width: max-content !important;
-                animation: muskaMarqueeScrollLeft 24s linear infinite !important;
+                animation: muskaMarqueeScrollLeft 65s linear infinite !important;
                 will-change: transform;
               }
-              .muska-marquee-row:hover {
-                animation-play-state: paused;
+              .muska-marquee-track:hover .muska-marquee-row,
+              .muska-marquee-row:hover,
+              .muska-marquee-row:hover * {
+                animation-play-state: paused !important;
               }
             `,
           }}
@@ -930,8 +922,8 @@ export default function HomePage() {
           </h2>
         </motion.div>
 
-        {/* Marquee Track Container */}
-        <div className="relative w-full overflow-hidden py-4">
+        {/* Marquee Track Container (Hover to pause, leave to resume) */}
+        <div className="relative w-full overflow-hidden py-4 muska-marquee-track group">
           <div className="muska-marquee-row items-center gap-8">
             {[...mitraList, ...mitraList, ...mitraList, ...mitraList].map((m, idx) => (
               <motion.div
