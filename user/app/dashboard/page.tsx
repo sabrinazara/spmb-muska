@@ -21,6 +21,7 @@ import {
     FileCheck,
 } from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
+import DashboardHeroLottie from '@/components/DashboardHeroLottie';
 
 interface DokumenItem {
     id: string;
@@ -131,21 +132,22 @@ export default function DashboardBeranda() {
     return (
         <div className="space-y-6 font-sans pb-12 animate-in fade-in duration-300">
             {/* Banner Utama */}
-            <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
-                <div className="relative z-10 max-w-2xl">
-                    <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-xs rounded-full text-xs font-semibold tracking-wide text-amber-200 mb-3">
+            {/* Banner Utama (Solid Color, No Gradient, Hero Lottie Illustration) */}
+            <div className="bg-emerald-700 dark:bg-emerald-800 border border-emerald-600/30 dark:border-emerald-700/50 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors duration-200">
+                <div className="relative z-10 max-w-xl space-y-3">
+                    <span className="inline-block px-3 py-1 bg-emerald-800/80 dark:bg-emerald-900/80 border border-emerald-500/30 rounded-full text-xs font-semibold tracking-wide text-amber-200">
                         Tahun Ajaran {tahunAjaran}
                     </span>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                         Selamat Datang, {pendaftaran?.namaLengkap || pendaftaran?.user?.nama || 'Calon Siswa'}!
                     </h1>
-                    <p className="mt-2 text-xs sm:text-sm text-emerald-100 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
                         Pantau seluruh proses penerimaan siswa baru SMK Muhammadiyah Sekampung melalui panduan alur terpadu di bawah ini.
                     </p>
-                    <div className="mt-5 flex flex-wrap gap-3">
+                    <div className="pt-2 flex flex-wrap gap-3">
                         <Link
                             href="/dashboard/lengkapi-data"
-                            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
+                            className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 active:bg-amber-500 text-slate-950 font-bold text-xs sm:text-sm rounded-xl shadow-xs transition inline-flex items-center gap-2 cursor-pointer"
                         >
                             <Edit3 className="w-4 h-4 text-slate-950" />
                             <span>{isBiodataComplete ? 'Lihat / Ubah Data' : 'Lengkapi Formulir Biodata'}</span>
@@ -160,15 +162,9 @@ export default function DashboardBeranda() {
                     </div>
                 </div>
 
-                {/* Responsive Official School Emblem Watermark */}
-                <div className="absolute -right-4 -bottom-4 sm:right-6 sm:top-1/2 sm:-translate-y-1/2 opacity-20 sm:opacity-25 pointer-events-none select-none">
-                    <div className="w-28 h-28 sm:w-44 sm:h-44 md:w-52 md:h-52 lg:w-60 lg:h-60 filter drop-shadow-[0_10px_25px_rgba(0,0,0,0.35)]">
-                        <img
-                            src="/logo.png"
-                            alt="Logo SMK Muhammadiyah Sekampung"
-                            className="w-full h-full object-contain"
-                        />
-                    </div>
+                {/* Responsive Hero Lottie Animation (Pengganti Watermark Logo SMK - Animasi herosection.json) */}
+                <div className="hidden sm:flex shrink-0 items-center justify-center w-52 h-40 md:w-64 md:h-48 lg:w-72 lg:h-52 relative z-10 select-none">
+                    <DashboardHeroLottie className="w-full h-full" />
                 </div>
             </div>
 
@@ -559,7 +555,7 @@ export default function DashboardBeranda() {
                     </div>
 
                     {/* Pengumuman Kelulusan Banner Card */}
-                    <div className="bg-gradient-to-br from-emerald-900 to-teal-950 text-white rounded-2xl p-6 shadow-xs border border-emerald-800">
+                    <div className="bg-emerald-900 text-white rounded-2xl p-6 shadow-xs border border-emerald-800">
                         <div className="flex items-center gap-2 text-amber-300 font-bold text-sm mb-2">
                             <Award className="w-4 h-4 text-amber-300" />
                             <span>Pengumuman Kelulusan</span>
@@ -576,7 +572,7 @@ export default function DashboardBeranda() {
                     </div>
 
                     {/* Kartu Ujian Box */}
-                    <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 rounded-2xl border border-amber-200/80 dark:border-amber-800/60 p-6 shadow-xs">
+                    <div className="bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-200/80 dark:border-amber-800/60 p-6 shadow-xs">
                         <div className="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold text-sm mb-2">
                             <CreditCard className="w-4 h-4 text-amber-700 dark:text-amber-400" />
                             <span>Kartu Peserta Ujian</span>

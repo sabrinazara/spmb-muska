@@ -313,7 +313,7 @@ export default function LengkapiDataPage() {
     return (
         <div className="space-y-6 font-sans antialiased pb-12">
             {/* PAGE TITLE & PROGRESS BANNER */}
-            <div className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+            <div className="bg-emerald-700 dark:bg-emerald-800 border border-emerald-600/30 dark:border-emerald-700/50 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden transition-colors duration-200">
                 <div className="relative z-10 max-w-2xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-3">
                         {/* <Sparkles className="w-3.5 h-3.5" /> */}
