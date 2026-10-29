@@ -79,6 +79,36 @@ export class LandingPageController {
         return this.landingService.getPublicProgramByIdOrSlug(idOrSlug);
     }
 
+    @Get('agenda')
+    async getPublicAgenda() {
+        return this.landingService.getAgenda();
+    }
+
+    @Get('agenda/:id')
+    async getPublicAgendaDetail(@Param('id') id: string) {
+        return this.landingService.getAgendaById(id);
+    }
+
+    @Get('prestasi')
+    async getPublicPrestasi() {
+        return this.landingService.getPrestasi();
+    }
+
+    @Get('prestasi/:id')
+    async getPublicPrestasiDetail(@Param('id') id: string) {
+        return this.landingService.getPrestasiById(id);
+    }
+
+    @Get('galeri')
+    async getPublicGaleri() {
+        return this.landingService.getPublicGaleri();
+    }
+
+    @Get('galeri/:slugOrId')
+    async getPublicGaleriDetail(@Param('slugOrId') slugOrId: string) {
+        return this.landingService.getPublicGaleriBySlugOrId(slugOrId);
+    }
+
     // ==========================================
     // ADMIN ENDPOINTS (PROTECTED BY ADMINGUARD)
     // ==========================================
@@ -290,5 +320,80 @@ export class LandingPageController {
     @Delete('admin/berita/:id')
     async deleteBerita(@Param('id') id: string, @Request() req: any) {
         return this.landingService.deleteBerita(id, req.user);
+    }
+
+    // 7. AGENDA SEKOLAH
+    @UseGuards(AdminGuard)
+    @Get('admin/agenda')
+    async getAgenda() {
+        return this.landingService.getAgenda();
+    }
+
+    @UseGuards(AdminGuard)
+    @Post('admin/agenda')
+    async createAgenda(@Body() body: any, @Request() req: any) {
+        return this.landingService.createAgenda(body, req.user);
+    }
+
+    @UseGuards(AdminGuard)
+    @Put('admin/agenda/:id')
+    async updateAgenda(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+        return this.landingService.updateAgenda(id, body, req.user);
+    }
+
+    @UseGuards(AdminGuard)
+    @Delete('admin/agenda/:id')
+    async deleteAgenda(@Param('id') id: string, @Request() req: any) {
+        return this.landingService.deleteAgenda(id, req.user);
+    }
+
+    // 8. PRESTASI SISWA
+    @UseGuards(AdminGuard)
+    @Get('admin/prestasi')
+    async getPrestasi() {
+        return this.landingService.getPrestasi();
+    }
+
+    @UseGuards(AdminGuard)
+    @Post('admin/prestasi')
+    async createPrestasi(@Body() body: any, @Request() req: any) {
+        return this.landingService.createPrestasi(body, req.user);
+    }
+
+    @UseGuards(AdminGuard)
+    @Put('admin/prestasi/:id')
+    async updatePrestasi(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+        return this.landingService.updatePrestasi(id, body, req.user);
+    }
+
+    @UseGuards(AdminGuard)
+    @Delete('admin/prestasi/:id')
+    async deletePrestasi(@Param('id') id: string, @Request() req: any) {
+        return this.landingService.deletePrestasi(id, req.user);
+    }
+
+    // 9. GALERI SEKOLAH
+    @UseGuards(AdminGuard)
+    @Get('admin/galeri')
+    async getGaleri() {
+        return this.landingService.getGaleri();
+    }
+
+    @UseGuards(AdminGuard)
+    @Post('admin/galeri')
+    async createGaleri(@Body() body: any, @Request() req: any) {
+        return this.landingService.createGaleri(body, req.user);
+    }
+
+    @UseGuards(AdminGuard)
+    @Put('admin/galeri/:id')
+    async updateGaleri(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+        return this.landingService.updateGaleri(id, body, req.user);
+    }
+
+    @UseGuards(AdminGuard)
+    @Delete('admin/galeri/:id')
+    async deleteGaleri(@Param('id') id: string, @Request() req: any) {
+        return this.landingService.deleteGaleri(id, req.user);
     }
 }

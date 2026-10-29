@@ -181,6 +181,7 @@ model ProfilSekolah {
   teleponResmi   String?
   whatsappResmi  String?
   mapsEmbedUrl   String?  @db.Text
+  logoUrl        String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now()) @updatedAt
 }
@@ -244,5 +245,49 @@ model Berita {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @default(now()) @updatedAt
 }
+
+model AgendaSekolah {
+  id          String   @id @default(uuid())
+  judul       String
+  tanggal     DateTime
+  waktu       String?
+  lokasi      String?
+  kategori    String?  @default("Umum") // Akademik, Kesiswaan, Ujian, SPMB, Umum
+  deskripsi   String?  @db.Text
+  isActive    Boolean  @default(true)
+  urutan      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
+model PrestasiSiswa {
+  id            String   @id @default(uuid())
+  judul         String
+  kategoriJuara String   @default("JUARA") // JUARA, JUARA 1, JUARA 2, MEDALI EMAS
+  namaPeserta   String
+  namaLomba     String?
+  tingkat       String?  @default("Kabupaten") // Kabupaten, Provinsi, Nasional, Internasional
+  fotoUrl       String
+  deskripsi     String?  @db.Text
+  tanggal       DateTime @default(now())
+  urutan        Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+}
+
+model GaleriSekolah {
+  id          String   @id @default(uuid())
+  judul       String
+  slug        String   @unique
+  kategori    String   @default("Kegiatan") // Kegiatan, Fasilitas, Prestasi, Pembelajaran
+  deskripsi   String?  @db.Text
+  thumbnail   String
+  fotoUrls    String[] @default([])
+  tanggal     DateTime @default(now())
+  urutan      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+}
+
 
 

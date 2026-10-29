@@ -13,7 +13,7 @@ export class LandingPageService {
         // Cek dan inisialisasi data bawaan sekolah jika belum ada
         await this.ensureInitialSeed();
 
-        const [sliders, profil, wks, guru, programKeahlian, mitraIndustri, berita, systemSettings] = await Promise.all([
+        const [sliders, profil, wks, guru, programKeahlian, mitraIndustri, berita, agenda, prestasi, galeri, systemSettings] = await Promise.all([
             this.prisma.heroSlider.findMany({
                 where: { isActive: true },
                 orderBy: { urutan: 'asc' },
@@ -35,6 +35,19 @@ export class LandingPageService {
             this.prisma.berita.findMany({
                 orderBy: { tanggalPublish: 'desc' },
                 take: 6,
+            }),
+            this.prisma.agendaSekolah.findMany({
+                where: { isActive: true },
+                orderBy: { tanggal: 'asc' },
+                take: 8,
+            }),
+            this.prisma.prestasiSiswa.findMany({
+                orderBy: [{ urutan: 'asc' }, { tanggal: 'desc' }],
+                take: 12,
+            }),
+            this.prisma.galeriSekolah.findMany({
+                orderBy: [{ urutan: 'asc' }, { tanggal: 'desc' }],
+                take: 12,
             }),
             this.prisma.systemSetting.findMany(),
         ]);
@@ -59,6 +72,9 @@ export class LandingPageService {
             programKeahlian,
             mitraIndustri,
             berita,
+            agenda,
+            prestasi,
+            galeri,
             settings,
         };
     }
@@ -360,6 +376,137 @@ export class LandingPageService {
                 ],
             });
         }
+
+        const agendaCount = await this.prisma.agendaSekolah.count();
+        if (agendaCount === 0) {
+            await this.prisma.agendaSekolah.createMany({
+                data: [
+                    {
+                        judul: 'Sosialisasi & Pendaftaran Jalur Prestasi SPMB TA 2026/2027',
+                        tanggal: new Date(Date.now() + 86400000 * 5),
+                        waktu: '08:00 - 11:30 WIB',
+                        lokasi: 'Aula Utama KH. Ahmad Dahlan SMK MUSKA',
+                        kategori: 'SPMB',
+                        deskripsi: 'Pemberian informasi teknis pendaftaran online, kuota beasiswa prestasi, serta demo sistem AI OCR berkas pendaftaran bagi calon wali murid.',
+                        isActive: true,
+                        urutan: 1,
+                    },
+                    {
+                        judul: 'Uji Kompetensi Keahlian (UKK) & Sertifikasi LSP-P1 Siswa Kelas XII',
+                        tanggal: new Date(Date.now() + 86400000 * 12),
+                        waktu: '07:30 - 15:30 WIB',
+                        lokasi: 'Bengkel Teknik & Laboratorium Komputer Terpadu',
+                        kategori: 'Akademik',
+                        deskripsi: 'Pelaksanaan asesmen kompetensi kerja riil berstandar BNSP yang diuji langsung oleh instruktur industri mitra terpercaya.',
+                        isActive: true,
+                        urutan: 2,
+                    },
+                    {
+                        judul: 'Peringatan Milad Muhammadiyah & Pagelaran Seni Budaya Pelajar',
+                        tanggal: new Date(Date.now() + 86400000 * 20),
+                        waktu: '08:00 - 16:00 WIB',
+                        lokasi: 'Lapangan Kampus SMK Muhammadiyah Sekampung',
+                        kategori: 'Kesiswaan',
+                        deskripsi: 'Ajang kreasi bakat siswa, pawai taaruf, atraksi Tapak Suci Putera Muhammadiyah, serta pameran karya vokasi kewirausahaan.',
+                        isActive: true,
+                        urutan: 3,
+                    },
+                    {
+                        judul: 'Kunjungan Industri & Kuliah Umum Bersama PT Astra Honda Motor',
+                        tanggal: new Date(Date.now() + 86400000 * 28),
+                        waktu: '09:00 - 13:00 WIB',
+                        lokasi: 'Studio Audio Visual & Bengkel TBSM',
+                        kategori: 'Umum',
+                        deskripsi: 'Bedah kurikulum teknologi sepeda motor injeksi terkini dan peluang karier langsung pasca lulus bagi siswa SMK MUSKA.',
+                        isActive: true,
+                        urutan: 4,
+                    },
+                ],
+            });
+        }
+
+        const prestasiCount = await this.prisma.prestasiSiswa.count();
+        if (prestasiCount === 0) {
+            await this.prisma.prestasiSiswa.createMany({
+                data: [
+                    {
+                        judul: 'E-Sport Mobile Legends Pelajar Se-Sumbagsel',
+                        kategoriJuara: 'JUARA',
+                        namaPeserta: 'GPS E-SPORT · Kelas 10 TJKT, 11 TJKT, 12 PPLG',
+                        namaLomba: 'OlympicAD 2026 Cabang E-Sport',
+                        tingkat: 'Regional',
+                        fotoUrl: '/banner-spmb.jpg',
+                        deskripsi: 'Meraih Juara 1 Turnamen E-Sport kategori pelajar tingkat Sumatera Bagian Selatan.',
+                        urutan: 1,
+                    },
+                    {
+                        judul: 'Lomba Cerdas Tangkas Kepanduan Hizbul Wathan',
+                        kategoriJuara: 'JUARA',
+                        namaPeserta: 'Kafilah Qobilah HW SMK MUSKA',
+                        namaLomba: 'Kemah Cerdas Tangkas Kepanduan Kedu & Sumbagsel',
+                        tingkat: 'Provinsi',
+                        fotoUrl: '/berita-lks.jpg',
+                        deskripsi: 'Meraih Juara Umum dalam rangkaian lomba navigasi darat, sandi morse, dan kepemimpinan Islam.',
+                        urutan: 2,
+                    },
+                    {
+                        judul: 'Lomba Film Pendek & Sinematografi "Cahaya Hati"',
+                        kategoriJuara: 'JUARA',
+                        namaPeserta: 'Tim Sinema DKV · Kelas 10 PPLG & 11 DKV',
+                        namaLomba: 'Festival Film Jumbara PMI & Kominfo Kabupaten',
+                        tingkat: 'Kabupaten',
+                        fotoUrl: '/berita-mou.jpg',
+                        deskripsi: 'Karya audio visual bertema solidaritas kemanusiaan dan kepedulian sosial di masa digital.',
+                        urutan: 3,
+                    },
+                    {
+                        judul: 'Lomba Seni Kaligrafi Islam OlympicAD Tingkat Nasional',
+                        kategoriJuara: 'JUARA',
+                        namaPeserta: 'Thalita Nur Azizah · Kelas 11 Pemasaran',
+                        namaLomba: 'OlympicAD Nasional Perguruan Muhammadiyah',
+                        tingkat: 'Nasional',
+                        fotoUrl: '/kepsek.jpg',
+                        deskripsi: 'Menyabet medali emas cabang kaligrafi kontemporer tingkat pelajar nasional.',
+                        urutan: 4,
+                    },
+                ],
+            });
+        }
+
+        const galeriCount = await this.prisma.galeriSekolah.count();
+        if (galeriCount === 0) {
+            await this.prisma.galeriSekolah.createMany({
+                data: [
+                    {
+                        judul: 'Gelar Karya Vokasi & Expo Jurusan SMK MUSKA',
+                        slug: 'gelar-karya-vokasi-expo-jurusan-smk-muska',
+                        kategori: 'Kegiatan',
+                        deskripsi: 'Dokumentasi semarak pameran hasil inovasi dan teknologi karya siswa dari 8 program keahlian SMK Muhammadiyah Sekampung.',
+                        thumbnail: '/banner-spmb.jpg',
+                        fotoUrls: ['/banner-spmb.jpg', '/berita-lks.jpg', '/berita-mou.jpg', '/kepsek.jpg'],
+                        urutan: 1,
+                    },
+                    {
+                        judul: 'Praktik Industri Bengkel Otomotif & Lab Komputer Modern',
+                        slug: 'praktik-industri-bengkel-otomotif-lab-komputer',
+                        kategori: 'Pembelajaran',
+                        deskripsi: 'Suasana pembelajaran vokasi berbasis praktik nyata pada laboratorium komputer terpadu dan bengkel standar ATPM.',
+                        thumbnail: '/berita-lks.jpg',
+                        fotoUrls: ['/berita-lks.jpg', '/banner-spmb.jpg', '/berita-mou.jpg'],
+                        urutan: 2,
+                    },
+                    {
+                        judul: 'Peringatan Milad Muhammadiyah & Bakti Sosial Pelajar',
+                        slug: 'peringatan-milad-muhammadiyah-bakti-sosial',
+                        kategori: 'Kesiswaan',
+                        deskripsi: 'Aksi nyata pengabdian masyarakat, donor darah, santunan, dan unjuk kreativitas siswa-siswi IPM dan HW.',
+                        thumbnail: '/berita-mou.jpg',
+                        fotoUrls: ['/berita-mou.jpg', '/banner-spmb.jpg', '/berita-lks.jpg'],
+                        urutan: 3,
+                    },
+                ],
+            });
+        }
     }
 
     async getPublicBerita() {
@@ -538,6 +685,7 @@ export class LandingPageService {
                 teleponResmi: data.teleponResmi || null,
                 whatsappResmi: data.whatsappResmi || null,
                 mapsEmbedUrl: data.mapsEmbedUrl || null,
+                logoUrl: data.logoUrl || '/logo.png',
             },
             update: {
                 namaKepsek: data.namaKepsek !== undefined ? data.namaKepsek : undefined,
@@ -553,6 +701,7 @@ export class LandingPageService {
                 teleponResmi: data.teleponResmi !== undefined ? data.teleponResmi : undefined,
                 whatsappResmi: data.whatsappResmi !== undefined ? data.whatsappResmi : undefined,
                 mapsEmbedUrl: data.mapsEmbedUrl !== undefined ? data.mapsEmbedUrl : undefined,
+                logoUrl: data.logoUrl !== undefined ? data.logoUrl : undefined,
             },
         });
 
@@ -996,5 +1145,344 @@ export class LandingPageService {
             });
         }
         return { message: 'Berita berhasil dihapus' };
+    }
+
+    // ==========================================
+    // 7. AGENDA SEKOLAH
+    // ==========================================
+
+    async getAgenda() {
+        await this.ensureInitialSeed();
+        return this.prisma.agendaSekolah.findMany({
+            orderBy: [{ tanggal: 'asc' }, { urutan: 'asc' }],
+        });
+    }
+
+    async getAgendaById(id: string) {
+        await this.ensureInitialSeed();
+        const agenda = await this.prisma.agendaSekolah.findUnique({ where: { id } });
+        if (!agenda) throw new NotFoundException('Agenda tidak ditemukan');
+        return agenda;
+    }
+
+    async createAgenda(data: any, adminUser?: any) {
+        if (!data.judul || !data.tanggal) {
+            throw new BadRequestException('Judul dan tanggal agenda wajib diisi');
+        }
+
+        const created = await this.prisma.agendaSekolah.create({
+            data: {
+                judul: data.judul,
+                tanggal: new Date(data.tanggal),
+                waktu: data.waktu || null,
+                lokasi: data.lokasi || null,
+                kategori: data.kategori || 'Umum',
+                deskripsi: data.deskripsi || null,
+                isActive: data.isActive !== undefined ? Boolean(data.isActive) : true,
+                urutan: data.urutan ? Number(data.urutan) : 0,
+            },
+        });
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'CREATE_AGENDA',
+                    detail: `Membuat agenda sekolah: "${created.judul}"`,
+                    targetUser: created.id,
+                },
+            });
+        }
+        return created;
+    }
+
+    async updateAgenda(id: string, data: any, adminUser?: any) {
+        const existing = await this.prisma.agendaSekolah.findUnique({ where: { id } });
+        if (!existing) throw new NotFoundException('Agenda tidak ditemukan');
+
+        const updated = await this.prisma.agendaSekolah.update({
+            where: { id },
+            data: {
+                judul: data.judul ?? existing.judul,
+                tanggal: data.tanggal ? new Date(data.tanggal) : existing.tanggal,
+                waktu: data.waktu !== undefined ? data.waktu : existing.waktu,
+                lokasi: data.lokasi !== undefined ? data.lokasi : existing.lokasi,
+                kategori: data.kategori ?? existing.kategori,
+                deskripsi: data.deskripsi !== undefined ? data.deskripsi : existing.deskripsi,
+                isActive: data.isActive !== undefined ? Boolean(data.isActive) : existing.isActive,
+                urutan: data.urutan !== undefined ? Number(data.urutan) : existing.urutan,
+            },
+        });
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'UPDATE_AGENDA',
+                    detail: `Memperbarui agenda: "${updated.judul}"`,
+                    targetUser: id,
+                },
+            });
+        }
+        return updated;
+    }
+
+    async deleteAgenda(id: string, adminUser?: any) {
+        const existing = await this.prisma.agendaSekolah.findUnique({ where: { id } });
+        if (!existing) throw new NotFoundException('Agenda tidak ditemukan');
+
+        await this.prisma.agendaSekolah.delete({ where: { id } });
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'DELETE_AGENDA',
+                    detail: `Menghapus agenda: "${existing.judul}"`,
+                    targetUser: id,
+                },
+            });
+        }
+        return { message: 'Agenda berhasil dihapus' };
+    }
+
+    // ==========================================
+    // 8. PRESTASI SISWA
+    // ==========================================
+
+    async getPrestasi() {
+        await this.ensureInitialSeed();
+        return this.prisma.prestasiSiswa.findMany({
+            orderBy: [{ urutan: 'asc' }, { tanggal: 'desc' }],
+        });
+    }
+
+    async getPrestasiById(id: string) {
+        await this.ensureInitialSeed();
+        const prestasi = await this.prisma.prestasiSiswa.findUnique({ where: { id } });
+        if (!prestasi) throw new NotFoundException('Prestasi tidak ditemukan');
+        return prestasi;
+    }
+
+    async createPrestasi(data: any, adminUser?: any) {
+        if (!data.judul || !data.namaPeserta || !data.fotoUrl) {
+            throw new BadRequestException('Judul, nama peserta, dan foto dokumentasi wajib diisi');
+        }
+
+        const created = await this.prisma.prestasiSiswa.create({
+            data: {
+                judul: data.judul,
+                kategoriJuara: data.kategoriJuara || 'JUARA',
+                namaPeserta: data.namaPeserta,
+                namaLomba: data.namaLomba || null,
+                tingkat: data.tingkat || 'Kabupaten',
+                fotoUrl: data.fotoUrl,
+                deskripsi: data.deskripsi || null,
+                tanggal: data.tanggal ? new Date(data.tanggal) : new Date(),
+                urutan: data.urutan ? Number(data.urutan) : 0,
+            },
+        });
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'CREATE_PRESTASI',
+                    detail: `Menambahkan prestasi siswa: "${created.judul}"`,
+                    targetUser: created.id,
+                },
+            });
+        }
+        return created;
+    }
+
+    async updatePrestasi(id: string, data: any, adminUser?: any) {
+        const existing = await this.prisma.prestasiSiswa.findUnique({ where: { id } });
+        if (!existing) throw new NotFoundException('Prestasi siswa tidak ditemukan');
+
+        const updated = await this.prisma.prestasiSiswa.update({
+            where: { id },
+            data: {
+                judul: data.judul ?? existing.judul,
+                kategoriJuara: data.kategoriJuara ?? existing.kategoriJuara,
+                namaPeserta: data.namaPeserta ?? existing.namaPeserta,
+                namaLomba: data.namaLomba !== undefined ? data.namaLomba : existing.namaLomba,
+                tingkat: data.tingkat ?? existing.tingkat,
+                fotoUrl: data.fotoUrl ?? existing.fotoUrl,
+                deskripsi: data.deskripsi !== undefined ? data.deskripsi : existing.deskripsi,
+                tanggal: data.tanggal ? new Date(data.tanggal) : existing.tanggal,
+                urutan: data.urutan !== undefined ? Number(data.urutan) : existing.urutan,
+            },
+        });
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'UPDATE_PRESTASI',
+                    detail: `Memperbarui prestasi siswa: "${updated.judul}"`,
+                    targetUser: id,
+                },
+            });
+        }
+        return updated;
+    }
+
+    async deletePrestasi(id: string, adminUser?: any) {
+        const existing = await this.prisma.prestasiSiswa.findUnique({ where: { id } });
+        if (!existing) throw new NotFoundException('Prestasi siswa tidak ditemukan');
+
+        await this.prisma.prestasiSiswa.delete({ where: { id } });
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'DELETE_PRESTASI',
+                    detail: `Menghapus prestasi siswa: "${existing.judul}"`,
+                    targetUser: id,
+                },
+            });
+        }
+        return { message: 'Prestasi berhasil dihapus' };
+    }
+
+    // ==========================================
+    // 9. GALERI SEKOLAH
+    // ==========================================
+
+    async getGaleri() {
+        await this.ensureInitialSeed();
+        return this.prisma.galeriSekolah.findMany({
+            orderBy: [{ urutan: 'asc' }, { tanggal: 'desc' }],
+        });
+    }
+
+    async getPublicGaleri() {
+        return this.getGaleri();
+    }
+
+    async getPublicGaleriBySlugOrId(slugOrId: string) {
+        await this.ensureInitialSeed();
+        const galeri = await this.prisma.galeriSekolah.findFirst({
+            where: {
+                OR: [{ slug: slugOrId }, { id: slugOrId }],
+            },
+        });
+        if (!galeri) {
+            throw new NotFoundException(`Galeri "${slugOrId}" tidak ditemukan`);
+        }
+        return galeri;
+    }
+
+    async createGaleri(data: any, adminUser?: any) {
+        if (!data.judul || !data.thumbnail) {
+            throw new BadRequestException('Judul dan thumbnail sampul album wajib diisi');
+        }
+
+        let baseSlug = (data.slug || data.judul)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+        if (!baseSlug) baseSlug = 'galeri-' + Date.now();
+
+        let finalSlug = baseSlug;
+        let counter = 1;
+        while (await this.prisma.galeriSekolah.findUnique({ where: { slug: finalSlug } })) {
+            finalSlug = `${baseSlug}-${counter}`;
+            counter++;
+        }
+
+        const created = await this.prisma.galeriSekolah.create({
+            data: {
+                judul: data.judul,
+                slug: finalSlug,
+                kategori: data.kategori || 'Kegiatan',
+                deskripsi: data.deskripsi || null,
+                thumbnail: data.thumbnail,
+                fotoUrls: Array.isArray(data.fotoUrls) ? data.fotoUrls : [],
+                tanggal: data.tanggal ? new Date(data.tanggal) : new Date(),
+                urutan: data.urutan ? Number(data.urutan) : 0,
+            },
+        });
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'CREATE_GALERI',
+                    detail: `Membuat album galeri foto: "${created.judul}"`,
+                    targetUser: created.id,
+                },
+            });
+        }
+        return created;
+    }
+
+    async updateGaleri(id: string, data: any, adminUser?: any) {
+        const existing = await this.prisma.galeriSekolah.findUnique({ where: { id } });
+        if (!existing) throw new NotFoundException('Album galeri tidak ditemukan');
+
+        let finalSlug = existing.slug;
+        if (data.slug && data.slug !== existing.slug) {
+            const cleanSlug = data.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            const check = await this.prisma.galeriSekolah.findUnique({ where: { slug: cleanSlug } });
+            if (check && check.id !== id) {
+                finalSlug = `${cleanSlug}-${Date.now().toString().slice(-4)}`;
+            } else {
+                finalSlug = cleanSlug;
+            }
+        }
+
+        const updated = await this.prisma.galeriSekolah.update({
+            where: { id },
+            data: {
+                judul: data.judul ?? existing.judul,
+                slug: finalSlug,
+                kategori: data.kategori ?? existing.kategori,
+                deskripsi: data.deskripsi !== undefined ? data.deskripsi : existing.deskripsi,
+                thumbnail: data.thumbnail ?? existing.thumbnail,
+                fotoUrls: Array.isArray(data.fotoUrls) ? data.fotoUrls : existing.fotoUrls,
+                tanggal: data.tanggal ? new Date(data.tanggal) : existing.tanggal,
+                urutan: data.urutan !== undefined ? Number(data.urutan) : existing.urutan,
+            },
+        });
+
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'UPDATE_GALERI',
+                    detail: `Memperbarui album galeri: "${updated.judul}"`,
+                    targetUser: id,
+                },
+            });
+        }
+        return updated;
+    }
+
+    async deleteGaleri(id: string, adminUser?: any) {
+        const existing = await this.prisma.galeriSekolah.findUnique({ where: { id } });
+        if (!existing) throw new NotFoundException('Album galeri tidak ditemukan');
+
+        await this.prisma.galeriSekolah.delete({ where: { id } });
+        if (adminUser) {
+            await this.prisma.auditLog.create({
+                data: {
+                    adminId: adminUser.sub,
+                    adminNama: adminUser.email,
+                    aksi: 'DELETE_GALERI',
+                    detail: `Menghapus album galeri: "${existing.judul}"`,
+                    targetUser: id,
+                },
+            });
+        }
+        return { message: 'Album galeri berhasil dihapus' };
     }
 }

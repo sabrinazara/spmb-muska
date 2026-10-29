@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, type Variants } from 'framer-motion';
-import { MapPin, Mail, Phone } from 'lucide-react';
+import { MapPin, Mail, Phone, MessageCircle } from 'lucide-react';
 
 interface LandingFooterProps {
   profil?: any;
@@ -18,6 +18,16 @@ const fadeInUp: Variants = {
 };
 
 export default function LandingFooter({ profil = {} }: LandingFooterProps) {
+  const logoSrc = profil?.logoUrl
+    ? (profil.logoUrl.startsWith('/uploads/')
+      ? (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001') + profil.logoUrl
+      : profil.logoUrl)
+    : '/logo.png';
+
+  const waRaw = profil?.whatsappResmi || profil?.teleponResmi || '081377653555';
+  const waClean = waRaw.replace(/\D/g, '').replace(/^0/, '62');
+  const waLink = `https://wa.me/${waClean}`;
+
   return (
     <motion.footer
       id="kontak"
@@ -25,7 +35,7 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
       variants={fadeInUp}
-      className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-16 pb-8"
+      className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-16 pb-6 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -34,7 +44,7 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 flex items-center justify-center shrink-0">
                 <img
-                  src="/logo.png"
+                  src={logoSrc}
                   alt="Logo SMK Muhammadiyah Sekampung"
                   className="w-full h-full object-contain filter drop-shadow-sm"
                   onError={(e) => {
@@ -50,7 +60,7 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
               Sekolah Menengah Kejuruan Pusat Keunggulan di Kabupaten Lampung Timur yang berkarakter Islami, kompeten, dan siap kerja.
             </p>
             <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-800 text-[11px] text-emerald-300 font-bold">
-              Moto: {profil?.motto || 'Sukses · Jaya · Bermanfaat · Inspiratif'}
+              {profil?.motto || 'Sukses · Jaya · Bermanfaat · Inspiratif'}
             </div>
           </div>
 
@@ -85,16 +95,6 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
                   Profil Pimpinan Sekolah
                 </Link>
               </li>
-              <li>
-                <a
-                  href="http://localhost:3002"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-emerald-400 transition-colors"
-                >
-                  CMS Dashboard Administrator
-                </a>
-              </li>
             </ul>
           </div>
 
@@ -117,7 +117,7 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
-                <span>{profil?.teleponResmi || '081377653555'}</span>
+                <span>{profil?.whatsappResmi || profil?.teleponResmi || '081377653555'}</span>
               </li>
             </ul>
           </div>
@@ -125,7 +125,7 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
           {/* Col 4: Google Maps Embed */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-widest">
-              Peta Lokasi Kampus
+              Peta Lokasi
             </h4>
             <div className="w-full h-40 rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-md">
               <iframe
@@ -144,8 +144,42 @@ export default function LandingFooter({ profil = {} }: LandingFooterProps) {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-slate-800/80 text-center text-xs text-slate-500">
-          © 2026 SMK Muhammadiyah Sekampung. Seluruh Hak Cipta Dilindungi Undang-Undang.
+        {/* BOTTOM ROW: COPYRIGHT & WHATSAPP (Sesuai Screenshot 2) */}
+        <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <p>© 2026 SMK Muhammadiyah Sekampung. Seluruh hak cipta dilindungi.</p>
+          <a
+            href={waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-slate-300 hover:text-emerald-400 transition-colors font-medium cursor-pointer"
+          >
+            <MessageCircle className="w-4 h-4 text-emerald-400" />
+            <span>Hubungi kami via WhatsApp</span>
+          </a>
+        </div>
+
+        {/* WATERMARK TYPOGRAPHY: MUSKA HEBAT. */}
+        <div className="pt-6 sm:pt-10 pb-4 w-full flex items-center overflow-hidden select-none pointer-events-none relative">
+
+          {/* Definisi keyframes untuk animasi berjalan (marquee) */}
+          <style>
+            {`
+      @keyframes marquee {
+        0% { transform: translateX(100vw); }
+        100% { transform: translateX(-100%); }
+      }
+      .animate-marquee {
+        display: inline-block;
+        animation: marquee 15s linear infinite;
+      }
+    `}
+          </style>
+
+          {/* Teks: Font Poppins, animasi marquee, dan efek blur di bawah (drop-shadow) */}
+          <div className="font-['Poppins'] font-black uppercase text-[15vw] leading-none text-slate-800/10 dark:text-slate-200/10 whitespace-nowrap animate-marquee drop-shadow-[0_8px_8px_rgba(0,0,0,0.08)]">
+            SMK MUSKA HEBAT.
+          </div>
+
         </div>
       </div>
     </motion.footer>

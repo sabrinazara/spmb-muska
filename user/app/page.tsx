@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
@@ -32,12 +32,17 @@ import {
   Quote,
   GraduationCap,
   Image as ImageIcon,
-  Home,
+  Trophy,
+  Share2,
+  Clock,
+  CheckCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { API_ENDPOINTS } from '@/lib/api';
 import ChatbotRAG from '@/components/ChatbotRAG';
 import RegistrationClosedModal from '@/components/RegistrationClosedModal';
 import LandingHeader from '@/components/LandingHeader';
+import LandingFooter from '@/components/LandingFooter';
 
 interface LandingData {
   sliders: any[];
@@ -47,6 +52,9 @@ interface LandingData {
   programKeahlian: any[];
   mitraIndustri: any[];
   berita: any[];
+  agenda?: any[];
+  prestasi?: any[];
+  galeri?: any[];
   settings?: {
     tahunAjaran?: string;
     bukaPendaftaran?: boolean;
@@ -166,6 +174,60 @@ export default function HomePage() {
   const [selectedBerita, setSelectedBerita] = useState<any | null>(null);
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
 
+  // Tab Keunggulan Sekolah (Layout Screenshot 1)
+  const [activeKeunggulanTab, setActiveKeunggulanTab] = useState<'app' | 'guru' | 'fasilitas'>('app');
+
+  // Prestasi Scroll & Auto-Slide (Setiap 5 Detik)
+  const [copiedShareId, setCopiedShareId] = useState<string | null>(null);
+  const prestasiScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollPrestasi = (direction: 'left' | 'right') => {
+    if (prestasiScrollRef.current) {
+      const scrollAmount = 340;
+      prestasiScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  const handleSharePrestasi = (e: React.MouseEvent, pr: any) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/prestasi/${pr.id}` : '';
+    const shareText = `Prestasi Siswa SMK MUSKA: ${pr.judul} - ${pr.namaPeserta} (${pr.kategoriJuara || 'JUARA'})\n${shareUrl}`;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      navigator.share({
+        title: pr.judul,
+        text: shareText,
+        url: shareUrl,
+      }).catch(() => {});
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(shareText);
+      setCopiedShareId(pr.id);
+      setTimeout(() => setCopiedShareId(null), 2500);
+    }
+  };
+
+  // Auto-Slide Prestasi Siswa Setiap 5 Detik (Mobile & Desktop)
+  useEffect(() => {
+    if (!data?.prestasi || data.prestasi.length <= 1) return;
+    const interval = setInterval(() => {
+      if (prestasiScrollRef.current) {
+        const container = prestasiScrollRef.current;
+        const scrollStep = 320;
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        if (container.scrollLeft >= maxScroll - 25) {
+          container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          container.scrollBy({ left: scrollStep, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [data?.prestasi]);
+
   useEffect(() => {
     setActivePhotoIdx(0);
   }, [selectedProgram]);
@@ -246,6 +308,9 @@ export default function HomePage() {
   const mitraList = data?.mitraIndustri || [];
   const rawBerita = data?.berita || [];
   const beritaList = rawBerita;
+  const agendaList = data?.agenda || [];
+  const prestasiList = data?.prestasi || [];
+  const galeriList = data?.galeri || [];
 
   // Limits & Pagination for WKS and Dewan Guru
   const INITIAL_WKS_LIMIT = 4;
@@ -308,6 +373,7 @@ export default function HomePage() {
         isHome={true}
         bukaPendaftaran={data?.settings?.bukaPendaftaran}
         tahunAjaran={data?.settings?.tahunAjaran || '2026/2027'}
+        profil={data?.profil}
       />
 
       {/* ========================================================
@@ -406,24 +472,32 @@ export default function HomePage() {
             {sliders.length > 1 && (
               <>
                 <motion.button
-                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(5, 150, 105, 0.85)' }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={() =>
                     setCurrentSlide((prev) => (prev === 0 ? sliders.length - 1 : prev - 1))
                   }
-                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
+                  className="group absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3.5 rounded-full bg-slate-950/20 hover:bg-slate-900/80 text-white/50 hover:text-emerald-400 backdrop-blur-xs border border-white/10 hover:border-emerald-500/40 opacity-40 hover:opacity-100 transition-all duration-300 cursor-pointer shadow-md flex items-center gap-1.5"
                   aria-label="Previous Slide"
+                  title={`Sebelumnya: ${sliders[currentSlide === 0 ? sliders.length - 1 : currentSlide - 1]?.title || 'Slide'}`}
                 >
-                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-0.5" />
+                  <span className="max-w-0 overflow-hidden whitespace-nowrap text-[11px] font-medium opacity-0 group-hover:max-w-32 group-hover:opacity-100 transition-all duration-300 hidden md:inline-block pr-1 text-slate-200">
+                    Sebelumnya
+                  </span>
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.1, backgroundColor: 'rgba(5, 150, 105, 0.85)' }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={() => setCurrentSlide((prev) => (prev + 1) % sliders.length)}
-                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-3 rounded-full bg-black/40 text-white backdrop-blur-md transition-colors cursor-pointer shadow-lg"
+                  className="group absolute right-2 sm:right-5 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3.5 rounded-full bg-slate-950/20 hover:bg-slate-900/80 text-white/50 hover:text-emerald-400 backdrop-blur-xs border border-white/10 hover:border-emerald-500/40 opacity-40 hover:opacity-100 transition-all duration-300 cursor-pointer shadow-md flex items-center gap-1.5"
                   aria-label="Next Slide"
+                  title={`Berikutnya: ${sliders[(currentSlide + 1) % sliders.length]?.title || 'Slide'}`}
                 >
-                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="max-w-0 overflow-hidden whitespace-nowrap text-[11px] font-medium opacity-0 group-hover:max-w-32 group-hover:opacity-100 transition-all duration-300 hidden md:inline-block pl-1 text-slate-200">
+                    Berikutnya
+                  </span>
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-0.5" />
                 </motion.button>
 
                 {/* Dot Indicators */}
@@ -956,89 +1030,160 @@ export default function HomePage() {
       </section>
 
       {/* ========================================================
-                8. KEUNGGULAN SEKOLAH (3 POIN IKONIK)
+                8. KEUNGGULAN SEKOLAH (FONT POPPINS & WARNA HIJAU/EMERALD)
             ======================================================== */}
-      <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        className="py-20 max-w-7xl mx-auto px-4 sm:px-8 space-y-12"
-      >
-        <motion.div variants={fadeInUp} className="text-center max-w-2xl mx-auto space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-            <Zap className="w-3.5 h-3.5" />
-            <span>Keunggulan</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-            Mengapa Memilih SMK Muhammadiyah Sekampung?
+      <section id="keunggulan" className="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-8">
+        <div className="border-b border-slate-200 dark:border-slate-800 pb-5 mb-10">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Keunggulan Sekolah
           </h2>
-        </motion.div>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2 font-normal">
+            Tiga hal yang menjadi dasar layanan pendidikan unggul kami di SMK Muhammadiyah Sekampung.
+          </p>
+        </div>
 
-        <motion.div
-          variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-        >
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ y: -10, transition: { duration: 0.25 } }}
-            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-8 shadow-xs hover:shadow-xl transition-colors duration-300 space-y-4 group"
-          >
-            <motion.div
-              whileHover={{ rotate: 8, scale: 1.1 }}
-              transition={{ duration: 0.25 }}
-              className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-colors duration-300"
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-16 items-start">
+          {/* Left Column: Vertical Tabs */}
+          <div className="md:col-span-4 divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
+            {/* Tab 1: Digital App */}
+            <button
+              type="button"
+              onClick={() => setActiveKeunggulanTab('app')}
+              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${
+                activeKeunggulanTab === 'app'
+                  ? 'border-l-4 border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/40'
+                  : 'hover:bg-slate-50 dark:hover:bg-slate-900/60 border-l-4 border-transparent'
+              }`}
             >
-              <Cpu className="w-7 h-7" />
-            </motion.div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              1. Layanan Digital & AI Terintegrasi
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Pelayanan SPMB berbasis AI OCR verifikasi berkas otomatis, chatbot RAG 24/7, serta ujian seleksi mandiri berbasis CBT modern.
-            </p>
-          </motion.div>
+              <div>
+                <div
+                  className={`text-sm sm:text-base transition-colors ${
+                    activeKeunggulanTab === 'app'
+                      ? 'font-bold text-emerald-800 dark:text-emerald-400'
+                      : 'font-semibold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'
+                  }`}
+                >
+                  Digital App
+                </div>
+                <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                  Layanan berbasis online
+                </div>
+              </div>
+              {activeKeunggulanTab === 'app' && (
+                <ArrowRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              )}
+            </button>
 
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ y: -10, transition: { duration: 0.25 } }}
-            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-amber-500 dark:hover:border-amber-500 rounded-3xl p-8 shadow-xs hover:shadow-xl transition-colors duration-300 space-y-4 group"
-          >
-            <motion.div
-              whileHover={{ rotate: 8, scale: 1.1 }}
-              transition={{ duration: 0.25 }}
-              className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center transition-colors duration-300"
+            {/* Tab 2: Guru Profesional */}
+            <button
+              type="button"
+              onClick={() => setActiveKeunggulanTab('guru')}
+              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${
+                activeKeunggulanTab === 'guru'
+                  ? 'border-l-4 border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/40'
+                  : 'hover:bg-slate-50 dark:hover:bg-slate-900/60 border-l-4 border-transparent'
+              }`}
             >
-              <Award className="w-7 h-7" />
-            </motion.div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              2. Guru Profesional & Sertifikasi Industri
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Tenaga pendidik tersertifikasi asesor BNSP dan instruktur pelatihan industri, memastikan transfer kompetensi kerja riil.
-            </p>
-          </motion.div>
+              <div>
+                <div
+                  className={`text-sm sm:text-base transition-colors ${
+                    activeKeunggulanTab === 'guru'
+                      ? 'font-bold text-emerald-800 dark:text-emerald-400'
+                      : 'font-semibold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'
+                  }`}
+                >
+                  Guru Profesional
+                </div>
+                <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                  Tenaga pendidik berkualitas
+                </div>
+              </div>
+              {activeKeunggulanTab === 'guru' && (
+                <ArrowRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              )}
+            </button>
 
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ y: -10, transition: { duration: 0.25 } }}
-            className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-teal-500 dark:hover:border-teal-500 rounded-3xl p-8 shadow-xs hover:shadow-xl transition-colors duration-300 space-y-4 group"
-          >
-            <motion.div
-              whileHover={{ rotate: 8, scale: 1.1 }}
-              transition={{ duration: 0.25 }}
-              className="w-14 h-14 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center transition-colors duration-300"
+            {/* Tab 3: Sarana Fasilitas */}
+            <button
+              type="button"
+              onClick={() => setActiveKeunggulanTab('fasilitas')}
+              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${
+                activeKeunggulanTab === 'fasilitas'
+                  ? 'border-l-4 border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/40'
+                  : 'hover:bg-slate-50 dark:hover:bg-slate-900/60 border-l-4 border-transparent'
+              }`}
             >
-              <Building2 className="w-7 h-7" />
-            </motion.div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              3. Bengkel & Sarana Praktik Lengkap
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Laboratorium komputer multimedia, bengkel injeksi resmi sepeda motor, studio DKV, serta mesin CNC berstandar APM nasional.
-            </p>
-          </motion.div>
-        </motion.div>
-      </motion.section>
+              <div>
+                <div
+                  className={`text-sm sm:text-base transition-colors ${
+                    activeKeunggulanTab === 'fasilitas'
+                      ? 'font-bold text-emerald-800 dark:text-emerald-400'
+                      : 'font-semibold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'
+                  }`}
+                >
+                  Sarana Fasilitas
+                </div>
+                <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                  Lengkap & modern
+                </div>
+              </div>
+              {activeKeunggulanTab === 'fasilitas' && (
+                <ArrowRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              )}
+            </button>
+          </div>
+
+          {/* Right Column: Content Detail (Poppins Font) */}
+          <div className="md:col-span-8 pt-2">
+            <AnimatePresence mode="wait">
+              {activeKeunggulanTab === 'app' && (
+                <motion.div
+                  key="keunggulan-app"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  <p className="text-lg sm:text-2xl lg:text-[23px] font-normal leading-relaxed text-slate-800 dark:text-slate-200">
+                    Sekolah kami sudah didukung dengan ekosistem digital terintegrasi untuk memudahkan kegiatan belajar mengajar, administrasi, dan perpustakaan dalam satu genggaman.
+                  </p>
+                </motion.div>
+              )}
+
+              {activeKeunggulanTab === 'guru' && (
+                <motion.div
+                  key="keunggulan-guru"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  <p className="text-lg sm:text-2xl lg:text-[23px] font-normal leading-relaxed text-slate-800 dark:text-slate-200">
+                    Tenaga pendidik kami berdedikasi tinggi, tersertifikasi asesor BNSP dan instruktur pelatihan industri resmi, berdedikasi mendidik akhlak karimah serta kompetensi kerja unggul siswa.
+                  </p>
+                </motion.div>
+              )}
+
+              {activeKeunggulanTab === 'fasilitas' && (
+                <motion.div
+                  key="keunggulan-fasilitas"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  <p className="text-lg sm:text-2xl lg:text-[23px] font-normal leading-relaxed text-slate-800 dark:text-slate-200">
+                    Fasilitas bengkel praktik industri dan laboratorium komputer modern berstandar APM nasional, ruang multimedia, dan sarana olahraga penunjang yang representatif dan lengkap.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </section>
 
       {/* ========================================================
                 9. BERITA TERBARU (GRID 3 KOLOM)
@@ -1137,134 +1282,373 @@ export default function HomePage() {
       </motion.section>
 
       {/* ========================================================
-                10. FOOTER & PETA GOOGLE MAPS
+                10. AGENDA KEGIATAN SEKOLAH (Dikelola oleh Admin)
             ======================================================== */}
-      <motion.footer
-        id="kontak"
+      <motion.section
+        id="agenda"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={fadeInUp}
-        className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-16 pb-8"
+        viewport={{ once: true, amount: 0.15 }}
+        className="py-20 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Col 1: Brand & Semboyan */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 flex items-center justify-center shrink-0">
-                  <img
-                    src="/logo.png"
-                    alt="Logo"
-                    className="w-full h-full object-contain filter drop-shadow-sm"
-                    onError={(e) => {
-                      e.currentTarget.src = '/logo.svg';
-                    }}
-                  />
-                </div>
-                <span className="font-bold text-sm text-white uppercase tracking-wider">
-                  SMK MUHAMMADIYAH SEKAMPUNG
-                </span>
+          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Jadwal & Agenda</span>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Sekolah Menengah Kejuruan Pusat Keunggulan di Kabupaten Lampung Timur yang berkarakter Islami, kompeten, dan siap kerja.
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+                Agenda Kegiatan SMK Muhammadiyah Sekampung
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-2xl">
+                Jadwal agenda akademik, perlombaan, ujian, dan kegiatan kesiswaan mendatang yang dapat diakses oleh seluruh warga sekolah.
               </p>
-              <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-800 text-[11px] text-emerald-300 font-bold">
-                Semboyan: Sukses · Jaya · Bermanfaat · Inspiratif
-              </div>
             </div>
+            {agendaList.length > 3 && (
+              <Link
+                href="/agenda"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:border-emerald-500 transition shadow-2xs group cursor-pointer"
+              >
+                <span>Total {agendaList.length} Agenda</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            )}
+          </motion.div>
 
-            {/* Col 2: Tautan Cepat */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest">
-                Tautan Pintasan
-              </h4>
-              <ul className="space-y-2 text-xs text-slate-400">
-                <li>
-                  <Link
-                    href="/register"
-                    onClick={(e) => handleAuthClick(e, '/register')}
-                    className="hover:text-emerald-400 transition-colors"
+          {agendaList.length === 0 ? (
+            <div className="text-center py-12 px-4 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              <Calendar className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <p className="text-sm text-slate-500">Belum ada agenda kegiatan yang dijadwalkan saat ini.</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {agendaList.map((ag: any) => {
+                const dateObj = new Date(ag.tanggal);
+                const dayNum = isNaN(dateObj.getDate()) ? '--' : String(dateObj.getDate()).padStart(2, '0');
+                const monthName = isNaN(dateObj.getDate())
+                  ? 'BULAN'
+                  : dateObj.toLocaleDateString('id-ID', { month: 'short' }).toUpperCase();
+                const yearNum = isNaN(dateObj.getFullYear()) ? '' : dateObj.getFullYear();
+
+                return (
+                  <motion.div
+                    key={ag.id}
+                    variants={cardVariant}
+                    whileHover={{ y: -6, transition: { duration: 0.2 } }}
                   >
-                    Pendaftaran SPMB Online
-                  </Link>
-                </li>
-                <li>
+                    <Link
+                      href={`/agenda/${ag.id}`}
+                      className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer group h-full"
+                    >
+                      <div className="space-y-4">
+                        {/* Top Row: Date Box + Category */}
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex flex-col items-center justify-center shadow-md shadow-emerald-600/20 shrink-0">
+                              <span className="text-lg font-black leading-none">{dayNum}</span>
+                              <span className="text-[10px] font-bold uppercase tracking-wider">{monthName}</span>
+                            </div>
+                            <div>
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                {ag.kategori || 'Umum'}
+                              </span>
+                              <div className="text-[11px] text-slate-400 mt-1">Tahun {yearNum}</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Title & Desc */}
+                        <div>
+                          <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            {ag.judul}
+                          </h3>
+                          {ag.deskripsi && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-2 leading-relaxed">
+                              {ag.deskripsi}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Metadata & Footer */}
+                      <div className="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-2 text-xs text-slate-500 dark:text-slate-400">
+                        {ag.waktu && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span>{ag.waktu}</span>
+                          </div>
+                        )}
+                        {ag.lokasi && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span className="truncate">{ag.lokasi}</span>
+                          </div>
+                        )}
+                        <div className="pt-2 flex items-center justify-between text-emerald-600 dark:text-emerald-400 font-bold text-xs group-hover:translate-x-1 transition-transform">
+                          <span>Lihat Rincian Agenda</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </div>
+      </motion.section>
+
+      {/* ========================================================
+                11. PRESTASI SISWA (Layout Referensi Screenshot 3)
+            ======================================================== */}
+      <motion.section
+        id="prestasi"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="py-20 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
+          {/* Header Prestasi (Poppins Font, No font-serif) */}
+          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Prestasi Siswa
+              </h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Capaian siswa SMK Muhammadiyah Sekampung di tingkat daerah hingga nasional.
+              </p>
+            </div>
+            <Link
+              href="/prestasi"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors group cursor-pointer"
+            >
+              <span>Semua prestasi</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
+
+          {/* Carousel Prestasi Siswa dengan Panah Navigasi */}
+          <div className="relative group/carousel">
+            {/* Navigasi Panah Kiri */}
+            <button
+              type="button"
+              onClick={() => scrollPrestasi('left')}
+              className="absolute -left-3 sm:-left-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md hover:shadow-xl text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95"
+              aria-label="Prestasi Sebelumnya"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Navigasi Panah Kanan */}
+            <button
+              type="button"
+              onClick={() => scrollPrestasi('right')}
+              className="absolute -right-3 sm:-right-5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md hover:shadow-xl text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95"
+              aria-label="Prestasi Selanjutnya"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Track Horizontal Scroll */}
+            <div
+              ref={prestasiScrollRef}
+              className="flex gap-6 overflow-x-auto pb-4 pt-2 px-1 scroll-smooth no-scrollbar scrollbar-none snap-x"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {prestasiList.map((pr: any) => {
+                const dateStr = pr.tanggal
+                  ? new Date(pr.tanggal).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })
+                  : 'Terbaru';
+
+                return (
                   <Link
-                    href="/login"
-                    onClick={(e) => handleAuthClick(e, '/login')}
-                    className="hover:text-emerald-400 transition-colors"
+                    key={pr.id}
+                    href={`/prestasi/${pr.id}`}
+                    className="snap-start shrink-0 w-[270px] sm:w-[290px] md:w-[310px] bg-white dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer"
                   >
-                    Login Akun Siswa
+                    {/* Foto Prestasi dengan Badge JUARA */}
+                    <div className="relative h-48 sm:h-52 bg-slate-100 dark:bg-slate-900 overflow-hidden">
+                      <img
+                        src={getFullUrl(pr.fotoUrl, '/banner-spmb.jpg')}
+                        alt={pr.judul}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.currentTarget.src = '/banner-spmb.jpg';
+                        }}
+                      />
+                      {/* Badge JUARA (Emas seperti Screenshot 3) */}
+                      <div className="absolute top-3 left-3 px-3 py-1 rounded-lg bg-amber-500 text-white font-extrabold text-[11px] uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-amber-500/30">
+                        <Trophy className="w-3.5 h-3.5 fill-current" />
+                        <span>{pr.kategoriJuara || 'JUARA'}</span>
+                      </div>
+                    </div>
+
+                    {/* Informasi Prestasi */}
+                    <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
+                      <div className="space-y-1.5">
+                        <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          {pr.judul}
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                          {pr.namaPeserta} {pr.namaLomba ? `· ${pr.namaLomba}` : ''} {pr.tingkat ? `(${pr.tingkat})` : ''}
+                        </p>
+                      </div>
+
+                      {/* Baris Bawah: Tanggal & Tombol Bagikan */}
+                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span>{dateStr}</span>
+                        <button
+                          type="button"
+                          onClick={(e) => handleSharePrestasi(e, pr)}
+                          className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 flex items-center justify-center transition-all shadow-2xs hover:scale-105"
+                          title="Bagikan Prestasi Ini"
+                        >
+                          {copiedShareId === pr.id ? (
+                            <CheckCircle className="w-4 h-4 text-emerald-500" />
+                          ) : (
+                            <Share2 className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </Link>
-                </li>
-                <li>
-                  <a href="#jurusan" className="hover:text-emerald-400 transition-colors">
-                    Daftar 8 Program Keahlian
-                  </a>
-                </li>
-                <li>
-                  <a href="#sambutan" className="hover:text-emerald-400 transition-colors">
-                    Profil Pimpinan Sekolah
-                  </a>
-                </li>
-                <li>
-                  <Link
-                    href="http://localhost:3002"
-                    target="_blank"
-                    className="hover:text-emerald-400 transition-colors"
-                  >
-                    CMS Dashboard Administrator
-                  </Link>
-                </li>
-              </ul>
+                );
+              })}
             </div>
-
-            {/* Col 3: Kontak Resmi */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest">
-                Kontak Sekretariat
-              </h4>
-              <ul className="space-y-2.5 text-xs text-slate-400">
-                <li className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <span>{profil.alamatLengkap || 'Jl. Raya Sekampung No. 45, Sekampung, Lampung Timur 34382'}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>{profil.emailResmi || 'smkmuhsekampung@gmail.com'}</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>{profil.teleponResmi || '(0725) 7851234'}</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Col 4: Google Maps Embed */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-widest">
-                Peta Lokasi Kampus
-              </h4>
-              <div className="w-full h-40 rounded-2xl overflow-hidden border border-slate-800 bg-slate-900">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15888.436151740685!2d105.4314!3d-5.1973!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMTEnNTAuMyJTIDEwNcKwMjYnMjkuMCJF!5e0!3m2!1sid!2sid!4v1600000000000!5m2!1sid!2sid"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen={false}
-                  loading="lazy"
-                  title="Peta Lokasi SMK Muhammadiyah Sekampung"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-slate-800/80 text-center text-xs text-slate-500">
-            © 2026 SMK Muhammadiyah Sekampung. Seluruh Hak Cipta Dilindungi Undang-Undang.
           </div>
         </div>
-      </motion.footer>
+      </motion.section>
+
+      {/* ========================================================
+                12. GALERI KEGIATAN SEKOLAH (Fitur Baru)
+            ======================================================== */}
+      <motion.section
+        id="galeri"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.15 }}
+        className="py-20 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-12">
+          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>Dokumentasi Visual</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+                Galeri Foto Kegiatan & Aktivitas
+              </h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-2xl">
+                Dokumentasi foto kegiatan belajar mengajar, praktikum kejuruan di bengkel, dan momen kebersamaan di kampus SMK Muhammadiyah Sekampung.
+              </p>
+            </div>
+            {galeriList.length > 3 && (
+              <Link
+                href="/galeri"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:border-emerald-500 transition shadow-2xs group cursor-pointer"
+              >
+                <span>Total {galeriList.length} Album Galeri</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            )}
+          </motion.div>
+
+          {galeriList.length === 0 ? (
+            <div className="text-center py-12 px-4 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              <ImageIcon className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <p className="text-sm text-slate-500">Belum ada album galeri foto yang dipublikasikan saat ini.</p>
+            </div>
+          ) : (
+            <motion.div
+              variants={staggerContainer}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {galeriList.map((item: any) => {
+                const totalPhotos = 1 + (Array.isArray(item.fotoUrls) ? item.fotoUrls.filter(Boolean).length : 0);
+                const dateStr = item.tanggal
+                  ? new Date(item.tanggal).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : 'Dokumentasi Sekolah';
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    variants={cardVariant}
+                    whileHover={{ y: -8, transition: { duration: 0.25 } }}
+                  >
+                    <Link
+                      href={`/galeri/${item.slug || item.id}`}
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer h-full"
+                    >
+                      {/* Thumbnail Image dengan Badge Total Foto */}
+                      <div className="relative h-56 bg-slate-100 dark:bg-slate-950 overflow-hidden">
+                        <img
+                          src={getFullUrl(item.thumbnail, '/banner-spmb.jpg')}
+                          alt={item.judul}
+                          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+                          onError={(e) => {
+                            e.currentTarget.src = '/banner-spmb.jpg';
+                          }}
+                        />
+                        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
+                          {item.kategori || 'Galeri'}
+                        </span>
+                        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 flex items-center gap-1.5">
+                          <ImageIcon className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>{totalPhotos} Foto</span>
+                        </span>
+                      </div>
+
+                      {/* Deskripsi Galeri */}
+                      <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                            <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>{dateStr}</span>
+                          </div>
+                          <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            {item.judul}
+                          </h3>
+                          {item.deskripsi && (
+                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                              {item.deskripsi}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                          <div className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 group-hover:border-emerald-500 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/30 text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center justify-center gap-1.5">
+                            <span>Buka Album Foto</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </div>
+      </motion.section>
+
+      {/* ========================================================
+                13. FOOTER DENGAN BRANDING "MUSKA HEBAT."
+            ======================================================== */}
+      <LandingFooter profil={profil} />
 
       {/* FLOATING AI ASSISTANT CHATBOT */}
       <ChatbotRAG />
@@ -1544,6 +1928,8 @@ export default function HomePage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+
 
       {/* Modal Notifikasi Pendaftaran Ditutup Sementara */}
       <RegistrationClosedModal

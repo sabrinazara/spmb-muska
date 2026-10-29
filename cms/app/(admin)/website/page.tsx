@@ -23,13 +23,16 @@ import {
     Building2,
     BookOpen,
     GraduationCap,
+    Calendar,
+    Trophy,
+    Award,
 } from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS, USER_URL, getAuthHeaders } from '@/lib/api';
 import ImageUploader from '@/components/ImageUploader';
 import MultiImageUploader from '@/components/MultiImageUploader';
 import { cmsToast, useToast } from '@/components/ToastProvider';
 
-type TabKey = 'slider' | 'profil' | 'wks' | 'guru' | 'berita' | 'mitra';
+type TabKey = 'slider' | 'profil' | 'wks' | 'guru' | 'berita' | 'agenda' | 'prestasi' | 'galeri' | 'mitra';
 
 export default function WebsiteManagerPage() {
     const { confirmAction } = useToast();
@@ -51,6 +54,9 @@ export default function WebsiteManagerPage() {
     const [wksList, setWksList] = useState<any[]>([]);
     const [guruList, setGuruList] = useState<any[]>([]);
     const [beritaList, setBeritaList] = useState<any[]>([]);
+    const [agendaList, setAgendaList] = useState<any[]>([]);
+    const [prestasiList, setPrestasiList] = useState<any[]>([]);
+    const [galeriList, setGaleriList] = useState<any[]>([]);
     const [mitraList, setMitraList] = useState<any[]>([]);
     const [programs, setPrograms] = useState<any[]>([]);
 
@@ -71,6 +77,9 @@ export default function WebsiteManagerPage() {
                 setWksList(data.wks || []);
                 setGuruList(data.guru || []);
                 setBeritaList(data.berita || []);
+                setAgendaList(data.agenda || []);
+                setPrestasiList(data.prestasi || []);
+                setGaleriList(data.galeri || []);
                 setMitraList(data.mitraIndustri || []);
                 setPrograms(data.programKeahlian || []);
             }
@@ -158,6 +167,12 @@ export default function WebsiteManagerPage() {
             url = formData.id ? API_ENDPOINTS.WEBSITE.GURU_BY_ID(formData.id) : API_ENDPOINTS.WEBSITE.GURU;
         } else if (modalType === 'berita') {
             url = formData.id ? API_ENDPOINTS.WEBSITE.BERITA_BY_ID(formData.id) : API_ENDPOINTS.WEBSITE.BERITA;
+        } else if (modalType === 'agenda') {
+            url = formData.id ? API_ENDPOINTS.WEBSITE.AGENDA_BY_ID(formData.id) : API_ENDPOINTS.WEBSITE.AGENDA;
+        } else if (modalType === 'prestasi') {
+            url = formData.id ? API_ENDPOINTS.WEBSITE.PRESTASI_BY_ID(formData.id) : API_ENDPOINTS.WEBSITE.PRESTASI;
+        } else if (modalType === 'galeri') {
+            url = formData.id ? API_ENDPOINTS.WEBSITE.GALERI_BY_ID(formData.id) : API_ENDPOINTS.WEBSITE.GALERI;
         } else if (modalType === 'mitra') {
             url = formData.id ? API_ENDPOINTS.WEBSITE.MITRA_BY_ID(formData.id) : API_ENDPOINTS.WEBSITE.MITRA;
         } else if (modalType === 'program') {
@@ -195,11 +210,14 @@ export default function WebsiteManagerPage() {
 
     const tabs = [
         { id: 'slider', label: '1. Slider Hero Banner', icon: Sliders },
-        { id: 'profil', label: '2. Profil & Sambutan Kepsek', icon: UserCheck },
+        { id: 'profil', label: '2. Profil & Identitas Sekolah', icon: UserCheck },
         { id: 'wks', label: '3. Wakil Kepala Sekolah', icon: Users },
         { id: 'guru', label: '4. Dewan Guru & Pendidik', icon: GraduationCap },
         { id: 'berita', label: '5. Berita & Pengumuman', icon: Newspaper },
-        { id: 'mitra', label: '6. Mitra DUDI & Jurusan', icon: Briefcase },
+        { id: 'agenda', label: '6. Agenda Sekolah', icon: Calendar },
+        { id: 'prestasi', label: '7. Prestasi Siswa', icon: Trophy },
+        { id: 'galeri', label: '8. Galeri Sekolah', icon: ImageIcon },
+        { id: 'mitra', label: '9. Mitra DUDI & Jurusan', icon: Briefcase },
     ];
 
     return (
@@ -354,6 +372,19 @@ export default function WebsiteManagerPage() {
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
+                                <div className="sm:col-span-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                                    <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200">
+                                        Identitas Brand & Logo Sekolah (Navbar & Footer)
+                                    </h3>
+                                    <ImageUploader
+                                        label="Logo Resmi Sekolah / Yayasan"
+                                        value={profil.logoUrl || '/logo.png'}
+                                        onChange={(url) => setProfil({ ...profil, logoUrl: url })}
+                                        aspectRatio="square"
+                                        helperText="Disarankan file gambar logo format PNG transparan atau SVG resolusi tajam (tampil otomatis di header navbar dan footer)."
+                                    />
+                                </div>
+
                                 <div>
                                     <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Lengkap Kepala Sekolah *</label>
                                     <input
@@ -653,7 +684,316 @@ export default function WebsiteManagerPage() {
                         </div>
                     )}
 
-                    {/* 5. MITRA DUDI & JURUSAN */}
+                    {/* 6. AGENDA SEKOLAH */}
+                    {activeTab === 'agenda' && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                                        Agenda & Jadwal Kegiatan Sekolah
+                                    </h2>
+                                    <p className="text-xs text-slate-500">Kelola jadwal sosialisasi, ujian, acara kesiswaan, dan agenda resmi SMK MUSKA</p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setFormData({
+                                            judul: '',
+                                            tanggal: new Date().toISOString().slice(0, 10),
+                                            waktu: '08:00 - 12:00 WIB',
+                                            lokasi: 'Aula Utama SMK Muhammadiyah Sekampung',
+                                            kategori: 'Umum',
+                                            deskripsi: '',
+                                            isActive: true,
+                                            urutan: agendaList.length + 1,
+                                        });
+                                        setModalType('agenda');
+                                    }}
+                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Tambah Agenda</span>
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {agendaList.map((a) => (
+                                    <div key={a.id} className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col justify-between space-y-3">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                                                    {a.kategori || 'Umum'}
+                                                </span>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${a.isActive ? 'bg-teal-500/10 text-teal-600' : 'bg-slate-500/10 text-slate-400'}`}>
+                                                    {a.isActive ? 'Tayang' : 'Nonaktif'}
+                                                </span>
+                                            </div>
+                                            <h3 className="font-bold text-sm text-slate-900 dark:text-white leading-snug">{a.judul}</h3>
+                                            <div className="space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                                                <div className="flex items-center gap-1.5 font-medium text-emerald-600 dark:text-emerald-400">
+                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    <span>
+                                                        {new Date(a.tanggal).toLocaleDateString('id-ID', {
+                                                            weekday: 'long',
+                                                            day: 'numeric',
+                                                            month: 'long',
+                                                            year: 'numeric',
+                                                        })}
+                                                    </span>
+                                                </div>
+                                                {a.waktu && <div className="text-[11px] text-slate-400">⏰ {a.waktu}</div>}
+                                                {a.lokasi && <div className="text-[11px] text-slate-400">📍 {a.lokasi}</div>}
+                                            </div>
+                                            {a.deskripsi && (
+                                                <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{a.deskripsi}</p>
+                                            )}
+                                        </div>
+
+                                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[11px] text-slate-400">
+                                            <span>Urutan: {a.urutan}</span>
+                                            <div className="flex gap-1.5">
+                                                <button
+                                                    onClick={() => {
+                                                        setFormData({
+                                                            ...a,
+                                                            tanggal: a.tanggal ? new Date(a.tanggal).toISOString().slice(0, 10) : '',
+                                                        });
+                                                        setModalType('agenda');
+                                                    }}
+                                                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                    title="Edit Agenda"
+                                                >
+                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteItem(API_ENDPOINTS.WEBSITE.AGENDA_BY_ID(a.id), 'Agenda berhasil dihapus')}
+                                                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-rose-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                    title="Hapus Agenda"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 7. PRESTASI SISWA */}
+                    {activeTab === 'prestasi' && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                                        Prestasi Siswa & Siswi Sekolah
+                                    </h2>
+                                    <p className="text-xs text-slate-500">Capaian siswa SMK Muhammadiyah Sekampung di tingkat daerah hingga nasional</p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setFormData({
+                                            judul: '',
+                                            kategoriJuara: 'JUARA',
+                                            namaPeserta: '',
+                                            namaLomba: '',
+                                            tingkat: 'Kabupaten',
+                                            fotoUrl: '',
+                                            deskripsi: '',
+                                            tanggal: new Date().toISOString().slice(0, 10),
+                                            urutan: prestasiList.length + 1,
+                                        });
+                                        setModalType('prestasi');
+                                    }}
+                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Tambah Prestasi</span>
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                {prestasiList.map((pr) => (
+                                    <div key={pr.id} className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between group">
+                                        <div className="relative h-44 bg-slate-100 dark:bg-slate-900 overflow-hidden">
+                                            <img
+                                                src={getFullUrl(pr.fotoUrl)}
+                                                alt={pr.judul}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                onError={(e) => { e.currentTarget.src = '/banner-spmb.jpg'; }}
+                                            />
+                                            <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-amber-500 text-white shadow-md flex items-center gap-1">
+                                                <Trophy className="w-3 h-3" />
+                                                <span>{pr.kategoriJuara || 'JUARA'}</span>
+                                            </span>
+                                            <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold bg-black/60 text-white backdrop-blur-xs">
+                                                {pr.tingkat || 'Daerah'}
+                                            </span>
+                                        </div>
+
+                                        <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                                            <div className="space-y-1.5">
+                                                <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                                                    {pr.judul}
+                                                </h3>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                                    {pr.namaPeserta}
+                                                </p>
+                                                {pr.namaLomba && (
+                                                    <p className="text-[11px] text-slate-400 line-clamp-1">
+                                                        {pr.namaLomba}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px] text-slate-400">
+                                                <span>
+                                                    {new Date(pr.tanggal).toLocaleDateString('id-ID', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    })}
+                                                </span>
+                                                <div className="flex gap-1.5">
+                                                    <button
+                                                        onClick={() => {
+                                                            setFormData({
+                                                                ...pr,
+                                                                tanggal: pr.tanggal ? new Date(pr.tanggal).toISOString().slice(0, 10) : '',
+                                                            });
+                                                            setModalType('prestasi');
+                                                        }}
+                                                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Edit Prestasi"
+                                                    >
+                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteItem(API_ENDPOINTS.WEBSITE.PRESTASI_BY_ID(pr.id), 'Prestasi berhasil dihapus')}
+                                                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-rose-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Hapus Prestasi"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 8. GALERI SEKOLAH */}
+                    {activeTab === 'galeri' && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                                        Galeri Foto & Album Dokumentasi Sekolah
+                                    </h2>
+                                    <p className="text-xs text-slate-500">Kelola album foto kegiatan, fasilitas kampus, dan ragam dokumentasi interaktif</p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setFormData({
+                                            judul: '',
+                                            slug: '',
+                                            kategori: 'Kegiatan',
+                                            deskripsi: '',
+                                            thumbnail: '',
+                                            fotoUrls: [],
+                                            tanggal: new Date().toISOString().slice(0, 10),
+                                            urutan: galeriList.length + 1,
+                                        });
+                                        setModalType('galeri');
+                                    }}
+                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    <span>Tambah Album Galeri</span>
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {galeriList.map((g) => (
+                                    <div key={g.id} className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between group">
+                                        <div className="relative h-48 bg-slate-100 dark:bg-slate-900 overflow-hidden">
+                                            <img
+                                                src={getFullUrl(g.thumbnail)}
+                                                alt={g.judul}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                onError={(e) => { e.currentTarget.src = '/banner-spmb.jpg'; }}
+                                            />
+                                            <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-600 text-white shadow-xs">
+                                                {g.kategori || 'Kegiatan'}
+                                            </span>
+                                            <span className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-black/70 text-white backdrop-blur-xs flex items-center gap-1">
+                                                <ImageIcon className="w-3 h-3" />
+                                                <span>{(g.fotoUrls?.length || 0) + 1} Foto</span>
+                                            </span>
+                                        </div>
+
+                                        <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                                            <div className="space-y-1">
+                                                <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
+                                                    {g.judul}
+                                                </h3>
+                                                {g.deskripsi && (
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                                        {g.deskripsi}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px] text-slate-400">
+                                                <span>
+                                                    {new Date(g.tanggal).toLocaleDateString('id-ID', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    })}
+                                                </span>
+                                                <div className="flex gap-1.5">
+                                                    <a
+                                                        href={`${USER_URL}/galeri/${g.slug || g.id}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Pratinjau Halaman Galeri"
+                                                    >
+                                                        <ExternalLink className="w-3.5 h-3.5" />
+                                                    </a>
+                                                    <button
+                                                        onClick={() => {
+                                                            setFormData({
+                                                                ...g,
+                                                                fotoUrls: Array.isArray(g.fotoUrls) ? g.fotoUrls : [],
+                                                                tanggal: g.tanggal ? new Date(g.tanggal).toISOString().slice(0, 10) : '',
+                                                            });
+                                                            setModalType('galeri');
+                                                        }}
+                                                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-emerald-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Edit Galeri"
+                                                    >
+                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteItem(API_ENDPOINTS.WEBSITE.GALERI_BY_ID(g.id), 'Album galeri berhasil dihapus')}
+                                                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:text-rose-600 text-slate-600 dark:text-slate-300 transition cursor-pointer"
+                                                        title="Hapus Galeri"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 9. MITRA DUDI & JURUSAN */}
                     {activeTab === 'mitra' && (
                         <div className="space-y-8">
                             {/* MITRA DUDI */}
@@ -995,6 +1335,285 @@ export default function WebsiteManagerPage() {
                                     <div>
                                         <label className="block font-bold mb-1">Daya Tampung / Kuota Kursi</label>
                                         <input type="number" min={1} value={formData.kuota || 72} onChange={(e) => setFormData({ ...formData, kuota: Number(e.target.value) })} className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs" />
+                                    </div>
+                                </>
+                            )}
+
+                            {/* AGENDA FIELDS */}
+                            {modalType === 'agenda' && (
+                                <>
+                                    <div>
+                                        <label className="block font-bold mb-1">Judul Agenda / Kegiatan *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Cth: Sosialisasi & Pendaftaran SPMB Gelombang 1"
+                                            value={formData.judul || ''}
+                                            onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block font-bold mb-1">Tanggal Pelaksanaan *</label>
+                                            <input
+                                                type="date"
+                                                required
+                                                value={formData.tanggal ? formData.tanggal.slice(0, 10) : ''}
+                                                onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-bold mb-1">Waktu / Jam</label>
+                                            <input
+                                                type="text"
+                                                placeholder="08:00 - 12:00 WIB"
+                                                value={formData.waktu || ''}
+                                                onChange={(e) => setFormData({ ...formData, waktu: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block font-bold mb-1">Lokasi / Tempat</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Aula Utama KH. Ahmad Dahlan"
+                                                value={formData.lokasi || ''}
+                                                onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-bold mb-1">Kategori Agenda</label>
+                                            <select
+                                                value={formData.kategori || 'Umum'}
+                                                onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            >
+                                                <option value="Umum">Umum</option>
+                                                <option value="SPMB">SPMB / Pendaftaran</option>
+                                                <option value="Akademik">Akademik & Ujian</option>
+                                                <option value="Kesiswaan">Kesiswaan & Ekstra</option>
+                                                <option value="Kejuruan">Kejuruan & DUDI</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold mb-1">Deskripsi & Rincian Agenda</label>
+                                        <textarea
+                                            rows={3}
+                                            placeholder="Uraian kegiatan atau panduan bagi calon peserta..."
+                                            value={formData.deskripsi || ''}
+                                            onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs leading-relaxed"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block font-bold mb-1">Nomor Urutan</label>
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                value={formData.urutan || 1}
+                                                onChange={(e) => setFormData({ ...formData, urutan: Number(e.target.value) })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            />
+                                        </div>
+                                        <div className="flex items-center gap-2 pt-5">
+                                            <input
+                                                type="checkbox"
+                                                id="agendaActive"
+                                                checked={formData.isActive !== false}
+                                                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                                className="rounded"
+                                            />
+                                            <label htmlFor="agendaActive" className="font-bold cursor-pointer">
+                                                Aktif / Tampilkan di Web
+                                            </label>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* PRESTASI FIELDS */}
+                            {modalType === 'prestasi' && (
+                                <>
+                                    <div>
+                                        <label className="block font-bold mb-1">Judul Kejuaraan / Prestasi *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Cth: E-Sport Mobile Legends Pelajar Se-Sumbagsel"
+                                            value={formData.judul || ''}
+                                            onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block font-bold mb-1">Badge Predikat Juara *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                placeholder="Cth: JUARA, JUARA 1, MEDALI EMAS"
+                                                value={formData.kategoriJuara || 'JUARA'}
+                                                onChange={(e) => setFormData({ ...formData, kategoriJuara: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs uppercase"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-bold mb-1">Tingkat Kejuaraan</label>
+                                            <select
+                                                value={formData.tingkat || 'Kabupaten'}
+                                                onChange={(e) => setFormData({ ...formData, tingkat: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            >
+                                                <option value="Kabupaten">Kabupaten / Kota</option>
+                                                <option value="Provinsi">Provinsi</option>
+                                                <option value="Regional">Regional / Sumbagsel</option>
+                                                <option value="Nasional">Nasional</option>
+                                                <option value="Internasional">Internasional</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold mb-1">Nama Siswa / Tim Pemenang & Kelas *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Cth: Fikri Pratama · Kelas 12 TJKT"
+                                            value={formData.namaPeserta || ''}
+                                            onChange={(e) => setFormData({ ...formData, namaPeserta: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold mb-1">Nama Event / Penyelenggara Lomba</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Cth: OlympicAD 2026 di Universitas Muhammadiyah"
+                                            value={formData.namaLomba || ''}
+                                            onChange={(e) => setFormData({ ...formData, namaLomba: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                        />
+                                    </div>
+                                    <ImageUploader
+                                        label="Foto Dokumentasi Prestasi / Penyerahan Piala *"
+                                        value={formData.fotoUrl || ''}
+                                        onChange={(url) => setFormData({ ...formData, fotoUrl: url })}
+                                        aspectRatio="square"
+                                        required
+                                        helperText="Unggah foto dokumentasi juara memegang trofi atau piagam"
+                                    />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block font-bold mb-1">Tanggal Raihan</label>
+                                            <input
+                                                type="date"
+                                                value={formData.tanggal ? formData.tanggal.slice(0, 10) : ''}
+                                                onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-bold mb-1">Nomor Urutan</label>
+                                            <input
+                                                type="number"
+                                                min={1}
+                                                value={formData.urutan || 1}
+                                                onChange={(e) => setFormData({ ...formData, urutan: Number(e.target.value) })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold mb-1">Keterangan / Cerita Prestasi</label>
+                                        <textarea
+                                            rows={2}
+                                            value={formData.deskripsi || ''}
+                                            onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs leading-relaxed"
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            {/* GALERI FIELDS */}
+                            {modalType === 'galeri' && (
+                                <>
+                                    <div>
+                                        <label className="block font-bold mb-1">Judul Album Galeri *</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            placeholder="Cth: Gelar Karya Vokasi & Expo Jurusan SMK MUSKA"
+                                            value={formData.judul || ''}
+                                            onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block font-bold mb-1">Kategori Album</label>
+                                            <select
+                                                value={formData.kategori || 'Kegiatan'}
+                                                onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            >
+                                                <option value="Kegiatan">Kegiatan Sekolah</option>
+                                                <option value="Pembelajaran">Praktik & Pembelajaran</option>
+                                                <option value="Fasilitas">Fasilitas Kampus</option>
+                                                <option value="Kesiswaan">Kesiswaan & Ekstra</option>
+                                                <option value="Prestasi">Prestasi</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block font-bold mb-1">Tanggal Dokumentasi</label>
+                                            <input
+                                                type="date"
+                                                value={formData.tanggal ? formData.tanggal.slice(0, 10) : ''}
+                                                onChange={(e) => setFormData({ ...formData, tanggal: e.target.value })}
+                                                className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                            />
+                                        </div>
+                                    </div>
+                                    <ImageUploader
+                                        label="Foto Sampul / Thumbnail Album *"
+                                        value={formData.thumbnail || ''}
+                                        onChange={(url) => setFormData({ ...formData, thumbnail: url })}
+                                        aspectRatio="banner"
+                                        required
+                                        helperText="Unggah foto utama yang mewakili album ini (resolusi landscape)"
+                                    />
+                                    <MultiImageUploader
+                                        label="Koleksi Foto Lainnya dalam Album (Maksimal 20 Foto)"
+                                        value={formData.fotoUrls || []}
+                                        onChange={(urls) => setFormData({ ...formData, fotoUrls: urls })}
+                                        maxPhotos={20}
+                                        helperText="Pengunjung dapat mengklik album untuk melihat seluruh foto lainnya secara lengkap"
+                                    />
+                                    <div>
+                                        <label className="block font-bold mb-1">Deskripsi Album Galeri</label>
+                                        <textarea
+                                            rows={3}
+                                            placeholder="Deskripsi singkat seputar kegiatan atau momen dokumentasi..."
+                                            value={formData.deskripsi || ''}
+                                            onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs leading-relaxed"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold mb-1">Nomor Urutan</label>
+                                        <input
+                                            type="number"
+                                                min={1}
+                                            value={formData.urutan || 1}
+                                            onChange={(e) => setFormData({ ...formData, urutan: Number(e.target.value) })}
+                                            className="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs"
+                                        />
                                     </div>
                                 </>
                             )}

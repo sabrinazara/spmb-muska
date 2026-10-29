@@ -53,6 +53,12 @@ export const API_ENDPOINTS = {
         MITRA_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/mitra/${id}`,
         BERITA: `${API_BASE_URL}/landing-page/admin/berita`,
         BERITA_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/berita/${id}`,
+        AGENDA: `${API_BASE_URL}/landing-page/admin/agenda`,
+        AGENDA_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/agenda/${id}`,
+        PRESTASI: `${API_BASE_URL}/landing-page/admin/prestasi`,
+        PRESTASI_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/prestasi/${id}`,
+        GALERI: `${API_BASE_URL}/landing-page/admin/galeri`,
+        GALERI_BY_ID: (id: string) => `${API_BASE_URL}/landing-page/admin/galeri/${id}`,
         UPLOAD_IMAGE: `${API_BASE_URL}/landing-page/admin/upload`,
     },
     AI: {

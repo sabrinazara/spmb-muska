@@ -40,6 +40,18 @@ export const API_ENDPOINTS = {
         LIST: `${API_BASE_URL}/landing-page/jurusan`,
         DETAIL: (idOrSlug: string) => `${API_BASE_URL}/landing-page/jurusan/${idOrSlug}`,
     },
+    AGENDA: {
+        LIST: `${API_BASE_URL}/landing-page/agenda`,
+        DETAIL: (id: string) => `${API_BASE_URL}/landing-page/agenda/${id}`,
+    },
+    PRESTASI: {
+        LIST: `${API_BASE_URL}/landing-page/prestasi`,
+        DETAIL: (id: string) => `${API_BASE_URL}/landing-page/prestasi/${id}`,
+    },
+    GALERI: {
+        LIST: `${API_BASE_URL}/landing-page/galeri`,
+        DETAIL: (slugOrId: string) => `${API_BASE_URL}/landing-page/galeri/${slugOrId}`,
+    },
 
     // Upload & Verifikasi Dokumen
     DOKUMEN: {
