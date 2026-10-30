@@ -146,7 +146,7 @@ export default function PrestasiListPage() {
         title: pr.judul,
         text: shareText,
         url: shareUrl,
-      }).catch(() => {});
+      }).catch(() => { });
     } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(shareText);
       setCopiedShareId(pr.id);
@@ -177,7 +177,6 @@ export default function PrestasiListPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                  <Trophy className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                   <span>Koleksi Prestasi & Kejuaraan</span>
                 </div>
                 <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -216,11 +215,10 @@ export default function PrestasiListPage() {
                   <button
                     key={tingkat}
                     onClick={() => setSelectedTingkat(tingkat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                      selectedTingkat === tingkat
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${selectedTingkat === tingkat
                         ? 'bg-emerald-600 text-white shadow-xs'
                         : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600'
-                    }`}
+                      }`}
                   >
                     {tingkat === 'Semua' ? 'Semua Tingkat' : `Tingkat ${tingkat}`}
                   </button>
@@ -268,10 +266,10 @@ export default function PrestasiListPage() {
               {filteredPrestasi.map((pr) => {
                 const dateStr = pr.tanggal
                   ? new Date(pr.tanggal).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })
                   : 'Terbaru';
 
                 return (

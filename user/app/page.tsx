@@ -201,7 +201,7 @@ export default function HomePage() {
         title: pr.judul,
         text: shareText,
         url: shareUrl,
-      }).catch(() => {});
+      }).catch(() => { });
     } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(shareText);
       setCopiedShareId(pr.id);
@@ -1049,19 +1049,17 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setActiveKeunggulanTab('app')}
-              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${
-                activeKeunggulanTab === 'app'
+              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${activeKeunggulanTab === 'app'
                   ? 'border-l-4 border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/40'
                   : 'hover:bg-slate-50 dark:hover:bg-slate-900/60 border-l-4 border-transparent'
-              }`}
+                }`}
             >
               <div>
                 <div
-                  className={`text-sm sm:text-base transition-colors ${
-                    activeKeunggulanTab === 'app'
+                  className={`text-sm sm:text-base transition-colors ${activeKeunggulanTab === 'app'
                       ? 'font-bold text-emerald-800 dark:text-emerald-400'
                       : 'font-semibold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'
-                  }`}
+                    }`}
                 >
                   Digital App
                 </div>
@@ -1078,19 +1076,17 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setActiveKeunggulanTab('guru')}
-              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${
-                activeKeunggulanTab === 'guru'
+              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${activeKeunggulanTab === 'guru'
                   ? 'border-l-4 border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/40'
                   : 'hover:bg-slate-50 dark:hover:bg-slate-900/60 border-l-4 border-transparent'
-              }`}
+                }`}
             >
               <div>
                 <div
-                  className={`text-sm sm:text-base transition-colors ${
-                    activeKeunggulanTab === 'guru'
+                  className={`text-sm sm:text-base transition-colors ${activeKeunggulanTab === 'guru'
                       ? 'font-bold text-emerald-800 dark:text-emerald-400'
                       : 'font-semibold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'
-                  }`}
+                    }`}
                 >
                   Guru Profesional
                 </div>
@@ -1107,19 +1103,17 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setActiveKeunggulanTab('fasilitas')}
-              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${
-                activeKeunggulanTab === 'fasilitas'
+              className={`w-full text-left py-4 px-5 transition-all duration-200 cursor-pointer flex items-center justify-between group ${activeKeunggulanTab === 'fasilitas'
                   ? 'border-l-4 border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/40'
                   : 'hover:bg-slate-50 dark:hover:bg-slate-900/60 border-l-4 border-transparent'
-              }`}
+                }`}
             >
               <div>
                 <div
-                  className={`text-sm sm:text-base transition-colors ${
-                    activeKeunggulanTab === 'fasilitas'
+                  className={`text-sm sm:text-base transition-colors ${activeKeunggulanTab === 'fasilitas'
                       ? 'font-bold text-emerald-800 dark:text-emerald-400'
                       : 'font-semibold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'
-                  }`}
+                    }`}
                 >
                   Sarana Fasilitas
                 </div>
@@ -1463,10 +1457,10 @@ export default function HomePage() {
               {prestasiList.map((pr: any) => {
                 const dateStr = pr.tanggal
                   ? new Date(pr.tanggal).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })
                   : 'Terbaru';
 
                 return (
@@ -1577,10 +1571,10 @@ export default function HomePage() {
                 const totalPhotos = 1 + (Array.isArray(item.fotoUrls) ? item.fotoUrls.filter(Boolean).length : 0);
                 const dateStr = item.tanggal
                   ? new Date(item.tanggal).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })
                   : 'Dokumentasi Sekolah';
 
                 return (
@@ -1605,10 +1599,6 @@ export default function HomePage() {
                         />
                         <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
                           {item.kategori || 'Galeri'}
-                        </span>
-                        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/60 backdrop-blur-md text-white border border-white/20 flex items-center gap-1.5">
-                          <ImageIcon className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>{totalPhotos} Foto</span>
                         </span>
                       </div>
 

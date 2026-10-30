@@ -152,7 +152,6 @@ export default function GaleriListPage() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                  <ImageIcon className="w-3.5 h-3.5" />
                   <span>Dokumentasi Visual Kampus</span>
                 </div>
                 <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -191,11 +190,10 @@ export default function GaleriListPage() {
                   <button
                     key={kat}
                     onClick={() => setSelectedKategori(kat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                      selectedKategori === kat
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${selectedKategori === kat
                         ? 'bg-emerald-600 text-white shadow-xs'
                         : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-emerald-500 hover:text-emerald-600'
-                    }`}
+                      }`}
                   >
                     {kat}
                   </button>
@@ -244,10 +242,10 @@ export default function GaleriListPage() {
                 const totalPhotos = 1 + (Array.isArray(item.fotoUrls) ? item.fotoUrls.filter(Boolean).length : 0);
                 const dateStr = item.tanggal
                   ? new Date(item.tanggal).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })
                   : 'Dokumentasi Sekolah';
 
                 return (
