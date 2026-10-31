@@ -413,9 +413,10 @@ export class AdminService {
         id: string,
         data: {
             nilaiUjian?: number;
-            statusKelulusan?: 'LULUS' | 'TIDAK_LULUS' | 'MENUNGGU';
+            statusKelulusan?: 'LULUS' | 'TIDAK_LULUS' | 'CADANGAN' | 'MENUNGGU';
             ruangUjian?: string;
             jadwalUjian?: string;
+            catatan?: string;
         },
         adminUser: { sub: string; email: string }
     ) {
@@ -437,6 +438,12 @@ export class AdminService {
         }
         if (data.ruangUjian !== undefined) {
             updateData.ruangUjian = data.ruangUjian;
+        }
+        if (data.jadwalUjian !== undefined) {
+            updateData.jadwalUjian = data.jadwalUjian;
+        }
+        if (data.catatan !== undefined) {
+            updateData.catatanVerifikasi = data.catatan;
         }
         if (data.jadwalUjian !== undefined) {
             updateData.jadwalUjian = data.jadwalUjian;
@@ -838,6 +845,9 @@ export class AdminService {
             tanggalPengumuman: map['tanggalPengumuman'] || '2026-06-01T10:00:00',
             tahunAjaran: map['tahunAjaran'] || '2026/2027',
             bukaPendaftaran: map['bukaPendaftaran'] !== 'false',
+            judulPengumuman: map['judulPengumuman'] || 'Pengumuman Hasil Seleksi PPDB SMK Muhammadiyah Sekampung',
+            pesanLulus: map['pesanLulus'] || 'Selamat! Anda dinyatakan LULUS dalam seleksi Penerimaan Peserta Didik Baru (PPDB) SMK Muhammadiyah Sekampung. Silakan segera lakukan daftar ulang sesuai petunjuk yang diberikan.',
+            pesanTidakLulus: map['pesanTidakLulus'] || 'Mohon maaf, Anda belum dinyatakan lulus pada kompetensi keahlian pilihan utama. Anda dapat berkonsultasi dengan panitia mengenai pilihan kompetensi keahlian lainnya.',
             waktuServer: new Date().toISOString(),
         };
     }
@@ -846,7 +856,15 @@ export class AdminService {
      * Memperbarui Pengaturan Sistem
      */
     async updateSettings(
-        data: { pengumumanDibuka?: boolean; tanggalPengumuman?: string; tahunAjaran?: string; bukaPendaftaran?: boolean },
+        data: {
+            pengumumanDibuka?: boolean;
+            tanggalPengumuman?: string;
+            tahunAjaran?: string;
+            bukaPendaftaran?: boolean;
+            judulPengumuman?: string;
+            pesanLulus?: string;
+            pesanTidakLulus?: string;
+        },
         adminUser: { sub: string; email: string }
     ) {
         if (data.pengumumanDibuka !== undefined) {
@@ -881,6 +899,30 @@ export class AdminService {
             });
         }
 
+        if (data.judulPengumuman !== undefined) {
+            await this.prisma.systemSetting.upsert({
+                where: { key: 'judulPengumuman' },
+                update: { value: data.judulPengumuman },
+                create: { key: 'judulPengumuman', value: data.judulPengumuman },
+            });
+        }
+
+        if (data.pesanLulus !== undefined) {
+            await this.prisma.systemSetting.upsert({
+                where: { key: 'pesanLulus' },
+                update: { value: data.pesanLulus },
+                create: { key: 'pesanLulus', value: data.pesanLulus },
+            });
+        }
+
+        if (data.pesanTidakLulus !== undefined) {
+            await this.prisma.systemSetting.upsert({
+                where: { key: 'pesanTidakLulus' },
+                update: { value: data.pesanTidakLulus },
+                create: { key: 'pesanTidakLulus', value: data.pesanTidakLulus },
+            });
+        }
+
         await this.prisma.auditLog.create({
             data: {
                 adminId: adminUser.sub,
@@ -892,6 +934,46 @@ export class AdminService {
         });
 
         return this.getSettings();
+    }
+
+    /**
+     * Update Batch Status Kelulusan Calon Siswa
+     */
+    async updateBatchKelulusan(
+        data: {
+            pendaftaranIds: string[];
+            statusKelulusan: 'LULUS' | 'TIDAK_LULUS' | 'CADANGAN' | 'MENUNGGU';
+            catatan?: string;
+        },
+        adminUser: { sub: string; email: string }
+    ) {
+        if (!data.pendaftaranIds || !Array.isArray(data.pendaftaranIds) || data.pendaftaranIds.length === 0) {
+            throw new BadRequestException('Pilih minimal satu calon siswa');
+        }
+
+        const updateData: any = {
+            statusKelulusan: data.statusKelulusan,
+        };
+        if (data.catatan !== undefined) {
+            updateData.catatanVerifikasi = data.catatan;
+        }
+
+        const result = await this.prisma.pendaftaran.updateMany({
+            where: { id: { in: data.pendaftaranIds } },
+            data: updateData,
+        });
+
+        await this.prisma.auditLog.create({
+            data: {
+                adminId: adminUser.sub,
+                adminNama: adminUser.email,
+                aksi: 'UPDATE_BATCH_KELULUSAN',
+                detail: `Memperbarui status kelulusan ${result.count} siswa menjadi ${data.statusKelulusan}`,
+                targetUser: 'MULTIPLE_STUDENTS',
+            }
+        });
+
+        return { success: true, count: result.count };
     }
 
     /**

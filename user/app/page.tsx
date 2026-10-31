@@ -1654,7 +1654,7 @@ export default function HomePage() {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.9 }}
             onClick={scrollToTop}
-            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 p-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white shadow-xl cursor-pointer flex items-center justify-center border border-white/20"
+            className="fixed bottom-[100px] right-4 sm:bottom-[116px] sm:right-6 z-40 p-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white shadow-xl cursor-pointer flex items-center justify-center border border-white/20"
             title="Kembali ke Atas"
           >
             <ChevronRight className="w-5 h-5 -rotate-90" />

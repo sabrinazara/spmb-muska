@@ -99,13 +99,26 @@ export class AdminController {
         @Param('id') id: string,
         @Body() body: {
             nilaiUjian?: number;
-            statusKelulusan?: 'LULUS' | 'TIDAK_LULUS' | 'MENUNGGU';
+            statusKelulusan?: 'LULUS' | 'TIDAK_LULUS' | 'CADANGAN' | 'MENUNGGU';
             ruangUjian?: string;
             jadwalUjian?: string;
+            catatan?: string;
         },
         @Request() req: any,
     ) {
         return this.adminService.inputNilaiDanKelulusan(id, body, req.user);
+    }
+
+    @Put('kelulusan/batch')
+    async updateBatchKelulusan(
+        @Body() body: {
+            pendaftaranIds: string[];
+            statusKelulusan: 'LULUS' | 'TIDAK_LULUS' | 'CADANGAN' | 'MENUNGGU';
+            catatan?: string;
+        },
+        @Request() req: any,
+    ) {
+        return this.adminService.updateBatchKelulusan(body, req.user);
     }
 
     @Get('export-excel')
@@ -192,7 +205,15 @@ export class AdminController {
 
     @Put('settings')
     async updateSettings(
-        @Body() body: { pengumumanDibuka?: boolean; tanggalPengumuman?: string; tahunAjaran?: string; bukaPendaftaran?: boolean },
+        @Body() body: {
+            pengumumanDibuka?: boolean;
+            tanggalPengumuman?: string;
+            tahunAjaran?: string;
+            bukaPendaftaran?: boolean;
+            judulPengumuman?: string;
+            pesanLulus?: string;
+            pesanTidakLulus?: string;
+        },
         @Request() req: any,
     ) {
         return this.adminService.updateSettings(body, req.user);

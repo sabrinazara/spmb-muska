@@ -461,9 +461,33 @@ export default function LandingHeader({
                         <div className="text-[10px] text-slate-400">Dokumentasi foto kegiatan</div>
                       </div>
                     </Link>
+
+                    <Link
+                      href="/pengumuman"
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/60 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group/item"
+                    >
+                      <div>
+                        <div className="font-bold text-xs text-slate-900 dark:text-white group-hover/item:text-emerald-600 dark:group-hover/item:text-emerald-400 flex items-center gap-1.5">
+                          <span>Pengumuman</span>
+                          <span className="px-1.5 py-0.5 bg-emerald-600 text-[9px] text-white rounded-full font-bold">Online</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">Cek status kelulusan seleksi</div>
+                      </div>
+                    </Link>
                   </div>
                 </div>
               </div>
+
+              {/* 5. Pengumuman Kelulusan (Navbar Menu Utama) */}
+              <Link
+                href="/pengumuman"
+                className={`px-3 py-2 rounded-xl transition-colors ${activeMenu === 'pengumuman'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 font-bold border border-emerald-200/70 dark:border-emerald-800/60 shadow-2xs'
+                  : 'hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
+                  }`}
+              >
+                Pengumuman
+              </Link>
 
               {/* 5. Kontak */}
               <Link
@@ -539,7 +563,7 @@ export default function LandingHeader({
                     onClick={() => setMobileExpandedGroup(mobileExpandedGroup === 'profil' ? null : 'profil')}
                     className="w-full flex items-center justify-between p-3 text-slate-800 dark:text-slate-200 font-bold hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
                   >
-                    <span>Profil Sekolah</span>
+                    <span>Profil</span>
                     <ChevronDown
                       className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${mobileExpandedGroup === 'profil' ? 'rotate-180 text-emerald-600' : ''
                         }`}
@@ -665,9 +689,32 @@ export default function LandingHeader({
                         <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
                         <span>Galeri Foto Dokumentasi</span>
                       </Link>
+                      <Link
+                        href="/pengumuman"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex items-center gap-2.5 p-2 rounded-lg text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50/70 dark:bg-emerald-950/40"
+                      >
+                        <Award className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Pengumuman Kelulusan Online</span>
+                      </Link>
                     </div>
                   )}
                 </div>
+
+                {/* 5. Pengumuman Kelulusan Mobile Direct */}
+                <Link
+                  href="/pengumuman"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-between py-2.5 px-3 rounded-xl transition ${activeMenu === 'pengumuman'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 font-bold'
+                    : 'text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50/40 dark:bg-emerald-950/20'
+                    }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Award className="w-4 h-4 text-emerald-600" />
+                    <span>Pengumuman Kelulusan</span>
+                  </span>
+                </Link>
 
                 {/* 5. Kontak */}
                 <Link

@@ -13,6 +13,7 @@ import {
     ChevronDown,
 } from 'lucide-react';
 import { sendAiChatMessage } from '@/lib/api';
+import ChatbotLottie from '@/components/ChatbotLottie';
 
 interface Message {
     id: string;
@@ -106,22 +107,17 @@ export default function ChatbotRAG() {
     };
 
     return (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 font-sans">
-            {/* FLOATING LAUNCHER: LOGO CHATBOT DENGAN TULISAN TANYA DI SINI */}
+        <div className="fixed bottom-2 right-3 sm:bottom-3 sm:right-5 z-50 font-sans">
+            {/* FLOATING LAUNCHER: LOTTIE CHATBOT */}
             {!isOpen && (
                 <button
+                    type="button"
                     onClick={() => setIsOpen(true)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-slate-950 dark:bg-slate-900 hover:bg-slate-900 dark:hover:bg-slate-800 text-white shadow-xl hover:shadow-2xl border border-emerald-500/50 hover:border-emerald-500 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer group"
+                    className="cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95 drop-shadow-2xl focus:outline-none"
                     aria-label="Tanya di Sini - Asisten AI SPMB"
                     title="Tanya di Sini - Asisten AI SPMB"
                 >
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 group-hover:bg-emerald-500 transition-colors shadow-xs">
-                        <Bot className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-100 group-hover:text-emerald-400 transition-colors whitespace-nowrap">
-                        Tanya di Sini
-                    </span>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <ChatbotLottie className="w-20 h-20 sm:w-22 sm:h-22" />
                 </button>
             )}
 

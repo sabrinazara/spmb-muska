@@ -26,6 +26,7 @@ import {
     Zap,
     HardDrive,
     Globe,
+    Megaphone,
 } from 'lucide-react';
 import { API_ENDPOINTS, getAuthHeaders } from '@/lib/api';
 
@@ -255,6 +256,12 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
                     exact: false,
                     icon: Sliders,
                 },
+                {
+                    name: 'Pengumuman',
+                    href: '/pengumuman',
+                    exact: false,
+                    icon: Megaphone,
+                },
             ],
         },
         {
@@ -300,6 +307,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         if (pathname.startsWith('/pendaftar/')) return 'Detail & Validasi Berkas Pendaftar';
         if (pathname === '/pendaftar') return 'Kelola Data Pendaftar';
         if (pathname === '/pengaturan-kuota') return 'Manajemen Kuota Jurusan & Seleksi Ranking';
+        if (pathname === '/pengumuman') return 'Manajemen Pengumuman & Kelulusan Siswa';
         if (pathname === '/admin-users') return 'Manajemen Administrator & Akun Panitia';
         if (pathname === '/settings') return 'Pengaturan SPMB & Jadwal Kelulusan';
         if (pathname === '/knowledge-base') return 'AI Knowledge Base Management';

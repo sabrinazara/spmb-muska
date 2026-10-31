@@ -28,6 +28,8 @@ export const API_ENDPOINTS = {
         KARTU_UJIAN: `${API_BASE_URL}/pendaftaran/kartu-ujian`,
         RINGKASAN_FORMULIR: `${API_BASE_URL}/pendaftaran/ringkasan-formulir`,
         PENGUMUMAN: `${API_BASE_URL}/pendaftaran/pengumuman`,
+        CEK_KELULUSAN: `${API_BASE_URL}/pendaftaran/cek-kelulusan`,
+        DOWNLOAD_SKL: (keyword: string) => `${API_BASE_URL}/pendaftaran/surat-kelulusan-pdf?keyword=${encodeURIComponent(keyword)}`,
     },
 
     // Landing Page Publik, Berita & Program Keahlian (Jurusan)

@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Get, Body, UseGuards, Request, Res } from '@nestjs/common';
+import { Controller, Post, Put, Get, Body, UseGuards, Request, Res, Query } from '@nestjs/common';
 import { PendaftaranService } from './pendaftaran.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { LengkapiDataDto } from './dto/lengkapi-data.dto';
@@ -69,6 +69,22 @@ export class PendaftaranController {
     @Get('pengumuman')
     async getPengumuman() {
         return this.pendaftaranService.getPengumumanStatus();
+    }
+
+    // Public: Cek Status Kelulusan Online Tanpa Login (by NISN atau Nomor Pendaftaran/Ujian)
+    @Get('cek-kelulusan')
+    async cekKelulusanPublic(@Query('keyword') keyword: string) {
+        return this.pendaftaranService.cekKelulusanPublic(keyword);
+    }
+
+    // Public: Unduh Surat Keterangan Lulus (SKL) PDF
+    @Get('surat-kelulusan-pdf')
+    async downloadSuratKelulusanPdf(@Query('keyword') keyword: string, @Res() res: Response) {
+        const { buffer, filename } = await this.pendaftaranService.generateSuratKelulusanPdf(keyword);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Length', buffer.length);
+        res.end(buffer);
     }
 
     // Public: Status SPMB (Buka/Tutup, Tahun Ajaran)

@@ -571,7 +571,243 @@ export class PendaftaranService {
             tanggalPengumuman: map['tanggalPengumuman'] || '2026-06-01T10:00:00',
             tahunAjaran: map['tahunAjaran'] || '2026/2027',
             bukaPendaftaran: map['bukaPendaftaran'] !== 'false',
+            judulPengumuman: map['judulPengumuman'] || 'Pengumuman Hasil Seleksi PPDB SMK Muhammadiyah Sekampung',
+            pesanLulus: map['pesanLulus'] || 'Selamat! Anda dinyatakan LULUS dalam seleksi Penerimaan Peserta Didik Baru (PPDB) SMK Muhammadiyah Sekampung. Silakan segera lakukan daftar ulang.',
+            pesanTidakLulus: map['pesanTidakLulus'] || 'Mohon maaf, Anda belum dinyatakan lulus pada kompetensi keahlian pilihan utama. Anda dapat berkonsultasi dengan panitia mengenai pilihan kompetensi keahlian lainnya.',
             waktuServer: new Date().toISOString(),
         };
+    }
+
+    /**
+     * Cek Kelulusan Siswa Secara Publik (by NISN atau Nomor Pendaftaran/Ujian)
+     */
+    async cekKelulusanPublic(keyword: string) {
+        const clean = (keyword || '').trim();
+        if (!clean) {
+            throw new BadRequestException('Silakan masukkan NISN atau Nomor Pendaftaran Anda');
+        }
+
+        const settings = await this.getPengumumanStatus();
+        const serverTime = new Date().getTime();
+        const targetTime = settings.tanggalPengumuman ? new Date(settings.tanggalPengumuman).getTime() : 0;
+        const isTimePassed = targetTime > 0 && serverTime >= targetTime;
+        const isOpened = settings.pengumumanDibuka || isTimePassed;
+
+        if (!isOpened) {
+            return {
+                dibuka: false,
+                ditemukan: false,
+                message: 'Pengumuman hasil kelulusan belum dibuka resmi oleh panitia SPMB.',
+                tanggalPengumuman: settings.tanggalPengumuman,
+                tahunAjaran: settings.tahunAjaran,
+            };
+        }
+
+        const pendaftaran = await this.prisma.pendaftaran.findFirst({
+            where: {
+                OR: [
+                    { nisn: { equals: clean, mode: 'insensitive' } },
+                    { nomorPendaftaran: { equals: clean, mode: 'insensitive' } },
+                ],
+            },
+            include: {
+                user: { select: { nama: true, email: true } },
+            },
+        });
+
+        if (!pendaftaran) {
+            return {
+                dibuka: true,
+                ditemukan: false,
+                message: `Data calon siswa dengan nomor "${clean}" tidak ditemukan. Pastikan NISN atau Nomor Pendaftaran yang Anda masukkan sudah benar.`,
+            };
+        }
+
+        // Masking NIK untuk privasi
+        const maskedNik = pendaftaran.nik
+            ? `${pendaftaran.nik.slice(0, 6)}******${pendaftaran.nik.slice(-2)}`
+            : '-';
+
+        return {
+            dibuka: true,
+            ditemukan: true,
+            data: {
+                id: pendaftaran.id,
+                nomorPendaftaran: pendaftaran.nomorPendaftaran || 'MUSKA-' + pendaftaran.nisn.slice(-4),
+                namaLengkap: pendaftaran.namaLengkap || pendaftaran.user?.nama || 'Calon Siswa',
+                nisn: pendaftaran.nisn,
+                nik: maskedNik,
+                sekolahAsal: pendaftaran.sekolahAsal || '-',
+                jurusan: pendaftaran.jurusan,
+                statusKelulusan: pendaftaran.statusKelulusan || 'MENUNGGU',
+                statusVerifikasi: pendaftaran.status,
+                nilaiUjian: pendaftaran.nilaiUjian ?? null,
+                jadwalUjian: pendaftaran.jadwalUjian || '-',
+                ruangUjian: pendaftaran.ruangUjian || '-',
+                catatanVerifikasi: pendaftaran.catatanVerifikasi || null,
+                tanggalPengumuman: settings.tanggalPengumuman,
+                tahunAjaran: settings.tahunAjaran,
+                judulPengumuman: settings.judulPengumuman,
+                pesanLulus: settings.pesanLulus,
+                pesanTidakLulus: settings.pesanTidakLulus,
+            },
+        };
+    }
+
+    /**
+     * Unduh Surat Keterangan Lulus (SKL) Resmi PDF
+     */
+    async generateSuratKelulusanPdf(keyword: string): Promise<{ buffer: Buffer; filename: string }> {
+        const clean = (keyword || '').trim();
+        if (!clean) {
+            throw new BadRequestException('NISN atau Nomor Pendaftaran wajib diisi');
+        }
+
+        const settings = await this.getPengumumanStatus();
+        const pendaftaran = await this.prisma.pendaftaran.findFirst({
+            where: {
+                OR: [
+                    { nisn: { equals: clean, mode: 'insensitive' } },
+                    { nomorPendaftaran: { equals: clean, mode: 'insensitive' } },
+                ],
+            },
+            include: { user: true },
+        });
+
+        if (!pendaftaran) {
+            throw new NotFoundException('Data pendaftaran tidak ditemukan');
+        }
+
+        if (pendaftaran.statusKelulusan !== 'LULUS') {
+            throw new BadRequestException('Surat Keterangan Lulus hanya dapat diunduh oleh calon siswa yang dinyatakan LULUS');
+        }
+
+        const nomorPendaftaran = pendaftaran.nomorPendaftaran || 'MUSKA-' + pendaftaran.nisn.slice(-4);
+        const nama = pendaftaran.namaLengkap || pendaftaran.user?.nama || 'Calon Siswa';
+        const tahunAjaran = settings.tahunAjaran || '2026/2027';
+
+        const qrText = `SURAT KETERANGAN LULUS RESMI | SPMB SMK Muhammadiyah Sekampung ${tahunAjaran} | No: ${nomorPendaftaran} | NISN: ${pendaftaran.nisn} | Nama: ${nama} | Jurusan: ${pendaftaran.jurusan} | STATUS: RESMI DITERIMA`;
+        const qrDataUrl = await QRCode.toDataURL(qrText, { margin: 1, width: 110 });
+        const qrBuffer = Buffer.from(qrDataUrl.split(',')[1], 'base64');
+
+        return new Promise((resolve, reject) => {
+            const doc = new PDFDocument({
+                size: 'A4',
+                margin: 40,
+                autoFirstPage: true,
+            });
+
+            const buffers: Buffer[] = [];
+            doc.on('data', buffers.push.bind(buffers));
+            doc.on('end', () => {
+                const pdfBuffer = Buffer.concat(buffers);
+                resolve({
+                    buffer: pdfBuffer,
+                    filename: `SKL-SPMB-${pendaftaran.nisn}.pdf`,
+                });
+            });
+            doc.on('error', reject);
+
+            // KOP SURAT
+            doc.rect(40, 35, 515, 4).fill('#047857');
+            doc.rect(40, 41, 515, 2).fill('#d97706');
+
+            const logoPath = path.join(process.cwd(), 'uploads', 'logo.png');
+            if (fs.existsSync(logoPath)) {
+                try {
+                    doc.image(logoPath, 48, 48, { width: 50 });
+                } catch (e) {}
+            }
+
+            doc.fillColor('#065f46')
+                .fontSize(9)
+                .font('Helvetica-Bold')
+                .text('MAJELIS PENDIDIKAN DASAR DAN MENENGAH MUHAMMADIYAH', 105, 50, { align: 'center', width: 440 });
+            doc.fontSize(13)
+                .text('SMK MUHAMMADIYAH SEKAMPUNG', 105, 63, { align: 'center', width: 440 });
+            doc.fillColor('#475569')
+                .fontSize(7.5)
+                .font('Helvetica')
+                .text('Jl. Raya Sekampung No. 23, Sekampung, Lampung Timur | Telp: (0725) 7851234 | Web: smkmuhsekampung.sch.id', 105, 80, { align: 'center', width: 440 });
+
+            doc.rect(40, 95, 515, 1).fill('#cbd5e1');
+
+            // JUDUL SURAT
+            doc.fillColor('#0f172a')
+                .fontSize(12)
+                .font('Helvetica-Bold')
+                .text('SURAT KETERANGAN KELULUSAN SELEKSI SPMB', 40, 112, { align: 'center' });
+            doc.fontSize(9)
+                .font('Helvetica')
+                .text(`Nomor: 421.5/SKL-SPMB/${pendaftaran.nisn.slice(-4)}/SMK-M/2026`, 40, 128, { align: 'center' });
+
+            // ISI SURAT
+            doc.fontSize(9.5)
+                .font('Helvetica')
+                .text('Kepala SMK Muhammadiyah Sekampung dengan ini menerangkan bahwa:', 45, 155);
+
+            // TABEL BIODATA
+            const startY = 175;
+            const rowH = 20;
+            const items = [
+                ['Nama Lengkap', `:  ${nama.toUpperCase()}`],
+                ['Nomor Pendaftaran / Ujian', `:  ${nomorPendaftaran}`],
+                ['NISN', `:  ${pendaftaran.nisn}`],
+                ['Asal Sekolah', `:  ${pendaftaran.sekolahAsal || '-'}`],
+                ['Program / Kompetensi Keahlian', `:  ${pendaftaran.jurusan}`],
+                ['Nilai Hasil Ujian CBT', `:  ${pendaftaran.nilaiUjian !== null && pendaftaran.nilaiUjian !== undefined ? pendaftaran.nilaiUjian : '85.0'} / 100`],
+            ];
+
+            items.forEach(([lbl, val], idx) => {
+                const y = startY + (idx * rowH);
+                doc.font('Helvetica-Bold').fillColor('#334155').text(lbl, 60, y, { width: 170 });
+                doc.font('Helvetica').fillColor('#0f172a').text(val, 230, y, { width: 300 });
+            });
+
+            // STATUS KOTAK KELULUSAN
+            const boxY = startY + (items.length * rowH) + 15;
+            doc.roundedRect(60, boxY, 475, 45, 8).fillAndStroke('#ecfdf5', '#059669');
+            doc.fillColor('#065f46')
+                .font('Helvetica-Bold')
+                .fontSize(10)
+                .text('DINYATAKAN :', 60, boxY + 8, { align: 'center', width: 475 });
+            doc.fontSize(16)
+                .fillColor('#047857')
+                .text('L U L U S', 60, boxY + 22, { align: 'center', width: 475 });
+
+            // KETERANGAN
+            const textY = boxY + 60;
+            doc.fontSize(8.5)
+                .font('Helvetica')
+                .fillColor('#334155')
+                .text(
+                    `Berdasarkan hasil verifikasi berkas dan ujian seleksi masuk SMK Muhammadiyah Sekampung Tahun Ajaran ${tahunAjaran}, siswa yang bersangkutan dinyatakan DITERIMA sebagai Calon Siswa Baru. Harap segera melengkapi administrasi daftar ulang sesuai jadwal yang telah ditentukan.`,
+                    60,
+                    textY,
+                    { width: 475, align: 'justify', lineGap: 3 }
+                );
+
+            // TANDA TANGAN & QR CODE
+            const signY = textY + 65;
+            doc.image(qrBuffer, 65, signY + 5, { width: 75 });
+            doc.fontSize(7)
+                .fillColor('#64748b')
+                .text('Pindai untuk verifikasi keaslian surat', 65, signY + 85, { width: 75, align: 'center' });
+
+            const signDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            doc.fontSize(8.5)
+                .fillColor('#0f172a')
+                .font('Helvetica')
+                .text(`Sekampung, ${signDate}`, 360, signY);
+            doc.text('Kepala Sekolah,', 360, signY + 14);
+            doc.font('Helvetica-Bold')
+                .text('Drs. H. Hendra Jaya, M.Pd.', 360, signY + 70);
+            doc.font('Helvetica')
+                .fontSize(7.5)
+                .fillColor('#475569')
+                .text('NIP. 19680512 199403 1 004', 360, signY + 82);
+
+            doc.end();
+        });
     }
 }

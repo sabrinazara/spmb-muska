@@ -34,6 +34,8 @@ export const API_ENDPOINTS = {
         NOTIFICATIONS: `${API_BASE_URL}/admin/notifications`,
         KUOTA: `${API_BASE_URL}/admin/kuota`,
         UPDATE_KUOTA: (id: string) => `${API_BASE_URL}/admin/kuota/${id}`,
+        UPDATE_NILAI: (id: string) => `${API_BASE_URL}/admin/nilai/${id}`,
+        UPDATE_KELULUSAN_BATCH: `${API_BASE_URL}/admin/kelulusan/batch`,
         SELEKSI_OTOMATIS: `${API_BASE_URL}/admin/seleksi-otomatis`,
         DB_BACKUP: `${API_BASE_URL}/admin/db/backup`,
         DB_RESTORE: `${API_BASE_URL}/admin/db/restore`,

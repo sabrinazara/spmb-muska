@@ -374,14 +374,19 @@ export default function WebsiteManagerPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-xs">
                                 <div className="sm:col-span-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
                                     <h3 className="font-bold text-xs text-slate-800 dark:text-slate-200">
-                                        Identitas Brand & Logo Sekolah (Navbar & Footer)
+                                        Identitas Brand & Logo Sekolah (Favicon Browser, Navbar & Footer)
                                     </h3>
                                     <ImageUploader
                                         label="Logo Resmi Sekolah / Yayasan"
                                         value={profil.logoUrl || '/logo.png'}
-                                        onChange={(url) => setProfil({ ...profil, logoUrl: url })}
+                                        onChange={(url) => {
+                                            setProfil({ ...profil, logoUrl: url });
+                                            if (typeof window !== 'undefined') {
+                                                window.dispatchEvent(new CustomEvent('website_logo_updated', { detail: { url } }));
+                                            }
+                                        }}
                                         aspectRatio="square"
-                                        helperText="Disarankan file gambar logo format PNG transparan atau SVG resolusi tajam (tampil otomatis di header navbar dan footer)."
+                                        helperText="Disarankan file gambar logo format PNG transparan atau SVG resolusi tajam (tampil otomatis sebagai favicon browser tab, header navbar, dan footer)."
                                     />
                                 </div>
 
