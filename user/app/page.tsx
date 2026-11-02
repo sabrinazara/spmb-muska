@@ -43,6 +43,7 @@ import ChatbotRAG from '@/components/ChatbotRAG';
 import RegistrationClosedModal from '@/components/RegistrationClosedModal';
 import LandingHeader from '@/components/LandingHeader';
 import LandingFooter from '@/components/LandingFooter';
+import LandingLoader from '@/components/LandingLoader';
 
 interface LandingData {
   sliders: any[];
@@ -265,6 +266,8 @@ export default function HomePage() {
       document.documentElement.classList.remove('dark');
     }
 
+    const startFetch = Date.now();
+
     fetch(API_ENDPOINTS.LANDING_PAGE)
       .then((res) => res.json())
       .then((result) => {
@@ -275,7 +278,14 @@ export default function HomePage() {
         }
       })
       .catch((err) => console.error('Gagal mengambil data landing page:', err))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        // Beri buffer minimal (650ms) agar transisi putaran bola tampak estetis dan tidak flicker
+        const elapsed = Date.now() - startFetch;
+        const minWait = Math.max(0, 650 - elapsed);
+        setTimeout(() => {
+          setLoading(false);
+        }, minWait);
+      });
   }, []);
 
   // Toggle Theme
@@ -364,7 +374,26 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
+    <>
+      {/* Dynamic Animated Landing Page Loader dengan Animasi Drop Out ke Atas Halus */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            key="muska-landing-loader"
+            initial={{ y: 0, opacity: 1 }}
+            exit={{ y: '-100%' }}
+            transition={{
+              duration: 0.8,
+              ease: [0.76, 0, 0.24, 1], // Buttery-smooth custom ease curtain slide up
+            }}
+            className="fixed inset-0 z-[9999] bg-white shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden pointer-events-auto"
+          >
+            <LandingLoader isFullScreen={false} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans antialiased transition-colors duration-200">
       {/* ========================================================
                 FIXED FLOATING HEADER
             ======================================================== */}
@@ -1929,5 +1958,6 @@ export default function HomePage() {
         forceRedirectHome={false}
       />
     </div>
+    </>
   );
 }
