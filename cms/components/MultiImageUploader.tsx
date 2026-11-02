@@ -1,8 +1,16 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { UploadCloud, X, Loader2, Plus, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import {
+  UploadCloud,
+  X,
+  Loader2,
+  Plus,
+  AlertCircle,
+  Crop as CropIcon,
+} from 'lucide-react';
 import { API_BASE_URL, API_ENDPOINTS, getAuthUploadHeaders } from '@/lib/api';
+import ImageCropModal from './ImageCropModal';
 
 interface MultiImageUploaderProps {
   label: string;
@@ -25,6 +33,13 @@ export default function MultiImageUploader({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // State untuk Crop Modal
+  const [isCropOpen, setIsCropOpen] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropFileName, setCropFileName] = useState('galeri.jpg');
+  const [pendingOriginalFile, setPendingOriginalFile] = useState<File | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null); // null = new photo, number = re-cropping existing photo
+
   const getDisplayUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:')) return url;
@@ -32,7 +47,51 @@ export default function MultiImageUploader({
     return `${API_BASE_URL}${clean}`;
   };
 
-  const handleFileUpload = async (file: File) => {
+  const executeUpload = async (file: File, replaceIndex: number | null = null) => {
+    if (!file) return;
+
+    setErrorMsg(null);
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch(API_ENDPOINTS.WEBSITE.UPLOAD_IMAGE, {
+        method: 'POST',
+        headers: getAuthUploadHeaders(),
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        if (replaceIndex !== null && replaceIndex >= 0 && replaceIndex < value.length) {
+          // Replace existing photo at index
+          const nextList = [...value];
+          nextList[replaceIndex] = data.url;
+          onChange(nextList);
+        } else {
+          // Append new photo
+          const nextList = [...value, data.url].slice(0, maxPhotos);
+          onChange(nextList);
+        }
+        setErrorMsg(null);
+      } else {
+        setErrorMsg(data.message || 'Gagal mengunggah gambar');
+      }
+    } catch {
+      setErrorMsg('Koneksi terputus saat mengunggah gambar. Pastikan backend aktif.');
+    } finally {
+      setUploading(false);
+      setEditingIndex(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     if (value.length >= maxPhotos) {
@@ -52,41 +111,26 @@ export default function MultiImageUploader({
     }
 
     setErrorMsg(null);
-    setUploading(true);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await fetch(API_ENDPOINTS.WEBSITE.UPLOAD_IMAGE, {
-        method: 'POST',
-        headers: getAuthUploadHeaders(),
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (res.ok && data.url) {
-        const nextList = [...value, data.url].slice(0, maxPhotos);
-        onChange(nextList);
-        setErrorMsg(null);
-      } else {
-        setErrorMsg(data.message || 'Gagal mengunggah gambar');
-      }
-    } catch {
-      setErrorMsg('Koneksi terputus saat mengunggah gambar. Pastikan backend aktif.');
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
+    // Buka crop modal untuk foto baru
+    const objUrl = URL.createObjectURL(file);
+    setCropSrc(objUrl);
+    setCropFileName(file.name);
+    setPendingOriginalFile(file);
+    setEditingIndex(null);
+    setIsCropOpen(true);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileUpload(file);
-    }
+  // Re-crop foto yang sudah ada di galeri
+  const handleOpenCropForPhoto = (index: number) => {
+    const photoUrl = value[index];
+    if (!photoUrl) return;
+
+    setCropSrc(getDisplayUrl(photoUrl));
+    setCropFileName(photoUrl.split('/').pop() || `foto-${index + 1}.jpg`);
+    setPendingOriginalFile(null);
+    setEditingIndex(index);
+    setIsCropOpen(true);
   };
 
   const handleRemovePhoto = (index: number) => {
@@ -145,15 +189,28 @@ export default function MultiImageUploader({
               #{idx + 1}
             </div>
 
-            {/* Tombol Hapus */}
-            <button
-              type="button"
-              onClick={() => handleRemovePhoto(idx)}
-              className="absolute top-2 right-2 p-1.5 rounded-xl bg-rose-600/90 text-white hover:bg-rose-600 transition shadow-md cursor-pointer opacity-90 group-hover:opacity-100"
-              title="Hapus foto ini"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
+            {/* Overlay tombol aksi: Crop & Hapus */}
+            <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition">
+              {/* Tombol Crop Ulang */}
+              <button
+                type="button"
+                onClick={() => handleOpenCropForPhoto(idx)}
+                className="p-1.5 rounded-xl bg-slate-900/80 hover:bg-emerald-600 text-white backdrop-blur-xs transition shadow-md cursor-pointer"
+                title="Sesuaikan / Crop Ulang Foto Ini"
+              >
+                <CropIcon className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Tombol Hapus */}
+              <button
+                type="button"
+                onClick={() => handleRemovePhoto(idx)}
+                className="p-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white transition shadow-md cursor-pointer"
+                title="Hapus foto ini"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         ))}
 
@@ -176,7 +233,7 @@ export default function MultiImageUploader({
                   <Plus className="w-4 h-4" />
                 </div>
                 <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                  Tambah Foto
+                  Tambah & Crop Foto
                 </div>
                 <div className="text-[9px] text-slate-400 font-medium">
                   Sisa {maxPhotos - value.length} slot
@@ -194,6 +251,31 @@ export default function MultiImageUploader({
           <span>{errorMsg}</span>
         </div>
       )}
+
+      {/* Modal Crop Interaktif */}
+      <ImageCropModal
+        isOpen={isCropOpen}
+        onClose={() => {
+          setIsCropOpen(false);
+          setEditingIndex(null);
+          if (cropSrc && cropSrc.startsWith('blob:')) {
+            URL.revokeObjectURL(cropSrc);
+          }
+        }}
+        imageSrc={cropSrc}
+        fileName={cropFileName}
+        defaultAspectRatio="banner"
+        onCropComplete={(croppedFile) => {
+          executeUpload(croppedFile, editingIndex);
+        }}
+        onSkipCrop={
+          pendingOriginalFile
+            ? () => {
+                executeUpload(pendingOriginalFile, editingIndex);
+              }
+            : undefined
+        }
+      />
     </div>
   );
 }

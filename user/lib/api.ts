@@ -3,10 +3,18 @@
  * Semua request fetch di frontend WAJIB menggunakan konstanta dari file ini.
  */
 
-export const API_BASE_URL =
-    (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== 'http://localhost:3000')
-        ? process.env.NEXT_PUBLIC_API_URL
-        : 'http://localhost:3001';
+// Helper penentu URL API dinamis (Otomatis mendeteksi IP saat diakses dari HP di jaringan LAN/Wi-Fi)
+const resolveApiBase = (): string => {
+    if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL !== 'http://localhost:3000') {
+        return process.env.NEXT_PUBLIC_API_URL;
+    }
+    if (typeof window !== 'undefined' && window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        return `http://${window.location.hostname}:3001`;
+    }
+    return 'http://localhost:3001';
+};
+
+export const API_BASE_URL = resolveApiBase();
 
 export const AI_BASE_URL =
     process.env.NEXT_PUBLIC_AI_URL || 'http://localhost:8000';

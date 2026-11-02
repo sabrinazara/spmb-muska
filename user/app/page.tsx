@@ -178,18 +178,54 @@ export default function HomePage() {
   // Tab Keunggulan Sekolah (Layout Screenshot 1)
   const [activeKeunggulanTab, setActiveKeunggulanTab] = useState<'app' | 'guru' | 'fasilitas'>('app');
 
-  // Prestasi Scroll & Auto-Slide (Setiap 5 Detik)
+  // Prestasi Scroll & Auto-Slide (Selalu Presisi di Tengah / Center Aligned)
   const [copiedShareId, setCopiedShareId] = useState<string | null>(null);
   const prestasiScrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollPrestasi = (direction: 'left' | 'right') => {
-    if (prestasiScrollRef.current) {
-      const scrollAmount = 340;
-      prestasiScrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
+  // Helper untuk mendapatkan indeks kartu yang paling mendekati tengah saat ini
+  const getClosestPrestasiIndex = () => {
+    if (!prestasiScrollRef.current) return 0;
+    const container = prestasiScrollRef.current;
+    const containerCenter = container.scrollLeft + container.clientWidth / 2;
+    const cards = Array.from(container.children) as HTMLElement[];
+    if (cards.length === 0) return 0;
+
+    let closestIdx = 0;
+    let minDiff = Infinity;
+    cards.forEach((card, idx) => {
+      const cardCenter = card.offsetLeft + card.clientWidth / 2;
+      const diff = Math.abs(containerCenter - cardCenter);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = idx;
+      }
+    });
+    return closestIdx;
+  };
+
+  // Scroll ke kartu prestasi tertentu dan posisikan tepat di tengah container
+  const scrollToPrestasiCard = (targetIndex: number) => {
+    if (!prestasiScrollRef.current) return;
+    const container = prestasiScrollRef.current;
+    const cards = Array.from(container.children) as HTMLElement[];
+    if (cards.length === 0) return;
+
+    const totalCards = cards.length;
+    const clampedIndex = (targetIndex + totalCards) % totalCards;
+    const card = cards[clampedIndex];
+    if (card) {
+      const targetLeft = card.offsetLeft - (container.clientWidth - card.clientWidth) / 2;
+      container.scrollTo({
+        left: Math.max(0, targetLeft),
         behavior: 'smooth',
       });
     }
+  };
+
+  const scrollPrestasi = (direction: 'left' | 'right') => {
+    const currentIdx = getClosestPrestasiIndex();
+    const nextIdx = direction === 'left' ? currentIdx - 1 : currentIdx + 1;
+    scrollToPrestasiCard(nextIdx);
   };
 
   const handleSharePrestasi = (e: React.MouseEvent, pr: any) => {
@@ -210,19 +246,16 @@ export default function HomePage() {
     }
   };
 
-  // Auto-Slide Prestasi Siswa Setiap 5 Detik (Mobile & Desktop)
+  // Auto-Slide Prestasi Siswa Setiap 5 Detik (Selalu Center di Tengah)
   useEffect(() => {
-    if (!data?.prestasi || data.prestasi.length <= 1) return;
+    const listLength = data?.prestasi?.length || 0;
+    if (listLength <= 1) return;
+
     const interval = setInterval(() => {
       if (prestasiScrollRef.current) {
-        const container = prestasiScrollRef.current;
-        const scrollStep = 320;
-        const maxScroll = container.scrollWidth - container.clientWidth;
-        if (container.scrollLeft >= maxScroll - 25) {
-          container.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          container.scrollBy({ left: scrollStep, behavior: 'smooth' });
-        }
+        const currentIdx = getClosestPrestasiIndex();
+        const nextIdx = (currentIdx + 1) % listLength;
+        scrollToPrestasiCard(nextIdx);
       }
     }, 5000);
 
@@ -329,33 +362,33 @@ export default function HomePage() {
   const INITIAL_GURU_LIMIT = 8;
   const visibleGuru = showAllGuru ? guruList : guruList.slice(0, INITIAL_GURU_LIMIT);
 
-  // Layout helper adaptif untuk WKS
+  // Layout helper adaptif untuk WKS (Mobile: 2 Kolom Kiri-Kanan)
   const getWksContainerClass = (count: number) => {
-    if (count === 1) return 'flex justify-center max-w-sm mx-auto';
-    if (count === 2) return 'flex flex-wrap justify-center gap-6 max-w-2xl mx-auto';
-    if (count === 3) return 'flex flex-wrap justify-center gap-6 max-w-5xl mx-auto';
-    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6';
+    if (count === 1) return 'flex justify-center max-w-xs sm:max-w-sm mx-auto';
+    if (count === 2) return 'grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-6 max-w-2xl mx-auto';
+    if (count === 3) return 'grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-6 max-w-5xl mx-auto';
+    return 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6';
   };
 
   const getWksCardClass = (count: number) => {
     if (count === 1) return 'w-full';
-    if (count === 2) return 'w-full sm:w-[300px] max-w-sm';
-    if (count === 3) return 'w-full sm:w-[280px] lg:w-[310px]';
+    if (count === 2) return 'w-full sm:w-[280px] sm:max-w-sm';
+    if (count === 3) return 'w-full sm:w-[260px] lg:w-[310px]';
     return 'w-full';
   };
 
-  // Layout helper adaptif untuk Dewan Guru
+  // Layout helper adaptif untuk Dewan Guru (Mobile: 2 Kolom Kiri-Kanan)
   const getGuruContainerClass = (count: number) => {
-    if (count === 1) return 'flex justify-center max-w-sm mx-auto';
-    if (count === 2) return 'flex flex-wrap justify-center gap-6 max-w-2xl mx-auto';
-    if (count === 3) return 'flex flex-wrap justify-center gap-6 max-w-5xl mx-auto';
-    return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6';
+    if (count === 1) return 'flex justify-center max-w-xs sm:max-w-sm mx-auto';
+    if (count === 2) return 'grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-6 max-w-2xl mx-auto';
+    if (count === 3) return 'grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-3 sm:gap-6 max-w-5xl mx-auto';
+    return 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6';
   };
 
   const getGuruCardClass = (count: number) => {
     if (count === 1) return 'w-full';
-    if (count === 2) return 'w-full sm:w-[300px] max-w-sm';
-    if (count === 3) return 'w-full sm:w-[280px] lg:w-[310px]';
+    if (count === 2) return 'w-full sm:w-[280px] sm:max-w-sm';
+    if (count === 3) return 'w-full sm:w-[260px] lg:w-[310px]';
     return 'w-full';
   };
 
@@ -675,11 +708,11 @@ export default function HomePage() {
                     layout
                     variants={cardVariant}
                     whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
-                    className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 text-center space-y-4 shadow-xs hover:shadow-xl transition-colors duration-300 group ${getWksCardClass(
+                    className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-2.5 sm:space-y-4 shadow-xs hover:shadow-xl transition-colors duration-300 group ${getWksCardClass(
                       visibleWks.length
                     )}`}
                   >
-                    <div className="w-24 h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500 overflow-hidden group-hover:scale-105 transition-transform duration-300">
                       <img
                         src={getFullUrl(w.fotoUrl, '/avatar.png')}
                         alt={w.nama}
@@ -690,10 +723,10 @@ export default function HomePage() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                      <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug">
                         {w.nama}
                       </h3>
-                      <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1">
+                      <div className="text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 sm:mt-1 line-clamp-2">
                         {w.jabatan}
                       </div>
                     </div>
@@ -767,11 +800,11 @@ export default function HomePage() {
                   layout
                   variants={cardVariant}
                   whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
-                  className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl p-6 text-center space-y-4 shadow-xs hover:shadow-xl transition-colors duration-300 group ${getGuruCardClass(
+                  className={`bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-2.5 sm:space-y-4 shadow-xs hover:shadow-xl transition-colors duration-300 group ${getGuruCardClass(
                     visibleGuru.length
                   )}`}
                 >
-                  <div className="w-24 h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500/50 overflow-hidden group-hover:scale-105 group-hover:border-emerald-500 transition duration-300">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 mx-auto rounded-full bg-emerald-50 dark:bg-emerald-950/50 p-1 border-2 border-emerald-500/50 overflow-hidden group-hover:scale-105 group-hover:border-emerald-500 transition duration-300">
                     <img
                       src={getFullUrl(g.fotoUrl, '/avatar.png')}
                       alt={g.nama}
@@ -782,19 +815,19 @@ export default function HomePage() {
                     />
                   </div>
                   <div>
-                    <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-snug">
+                    <h3 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-snug line-clamp-2">
                       {g.nama}
                     </h3>
-                    <div className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-1 line-clamp-1">
+                    <div className="text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 sm:mt-1 line-clamp-1">
                       {g.mataPelajaran}
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
+                    <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 line-clamp-1">
                       {g.pendidikan || 'Pendidik Vokasi'}
                     </div>
                   </div>
                   {g.nip && (
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <span className="text-[9px] font-mono text-slate-400">NIP: {g.nip}</span>
+                    <div className="pt-1.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800">
+                      <span className="text-[8px] sm:text-[9px] font-mono text-slate-400">NIP: {g.nip}</span>
                     </div>
                   )}
                 </motion.div>
@@ -1480,7 +1513,7 @@ export default function HomePage() {
             {/* Track Horizontal Scroll */}
             <div
               ref={prestasiScrollRef}
-              className="flex gap-6 overflow-x-auto pb-4 pt-2 px-1 scroll-smooth no-scrollbar scrollbar-none snap-x"
+              className="flex gap-4 sm:gap-6 overflow-x-auto pb-4 pt-2 px-4 sm:px-8 scroll-smooth no-scrollbar scrollbar-none snap-x snap-mandatory"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {prestasiList.map((pr: any) => {
@@ -1496,7 +1529,7 @@ export default function HomePage() {
                   <Link
                     key={pr.id}
                     href={`/prestasi/${pr.id}`}
-                    className="snap-start shrink-0 w-[270px] sm:w-[290px] md:w-[310px] bg-white dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer"
+                    className="snap-center shrink-0 w-[260px] sm:w-[290px] md:w-[310px] bg-white dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer"
                   >
                     {/* Foto Prestasi dengan Badge JUARA */}
                     <div className="relative h-48 sm:h-52 bg-slate-100 dark:bg-slate-900 overflow-hidden">
@@ -1594,7 +1627,7 @@ export default function HomePage() {
           ) : (
             <motion.div
               variants={staggerContainer}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"
             >
               {galeriList.map((item: any) => {
                 const totalPhotos = 1 + (Array.isArray(item.fotoUrls) ? item.fotoUrls.filter(Boolean).length : 0);
@@ -1614,10 +1647,10 @@ export default function HomePage() {
                   >
                     <Link
                       href={`/galeri/${item.slug || item.id}`}
-                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer h-full"
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer h-full"
                     >
                       {/* Thumbnail Image dengan Badge Total Foto */}
-                      <div className="relative h-56 bg-slate-100 dark:bg-slate-950 overflow-hidden">
+                      <div className="relative h-36 sm:h-56 bg-slate-100 dark:bg-slate-950 overflow-hidden">
                         <img
                           src={getFullUrl(item.thumbnail, '/banner-spmb.jpg')}
                           alt={item.judul}
@@ -1626,32 +1659,32 @@ export default function HomePage() {
                             e.currentTarget.src = '/banner-spmb.jpg';
                           }}
                         />
-                        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
+                        <span className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
                           {item.kategori || 'Galeri'}
                         </span>
                       </div>
 
                       {/* Deskripsi Galeri */}
-                      <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                            <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>{dateStr}</span>
+                      <div className="p-3.5 sm:p-6 space-y-2 sm:space-y-3 flex-1 flex flex-col justify-between">
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-400">
+                            <Calendar className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span className="truncate">{dateStr}</span>
                           </div>
-                          <h3 className="font-bold text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          <h3 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                             {item.judul}
                           </h3>
                           {item.deskripsi && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-1 sm:line-clamp-2 leading-relaxed">
                               {item.deskripsi}
                             </p>
                           )}
                         </div>
 
-                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                          <div className="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 group-hover:border-emerald-500 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/30 text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center justify-center gap-1.5">
-                            <span>Buka Album Foto</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
+                        <div className="pt-2.5 sm:pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                          <div className="w-full py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-800 group-hover:border-emerald-500 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-950/30 text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center justify-center gap-1 sm:gap-1.5">
+                            <span>Buka Album</span>
+                            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                           </div>
                         </div>
                       </div>
