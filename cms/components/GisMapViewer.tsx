@@ -23,9 +23,9 @@ function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: num
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
         Math.cos((lat1 * Math.PI) / 180) *
-            Math.cos((lat2 * Math.PI) / 180) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return parseFloat((R * c).toFixed(2));
 }
@@ -145,8 +145,8 @@ export default function GisMapViewer({
             const schoolMarker = L.marker(SEKOLAH_COORDS, { icon: schoolIcon }).addTo(map);
             schoolMarker.bindPopup(`
                 <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
-                    <strong style="color: #d97706;">[Kampus] ${SEKOLAH_NAMA}</strong><br/>
-                    <span>Pusat Kampus Pelaksanaan SPMB</span>
+                    <strong style="color: #d97706;">[Sekolah] ${SEKOLAH_NAMA}</strong><br/>
+                    <span>Pusat Pelaksanaan SPMB</span>
                 </div>
             `);
 
@@ -206,7 +206,7 @@ export default function GisMapViewer({
             if (mapContainerRef.current) {
                 try {
                     (mapContainerRef.current as any)._leaflet_id = null;
-                } catch {}
+                } catch { }
             }
         };
     }, [studentLat, studentLng, hasCoords, namaLengkap, alamat]);
@@ -227,7 +227,7 @@ export default function GisMapViewer({
                             Peta Titik Koordinat Rumah Siswa (Visualisasi Zonasi GIS)
                         </h4>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                            Informasi geografis tempat tinggal pendaftar terhadap kampus sekolah
+                            Informasi geografis tempat tinggal pendaftar terhadap sekolah
                         </p>
                     </div>
                 </div>
@@ -283,7 +283,7 @@ export default function GisMapViewer({
                             <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" /> Rumah Calon Siswa
                         </span>
                         <span className="flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" /> Kampus SMK MUSKA
+                            <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" /> SMK MUSKA
                         </span>
                     </div>
                 </div>

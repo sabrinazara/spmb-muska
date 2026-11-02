@@ -176,11 +176,10 @@ export default function KnowledgeBaseManagementPage() {
             {/* Notification alert */}
             {alert && (
                 <div
-                    className={`p-4 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${
-                        alert.type === 'success'
-                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
-                            : 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30'
-                    }`}
+                    className={`p-4 rounded-xl text-xs sm:text-sm font-medium flex items-center justify-between border shadow-2xs animate-in fade-in duration-200 ${alert.type === 'success'
+                        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                        : 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30'
+                        }`}
                 >
                     <div className="flex items-center gap-2">
                         {alert.type === 'success' ? (
@@ -278,8 +277,8 @@ export default function KnowledgeBaseManagementPage() {
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles className="w-4 h-4 text-amber-300" />
-                                    <span>Unggah & Sinkronkan Dokumen</span>
+                                    <Sparkles className="w-4 h-4 text-white-300" />
+                                    <span>Unggah Dokumen</span>
                                 </>
                             )}
                         </button>

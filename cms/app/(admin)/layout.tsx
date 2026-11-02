@@ -236,7 +236,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     const navigationGroups = [
         {
             key: 'penerimaan',
-            title: 'Penerimaan Siswa',
+            title: 'SPMB',
             items: [
                 {
                     name: 'Data Pendaftar',
@@ -266,7 +266,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         },
         {
             key: 'master',
-            title: 'Master Sistem',
+            title: 'Sistem',
             items: [
                 {
                     name: 'Administrator',
