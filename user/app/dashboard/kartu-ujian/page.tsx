@@ -99,7 +99,7 @@ export default function KartuUjianPage() {
                 const errData = await res.json().catch(() => ({}));
                 setErrorMsg(errData.message || 'Gagal mengunduh kartu ujian. Pastikan status pendaftaran Anda Terverifikasi.');
             }
-        } catch (err) {
+        } catch {
             setErrorMsg('Terjadi kesalahan jaringan saat mengunduh file PDF.');
         } finally {
             setDownloading(false);
@@ -117,7 +117,7 @@ export default function KartuUjianPage() {
                 <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded-lg w-1/3"></div>
                 <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
                 <div className="h-24 bg-emerald-100/60 dark:bg-emerald-950/40 rounded-2xl"></div>
-                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 space-y-4">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-8 space-y-4">
                     <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/4 mx-auto"></div>
                     <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded w-1/3 mx-auto"></div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
@@ -137,25 +137,25 @@ export default function KartuUjianPage() {
     const isVerified = pendaftaran?.status === 'VALID';
 
     return (
-        <div className="space-y-6 font-sans pb-16 animate-in fade-in duration-300">
+        <div className="space-y-5 sm:space-y-6 font-sans pb-16 animate-in fade-in duration-300">
             {/* Header (Hidden on Print) */}
-            <div className="print:hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="print:hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    <h1 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                         Kartu Tanda Peserta Ujian Seleksi PPDB
                     </h1>
-                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
                         Kartu tanda pengenal resmi untuk mengikuti seleksi offline di SMK Muhammadiyah Sekampung
                     </p>
                 </div>
 
                 {isVerified && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-start sm:self-auto w-full sm:w-auto">
                         {/* Paper Mode Toggle */}
                         <button
                             type="button"
                             onClick={() => setPaperMode(!paperMode)}
-                            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                            className="flex-1 sm:flex-initial px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                             title="Beralih antara tampilan kontras tema dan kertas fisik putih"
                         >
                             <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -166,17 +166,17 @@ export default function KartuUjianPage() {
                         <button
                             type="button"
                             onClick={handlePrint}
-                            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                         >
                             <Printer className="w-3.5 h-3.5 text-amber-300" />
-                            <span className="hidden sm:inline">Cetak</span>
+                            <span>Cetak</span>
                         </button>
                     </div>
                 )}
             </div>
 
             {errorMsg && (
-                <div className="print:hidden p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800 text-sm font-medium flex items-center gap-2">
+                <div className="print:hidden p-3.5 sm:p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800 text-xs sm:text-sm font-medium flex items-center gap-2">
                     <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
                     <span>{errorMsg}</span>
                 </div>
@@ -184,13 +184,13 @@ export default function KartuUjianPage() {
 
             {/* Jika BELUM diverifikasi, tampilkan ALERT */}
             {!isVerified ? (
-                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-amber-200 dark:border-amber-900/50 p-6 sm:p-10 shadow-sm space-y-6">
-                    <div className="p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 border border-amber-200 dark:border-amber-700">
-                            <Clock className="w-6 h-6 text-amber-600 dark:text-amber-300" />
+                <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-amber-200 dark:border-amber-900/50 p-4 sm:p-6 md:p-8 lg:p-10 shadow-sm space-y-5 sm:space-y-6">
+                    <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 border border-amber-200 dark:border-amber-700">
+                            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600 dark:text-amber-300" />
                         </div>
                         <div className="space-y-1">
-                            <div className="text-sm font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                            <div className="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
                                 Selesaikan verifikasi dokumen terlebih dahulu
                             </div>
                             <p className="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200/90 leading-relaxed">
@@ -199,8 +199,8 @@ export default function KartuUjianPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                        <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2 hover:border-emerald-500/50 transition">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 sm:pt-2">
+                        <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2 hover:border-emerald-500/50 transition">
                             <div className="flex items-center gap-2 text-xs font-bold uppercase text-slate-800 dark:text-slate-200">
                                 <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                 <span>Langkah 1: Lengkapi Data Diri</span>
@@ -217,7 +217,7 @@ export default function KartuUjianPage() {
                             </Link>
                         </div>
 
-                        <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2 hover:border-emerald-500/50 transition">
+                        <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2 hover:border-emerald-500/50 transition">
                             <div className="flex items-center gap-2 text-xs font-bold uppercase text-slate-800 dark:text-slate-200">
                                 <FileCheck2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                                 <span>Langkah 2: Unggah Berkas & Verifikasi</span>
@@ -237,36 +237,36 @@ export default function KartuUjianPage() {
                 </div>
             ) : (
                 /* Jika SUDAH diverifikasi, tampilkan tombol UNDUH & Pratinjau Kartu Ujian */
-                <div className="space-y-6">
+                <div className="space-y-5 sm:space-y-6">
                     {/* Action Bar (Hidden on Print) */}
-                    <div className="print:hidden p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
+                    <div className="print:hidden p-4 sm:p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+                        <div className="flex items-start sm:items-center gap-3">
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-xs mt-0.5 sm:mt-0">
                                 <CheckCircle2 className="w-5 h-5 text-amber-300" />
                             </div>
                             <div>
-                                <div className="text-sm font-bold text-emerald-950 dark:text-emerald-100 flex items-center gap-2">
+                                <div className="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-100 flex flex-wrap items-center gap-2">
                                     <span>Status: RESMI TERVERIFIKASI</span>
                                     <span className="px-2 py-0.5 text-[10px] bg-emerald-200/80 dark:bg-emerald-800/60 text-emerald-900 dark:text-emerald-100 rounded-full font-mono">
                                         VALID
                                     </span>
                                 </div>
-                                <div className="text-xs text-emerald-800 dark:text-emerald-300 mt-0.5">
+                                <div className="text-[11px] sm:text-xs text-emerald-800 dark:text-emerald-300 mt-0.5 leading-snug">
                                     Kartu tanda peserta ujian resmi telah siap diunduh atau dicetak untuk ujian seleksi offline.
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                        <div className="flex items-center gap-2 w-full md:w-auto">
                             <button
                                 onClick={handleDownloadPdf}
                                 disabled={downloading}
-                                className="w-full sm:w-auto px-5 py-3 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                                className="flex-1 md:flex-initial px-4 sm:px-5 py-2.5 sm:py-3 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
                             >
                                 {downloading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin text-white" />
-                                        <span>Membuat File PDF...</span>
+                                        <span>Membuat PDF...</span>
                                     </>
                                 ) : (
                                     <>
@@ -278,10 +278,10 @@ export default function KartuUjianPage() {
 
                             <button
                                 onClick={handlePrint}
-                                className="px-4 py-3 bg-slate-800 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-sm"
+                                className="px-3.5 sm:px-4 py-2.5 sm:py-3 bg-slate-800 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
                             >
                                 <Printer className="w-4 h-4 text-amber-300" />
-                                <span className="hidden sm:inline">Cetak</span>
+                                <span>Cetak</span>
                             </button>
                         </div>
                     </div>
@@ -289,7 +289,7 @@ export default function KartuUjianPage() {
                     {/* Preview Kartu Ujian (Interactive Preview with Clean Theme & Print Support) */}
                     <div
                         id="kartu-ujian-print-area"
-                        className={`rounded-3xl border shadow-xl p-6 sm:p-10 max-w-3xl mx-auto space-y-6 transition-colors duration-200 ${
+                        className={`rounded-2xl sm:rounded-3xl border shadow-xl p-4 sm:p-6 md:p-8 lg:p-10 max-w-3xl mx-auto space-y-5 sm:space-y-6 transition-colors duration-200 ${
                             paperMode
                                 ? 'bg-white text-slate-900 border-slate-300 shadow-2xl'
                                 : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white border-slate-200 dark:border-emerald-600/40 shadow-xl dark:shadow-2xl dark:shadow-black/70'
@@ -304,11 +304,11 @@ export default function KartuUjianPage() {
                             }`}
                         >
                             {/* Accent line top */}
-                            <div className="h-1 bg-gradient-to-r from-emerald-700 via-amber-400 to-emerald-700 rounded-full mb-4"></div>
+                            <div className="h-1 bg-gradient-to-r from-emerald-700 via-amber-400 to-emerald-700 rounded-full mb-3 sm:mb-4"></div>
 
-                            <div className="flex items-center gap-4 sm:gap-6">
+                            <div className="flex items-center gap-3 sm:gap-5">
                                 {/* School Logo */}
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 p-1 rounded-2xl bg-white shadow-xs border border-slate-100 flex items-center justify-center">
+                                <div className="w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 shrink-0 p-1 rounded-2xl bg-white shadow-xs border border-slate-100 flex items-center justify-center">
                                     <img
                                         src="/logo.png"
                                         alt="Logo SMK Muhammadiyah Sekampung"
@@ -317,18 +317,18 @@ export default function KartuUjianPage() {
                                 </div>
 
                                 {/* School Details */}
-                                <div className="flex-1 text-center sm:text-left min-w-0">
+                                <div className="flex-1 text-left min-w-0">
                                     <div
-                                        className={`text-[10px] sm:text-xs font-extrabold uppercase tracking-wider ${
+                                        className={`text-[9px] sm:text-[11px] md:text-xs font-extrabold uppercase tracking-wider truncate ${
                                             paperMode
                                                 ? 'text-emerald-800'
                                                 : 'text-emerald-800 dark:text-emerald-400'
                                         }`}
                                     >
-                                        MAJELIS PENDIDIKAN DASAR DAN MENENGAH MUHAMMADIYAH
+                                        MAJELIS PENDIDIKAN DASAR DAN MENENGAH
                                     </div>
                                     <h2
-                                        className={`text-base sm:text-xl font-black tracking-tight uppercase leading-snug mt-0.5 ${
+                                        className={`text-sm sm:text-lg md:text-xl font-black tracking-tight uppercase leading-snug mt-0.5 ${
                                             paperMode
                                                 ? 'text-slate-900'
                                                 : 'text-slate-900 dark:text-white'
@@ -337,35 +337,35 @@ export default function KartuUjianPage() {
                                         SMK MUHAMMADIYAH SEKAMPUNG
                                     </h2>
                                     <div
-                                        className={`text-[10px] sm:text-[11px] leading-tight mt-1 ${
+                                        className={`text-[9px] sm:text-[10px] md:text-[11px] leading-tight mt-0.5 sm:mt-1 ${
                                             paperMode
                                                 ? 'text-slate-600'
                                                 : 'text-slate-600 dark:text-slate-300'
                                         }`}
                                     >
-                                        NPSN: 10806085 • Terakreditasi B • Kejuruan: TIK, Otomotif, Seni, Bisnis, Kuliner & Pemesinan
+                                        NPSN: 10806085 • Terakreditasi B • Kejuruan: TIK, Otomotif, Seni, Bisnis, Kuliner & Mesin
                                     </div>
                                     <div
-                                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 ${
+                                        className={`text-[8px] sm:text-[9px] md:text-[10px] leading-tight mt-0.5 line-clamp-1 ${
                                             paperMode
                                                 ? 'text-slate-500'
                                                 : 'text-slate-500 dark:text-slate-400'
                                         }`}
                                     >
-                                        Jl. Raya Sekampung No. 01, Kec. Sekampung, Kab. Lampung Timur 34382 • Telp/WA: 0812-3456-7890
+                                        Jl. Raya Sekampung No. 01, Kec. Sekampung, Lampung Timur 34382 • Telp/WA: 0812-3456-7890
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Title Badge & Verification Ribbon */}
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-                            <span className="inline-block px-4 py-1.5 bg-emerald-700 text-white text-xs font-bold tracking-wider uppercase rounded-lg shadow-2xs">
-                                KARTU TANDA PESERTA UJIAN SELEKSI SPMB TA {tahunAjaran}
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 pt-1">
+                            <span className="w-full sm:w-auto text-center inline-block px-3.5 sm:px-4 py-1.5 bg-emerald-700 text-white text-[11px] sm:text-xs font-bold tracking-wider uppercase rounded-lg shadow-2xs">
+                                KARTU PESERTA UJIAN SELEKSI TA {tahunAjaran}
                             </span>
 
                             <span
-                                className={`text-[11px] font-mono font-bold px-3 py-1 rounded-lg border ${
+                                className={`w-full sm:w-auto text-center text-[11px] font-mono font-bold px-3 py-1 rounded-lg border ${
                                     paperMode
                                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                         : 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800'
@@ -376,166 +376,178 @@ export default function KartuUjianPage() {
                         </div>
 
                         {/* Data Grid & Foto / QR Code */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-1">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 pt-1">
                             {/* 2 Kolom Data */}
-                            <div className="md:col-span-2 space-y-2.5 text-xs sm:text-sm">
+                            <div className="lg:col-span-2 space-y-2 sm:space-y-2.5 text-xs sm:text-sm">
+                                {/* Row 1: Nama Peserta */}
                                 <div
-                                    className={`grid grid-cols-3 py-2 px-3 rounded-lg border-b ${
+                                    className={`flex flex-col sm:grid sm:grid-cols-12 py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-xl border-b gap-1 sm:gap-2 items-start sm:items-center ${
                                         paperMode
                                             ? 'border-slate-200 bg-slate-50/50'
                                             : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
                                     }`}
                                 >
                                     <span
-                                        className={`font-semibold ${
+                                        className={`font-semibold text-xs sm:col-span-4 shrink-0 ${
                                             paperMode
-                                                ? 'text-slate-600'
-                                                : 'text-slate-600 dark:text-slate-300'
+                                                ? 'text-slate-500 sm:text-slate-600'
+                                                : 'text-slate-500 dark:text-slate-400 sm:text-slate-600 sm:dark:text-slate-300'
                                         }`}
                                     >
                                         Nama Peserta
                                     </span>
                                     <span
-                                        className={`col-span-2 font-bold ${
+                                        className={`sm:col-span-8 font-bold text-xs sm:text-sm break-words ${
                                             paperMode
                                                 ? 'text-slate-900'
                                                 : 'text-slate-900 dark:text-white'
                                         }`}
                                     >
-                                        : {pendaftaran?.namaLengkap}
+                                        <span className="hidden sm:inline mr-1.5 text-slate-400 font-normal">:</span>
+                                        {pendaftaran?.namaLengkap}
                                     </span>
                                 </div>
 
+                                {/* Row 2: NISN / NIK */}
                                 <div
-                                    className={`grid grid-cols-3 py-2 px-3 rounded-lg border-b ${
+                                    className={`flex flex-col sm:grid sm:grid-cols-12 py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-xl border-b gap-1 sm:gap-2 items-start sm:items-center ${
                                         paperMode
                                             ? 'border-slate-200 bg-slate-50/50'
                                             : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
                                     }`}
                                 >
                                     <span
-                                        className={`font-semibold ${
+                                        className={`font-semibold text-xs sm:col-span-4 shrink-0 ${
                                             paperMode
-                                                ? 'text-slate-600'
-                                                : 'text-slate-600 dark:text-slate-300'
+                                                ? 'text-slate-500 sm:text-slate-600'
+                                                : 'text-slate-500 dark:text-slate-400 sm:text-slate-600 sm:dark:text-slate-300'
                                         }`}
                                     >
                                         NISN / NIK
                                     </span>
                                     <span
-                                        className={`col-span-2 font-mono font-medium ${
+                                        className={`sm:col-span-8 font-mono font-medium text-xs sm:text-sm break-all ${
                                             paperMode
                                                 ? 'text-slate-800'
                                                 : 'text-slate-800 dark:text-slate-200'
                                         }`}
                                     >
-                                        : {pendaftaran?.nisn} / {pendaftaran?.nik}
+                                        <span className="hidden sm:inline mr-1.5 text-slate-400 font-normal">:</span>
+                                        {pendaftaran?.nisn} / {pendaftaran?.nik}
                                     </span>
                                 </div>
 
+                                {/* Row 3: Sekolah Asal */}
                                 <div
-                                    className={`grid grid-cols-3 py-2 px-3 rounded-lg border-b ${
+                                    className={`flex flex-col sm:grid sm:grid-cols-12 py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-xl border-b gap-1 sm:gap-2 items-start sm:items-center ${
                                         paperMode
                                             ? 'border-slate-200 bg-slate-50/50'
                                             : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
                                     }`}
                                 >
                                     <span
-                                        className={`font-semibold ${
+                                        className={`font-semibold text-xs sm:col-span-4 shrink-0 ${
                                             paperMode
-                                                ? 'text-slate-600'
-                                                : 'text-slate-600 dark:text-slate-300'
+                                                ? 'text-slate-500 sm:text-slate-600'
+                                                : 'text-slate-500 dark:text-slate-400 sm:text-slate-600 sm:dark:text-slate-300'
                                         }`}
                                     >
                                         Sekolah Asal
                                     </span>
                                     <span
-                                        className={`col-span-2 font-medium ${
+                                        className={`sm:col-span-8 font-medium text-xs sm:text-sm break-words ${
                                             paperMode
                                                 ? 'text-slate-800'
                                                 : 'text-slate-800 dark:text-slate-200'
                                         }`}
                                     >
-                                        : {pendaftaran?.sekolahAsal || '-'}
+                                        <span className="hidden sm:inline mr-1.5 text-slate-400 font-normal">:</span>
+                                        {pendaftaran?.sekolahAsal || '-'}
                                     </span>
                                 </div>
 
+                                {/* Row 4: Pilihan Jurusan */}
                                 <div
-                                    className={`grid grid-cols-3 py-2 px-3 rounded-lg border-b ${
+                                    className={`flex flex-col sm:grid sm:grid-cols-12 py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-xl border-b gap-1 sm:gap-2 items-start sm:items-center ${
                                         paperMode
                                             ? 'border-slate-200 bg-slate-50/50'
                                             : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
                                     }`}
                                 >
                                     <span
-                                        className={`font-semibold ${
+                                        className={`font-semibold text-xs sm:col-span-4 shrink-0 ${
                                             paperMode
-                                                ? 'text-slate-600'
-                                                : 'text-slate-600 dark:text-slate-300'
+                                                ? 'text-slate-500 sm:text-slate-600'
+                                                : 'text-slate-500 dark:text-slate-400 sm:text-slate-600 sm:dark:text-slate-300'
                                         }`}
                                     >
                                         Pilihan Jurusan
                                     </span>
                                     <span
-                                        className={`col-span-2 font-bold ${
+                                        className={`sm:col-span-8 font-bold text-xs sm:text-sm break-words ${
                                             paperMode
                                                 ? 'text-emerald-800'
                                                 : 'text-emerald-800 dark:text-emerald-400'
                                         }`}
                                     >
-                                        : {pendaftaran?.jurusan}
+                                        <span className="hidden sm:inline mr-1.5 text-slate-400 font-normal">:</span>
+                                        {pendaftaran?.jurusan}
                                     </span>
                                 </div>
 
+                                {/* Row 5: Jadwal Ujian */}
                                 <div
-                                    className={`grid grid-cols-3 py-2 px-3 rounded-lg border-b ${
+                                    className={`flex flex-col sm:grid sm:grid-cols-12 py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-xl border-b gap-1 sm:gap-2 items-start sm:items-center ${
                                         paperMode
                                             ? 'border-slate-200 bg-slate-50/50'
                                             : 'border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-800/40'
                                     }`}
                                 >
                                     <span
-                                        className={`font-semibold flex items-center gap-1.5 ${
+                                        className={`font-semibold text-xs sm:col-span-4 shrink-0 flex items-center gap-1.5 ${
                                             paperMode
-                                                ? 'text-slate-600'
-                                                : 'text-slate-600 dark:text-slate-300'
+                                                ? 'text-slate-500 sm:text-slate-600'
+                                                : 'text-slate-500 dark:text-slate-400 sm:text-slate-600 sm:dark:text-slate-300'
                                         }`}
                                     >
-                                        <Calendar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                        <Calendar className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                         <span>Jadwal Ujian</span>
                                     </span>
                                     <span
-                                        className={`col-span-2 font-semibold ${
+                                        className={`sm:col-span-8 font-semibold text-xs sm:text-sm break-words ${
                                             paperMode
                                                 ? 'text-slate-900'
                                                 : 'text-slate-900 dark:text-white'
                                         }`}
                                     >
-                                        : {pendaftaran?.jadwalUjian || 'Menunggu penetapan panitia'}
+                                        <span className="hidden sm:inline mr-1.5 text-slate-400 font-normal">:</span>
+                                        {pendaftaran?.jadwalUjian || 'Menunggu penetapan panitia'}
                                     </span>
                                 </div>
 
+                                {/* Row 6: Ruang Ujian */}
                                 <div
-                                    className={`grid grid-cols-3 py-2 px-3 rounded-lg ${
+                                    className={`flex flex-col sm:grid sm:grid-cols-12 py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-xl gap-1 sm:gap-2 items-start sm:items-center ${
                                         paperMode
                                             ? 'bg-slate-50/50'
                                             : 'bg-slate-50/70 dark:bg-slate-800/40'
                                     }`}
                                 >
                                     <span
-                                        className={`font-semibold flex items-center gap-1.5 ${
+                                        className={`font-semibold text-xs sm:col-span-4 shrink-0 flex items-center gap-1.5 ${
                                             paperMode
-                                                ? 'text-slate-600'
-                                                : 'text-slate-600 dark:text-slate-300'
+                                                ? 'text-slate-500 sm:text-slate-600'
+                                                : 'text-slate-500 dark:text-slate-400 sm:text-slate-600 sm:dark:text-slate-300'
                                         }`}
                                     >
-                                        <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                        <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                                         <span>Ruang Ujian</span>
                                     </span>
-                                    <span className="col-span-2">
-                                        : {pendaftaran?.ruangUjian ? (
+                                    <span className="sm:col-span-8">
+                                        <span className="hidden sm:inline mr-1.5 text-slate-400 font-normal">:</span>
+                                        {pendaftaran?.ruangUjian ? (
                                             <span
-                                                className={`font-bold px-2 py-0.5 rounded border text-xs ${
+                                                className={`inline-block font-bold px-2 py-0.5 rounded border text-xs ${
                                                     paperMode
                                                         ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
                                                         : 'text-emerald-800 bg-emerald-50 border-emerald-200 dark:text-emerald-300 dark:bg-emerald-950/60 dark:border-emerald-800'
@@ -545,7 +557,7 @@ export default function KartuUjianPage() {
                                             </span>
                                         ) : (
                                             <span
-                                                className={`italic ${
+                                                className={`italic text-xs ${
                                                     paperMode
                                                         ? 'text-amber-700'
                                                         : 'text-amber-700 dark:text-amber-400'
@@ -560,27 +572,27 @@ export default function KartuUjianPage() {
 
                             {/* 1 Kolom Pas Foto & QR Code */}
                             <div
-                                className={`flex flex-col items-center justify-center gap-4 p-4 rounded-2xl border ${
+                                className={`flex flex-row sm:flex-row lg:flex-col items-center justify-around lg:justify-center gap-4 p-4 rounded-2xl border ${
                                     paperMode
                                         ? 'bg-slate-50 border-slate-200'
                                         : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80'
                                 }`}
                             >
                                 <div
-                                    className={`w-28 h-36 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center p-2 text-xs font-semibold ${
+                                    className={`w-24 h-32 sm:w-28 sm:h-36 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center p-2 text-xs font-semibold shrink-0 ${
                                         paperMode
                                             ? 'border-slate-300 bg-white text-slate-500'
                                             : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                                     }`}
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-1 text-slate-400 dark:text-slate-500 text-xs">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-1 text-slate-400 dark:text-slate-500 text-[11px] sm:text-xs">
                                         3×4
                                     </div>
-                                    <span>Tempel Pas Foto 3x4 Resmi</span>
+                                    <span className="text-[10px] sm:text-xs leading-tight">Tempel Pas Foto 3x4 Resmi</span>
                                 </div>
 
                                 <div
-                                    className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold px-3 py-1.5 rounded-lg border text-center ${
+                                    className={`inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-mono font-bold px-3 py-2 rounded-xl border text-center ${
                                         paperMode
                                             ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                             : 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800'
@@ -594,14 +606,14 @@ export default function KartuUjianPage() {
 
                         {/* Catatan / Tata Tertib */}
                         <div
-                            className={`p-4 rounded-2xl border text-xs space-y-2 leading-relaxed ${
+                            className={`p-4 sm:p-5 rounded-2xl border text-xs space-y-2 leading-relaxed ${
                                 paperMode
                                     ? 'bg-slate-50 border-slate-200 text-slate-700'
                                     : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
                             }`}
                         >
                             <div
-                                className={`font-bold uppercase tracking-wider text-[11px] ${
+                                className={`font-bold uppercase tracking-wider text-[11px] sm:text-xs ${
                                     paperMode
                                         ? 'text-slate-900'
                                         : 'text-slate-900 dark:text-white'
@@ -609,7 +621,7 @@ export default function KartuUjianPage() {
                             >
                                 TATA TERTIB UJIAN SELEKSI OFFLINE:
                             </div>
-                            <ol className="list-decimal pl-4 space-y-1">
+                            <ol className="list-decimal pl-4 space-y-1.5 text-[11px] sm:text-xs">
                                 <li>Wajib membawa cetakan Kartu Peserta Ujian ini yang telah ditempel pas foto 3x4 berwarna.</li>
                                 <li>Hadir di lokasi kampus SMK Muhammadiyah Sekampung paling lambat 15 menit sebelum ujian dimulai.</li>
                                 <li>Mengenakan pakaian seragam sekolah asal (SMP/MTs) rapi, sopan, dan bersepatu.</li>
@@ -618,11 +630,11 @@ export default function KartuUjianPage() {
                         </div>
 
                         {/* Tanda Tangan Panitia (Print Only or Preview Bottom) */}
-                        <div className="pt-4 flex justify-between items-end text-xs">
-                            <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+                        <div className="pt-4 flex flex-col-reverse sm:flex-row justify-between items-center sm:items-end gap-4 text-xs">
+                            <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono text-center sm:text-left">
                                 Dicetak otomatis melalui Portal SPMB MUSKA
                             </div>
-                            <div className="text-center space-y-8">
+                            <div className="text-center space-y-6 sm:space-y-8">
                                 <div
                                     className={`font-medium ${
                                         paperMode

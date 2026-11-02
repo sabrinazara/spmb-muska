@@ -210,17 +210,17 @@ export default function LandingHeader({
           </div>
         </div>
 
-        {/* 2. MAIN NAVBAR (FLOATING PILL ON SCROLL) */}
+        {/* 2. MAIN NAVBAR (FULL WIDTH ON TOP, FLOATING PILL ON SCROLL) */}
         <div
-          className={`transition-all duration-300 pointer-events-none ${isScrolled
-            ? 'pt-2.5 sm:pt-4 px-3 sm:px-6 lg:px-8'
-            : 'pt-0 px-0'
+          className={`transition-all duration-300 ${isScrolled
+            ? 'pt-2.5 sm:pt-4 px-3 sm:px-6 lg:px-8 pointer-events-none'
+            : 'pt-0 px-0 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-2xs pointer-events-auto'
             }`}
         >
           <div
-            className={`max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4 transition-all duration-300 pointer-events-auto ${isScrolled
-              ? 'h-16 sm:h-18 px-3.5 sm:px-6 rounded-2xl sm:rounded-3xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-xl shadow-slate-900/8 dark:shadow-black/50'
-              : 'h-18 sm:h-20 px-4 sm:px-8 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-2xs'
+            className={`max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4 transition-all duration-300 ${isScrolled
+              ? 'h-16 sm:h-18 px-3.5 sm:px-6 rounded-2xl sm:rounded-3xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 shadow-xl shadow-slate-900/8 dark:shadow-black/50 pointer-events-auto'
+              : 'h-18 sm:h-20 px-4 sm:px-8 bg-transparent'
               }`}
           >
             {/* Brand Logo & Name With Typewriter Effect */}

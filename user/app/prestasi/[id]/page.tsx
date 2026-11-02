@@ -141,8 +141,8 @@ export default function PrestasiDetailPage({ params }: PageProps) {
         {/* HEADER */}
         <LandingHeader activeMenu="prestasi" isHome={false} profil={profil} />
 
-        <main className="pt-28 pb-20">
-          <div className="max-w-4xl mx-auto px-4 sm:px-8 space-y-8">
+        <main className="pt-5 sm:pt-6 pb-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-8 space-y-6 sm:space-y-8">
             {/* BREADCRUMB */}
             <nav className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <Link href="/" className="hover:text-emerald-600 transition-colors">

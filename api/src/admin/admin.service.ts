@@ -557,9 +557,9 @@ export class AdminService {
     /**
      * Mengambil riwayat Audit Trail panitia
      */
-    async getAuditLogs() {
+    async getAuditLogs(limit: number = 250) {
         return this.prisma.auditLog.findMany({
-            take: 50,
+            take: limit,
             orderBy: { createdAt: 'desc' },
         });
     }

@@ -130,8 +130,8 @@ export class AdminController {
     }
 
     @Get('audit-logs')
-    async getAuditLogs() {
-        return this.adminService.getAuditLogs();
+    async getAuditLogs(@Query('limit') limit?: number) {
+        return this.adminService.getAuditLogs(limit ? Number(limit) : 250);
     }
 
     @Delete('audit-logs')
